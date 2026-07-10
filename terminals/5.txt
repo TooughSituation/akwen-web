@@ -1,0 +1,45 @@
+---
+pid: 23664
+cwd: "C:\Users\user\akwen-web"
+command: "$env:PATH = \"C:\\Program Files\\nodejs;\" + $env:PATH; Set-Location \"C:\\Users\\user\\akwen-web\"; npm.cmd run build"
+started_at: 2026-07-10T10:10:29.909Z
+running_for_ms: 2335009  
+---
+
+> akwen-web@0.1.0 build
+> next build --turbopack
+
+   ▲ Next.js 15.5.20 (Turbopack)
+
+   Creating an optimized production build ...
+ ✓ Finished writing to disk in 87ms
+ ✓ Compiled successfully in 7.2s
+   Linting and checking validity of types ...
+   Collecting page data ...
+   Generating static pages (0/10) ...
+   Generating static pages (2/10) 
+   Generating static pages (4/10) 
+   Generating static pages (7/10) 
+ ✓ Generating static pages (10/10)
+   Finalizing page optimization ...
+   Collecting build traces ...
+
+Route (app)                         Size  First Load JS
+┌ ○ /                            5.26 kB         160 kB
+├ ○ /_not-found                      0 B         155 kB
+├ ○ /b2b                             0 B         155 kB
+├ ○ /kontakt                         0 B         155 kB
+├ ○ /o-nas                           0 B         155 kB
+├ ○ /oferta                          0 B         155 kB
+└ ○ /produkty                        0 B         155 kB
++ First Load JS shared by all     166 kB
+  ├ chunks/475395bf1b7ea74b.js   22.1 kB
+  ├ chunks/7625966760a80180.js   59.2 kB
+  ├ chunks/8082ab48faca5ea1.js   17.2 kB
+  └ chunks/bbb16867b8c45d57.js   32.8 kB
+  ├ chunks/a27bd635d2fdb8f2.css  11.3 kB
+  └ other shared chunks (total)  23.6 kB
+
+
+○  (Static)  prerendered as static content
+

@@ -1,0 +1,8 @@
+---
+pid: 23856
+cwd: "C:\Users\user\akwen-web"
+command: "$env:PATH = \"C:\\Program Files\\nodejs;\" + $env:PATH; curl.exe -s -o NUL -w \"%{http_code}\" http://localhost:3000; Start-Sleep -Seconds 8; curl.exe -s -o NUL -w \" %{http_code}\" http://localhost:3000"
+started_at: 2026-07-10T10:16:53.389Z
+running_for_ms: 1950000  
+---
+200 200

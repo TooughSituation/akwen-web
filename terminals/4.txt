@@ -1,0 +1,322 @@
+---
+pid: 20884
+cwd: "C:\Users\user\akwen-web"
+command: "$env:PATH = \"C:\\Program Files\\nodejs;\" + $env:PATH; Set-Location \"C:\\Users\\user\\akwen-web\"; npm.cmd run dev"
+started_at: 2026-07-10T09:55:07.254Z
+running_for_ms: 3270004  
+---
+
+> akwen-web@0.1.0 dev
+> next dev --turbopack
+
+   ▲ Next.js 15.5.20 (Turbopack)
+   - Local:        http://localhost:3000
+   - Network:      http://192.168.0.13:3000
+
+ ✓ Starting...
+ ✓ Ready in 2.6s
+ ○ Compiling / ...
+ ✓ Compiled / in 10.7s
+ GET / 200 in 12399ms
+ ○ Compiling /favicon.ico ...
+ ✓ Compiled /favicon.ico in 720ms
+ GET /favicon.ico?favicon.0b3bf435.ico 200 in 1161ms
+ GET / 200 in 525ms
+ ○ Compiling /oferta ...
+ ✓ Compiled /oferta in 1079ms
+ GET /oferta 200 in 1317ms
+ ○ Compiling /produkty ...
+ ✓ Compiled /produkty in 918ms
+ GET /produkty 200 in 1097ms
+ ○ Compiling /kontakt ...
+ ✓ Compiled /kontakt in 853ms
+ GET /kontakt 200 in 1061ms
+ ○ Compiling /o-nas ...
+ ✓ Compiled /o-nas in 926ms
+ GET /o-nas 200 in 1196ms
+ GET / 200 in 312ms
+ GET /produkty 200 in 267ms
+ GET / 200 in 203ms
+ GET /oferta 200 in 237ms
+ GET /oferta 200 in 282ms
+ GET /produkty 200 in 279ms
+ ✓ Compiled in 232ms
+ ✓ Compiled in 119ms
+ ✓ Compiled in 279ms
+ ✓ Compiled /produkty in 97ms
+ GET /produkty 200 in 575ms
+ GET /produkty 200 in 290ms
+ ✓ Compiled in 1513ms
+ GET /produkty 200 in 212ms
+ GET /produkty 200 in 220ms
+ GET /produkty 200 in 220ms
+ ✓ Compiled in 483ms
+ ✓ Compiled /produkty in 86ms
+ GET /produkty 200 in 385ms
+ GET /produkty 200 in 325ms
+ GET /produkty 200 in 258ms
+ GET /produkty 200 in 247ms
+ GET /produkty 200 in 239ms
+ GET /produkty 200 in 267ms
+ GET /produkty 200 in 260ms
+ ⨯ [Error: ENOENT: no such file or directory, open 'C:\Users\user\akwen-web\.next\static\development\_buildManifest.js.tmp.987f2989k0s'] {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'C:\\Users\\user\\akwen-web\\.next\\static\\development\\_buildManifest.js.tmp.987f2989k0s'
+}
+ ○ Compiling /_error ...
+ ✓ Compiled /_error in 2.4s
+ ⨯ [Error: ENOENT: no such file or directory, open 'C:\Users\user\akwen-web\.next\static\development\_buildManifest.js.tmp.a5roq5kj1mk'] {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'C:\\Users\\user\\akwen-web\\.next\\static\\development\\_buildManifest.js.tmp.a5roq5kj1mk'
+}
+[Error: ENOENT: no such file or directory, open 'C:\Users\user\akwen-web\.next\static\development\_buildManifest.js.tmp.987f2989k0s'] {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'C:\\Users\\user\\akwen-web\\.next\\static\\development\\_buildManifest.js.tmp.987f2989k0s'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open 'C:\Users\user\akwen-web\.next\static\development\_buildManifest.js.tmp.rgtuzb88uer'] {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'C:\\Users\\user\\akwen-web\\.next\\static\\development\\_buildManifest.js.tmp.rgtuzb88uer'
+}
+[Error: ENOENT: no such file or directory, open 'C:\Users\user\akwen-web\.next\static\development\_buildManifest.js.tmp.9mf9l25leab'] {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'C:\\Users\\user\\akwen-web\\.next\\static\\development\\_buildManifest.js.tmp.9mf9l25leab'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open 'C:\Users\user\akwen-web\.next\static\development\_buildManifest.js.tmp.si1hx6kgg5'] {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'C:\\Users\\user\\akwen-web\\.next\\static\\development\\_buildManifest.js.tmp.si1hx6kgg5'
+}
+ ✓ Compiled / in 59ms
+ ⨯ [Error: ENOENT: no such file or directory, open 'C:\Users\user\akwen-web\.next\static\development\_buildManifest.js.tmp.4yiz42ee7f7'] {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'C:\\Users\\user\\akwen-web\\.next\\static\\development\\_buildManifest.js.tmp.4yiz42ee7f7'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open 'C:\Users\user\akwen-web\.next\static\development\_buildManifest.js.tmp.xkiqn5e4mkp'] {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'C:\\Users\\user\\akwen-web\\.next\\static\\development\\_buildManifest.js.tmp.xkiqn5e4mkp'
+}
+[Error: ENOENT: no such file or directory, open 'C:\Users\user\akwen-web\.next\static\development\_buildManifest.js.tmp.4yiz42ee7f7'] {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'C:\\Users\\user\\akwen-web\\.next\\static\\development\\_buildManifest.js.tmp.4yiz42ee7f7'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open 'C:\Users\user\akwen-web\.next\static\development\_buildManifest.js.tmp.eqajvnzopl'] {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'C:\\Users\\user\\akwen-web\\.next\\static\\development\\_buildManifest.js.tmp.eqajvnzopl'
+}
+[Error: ENOENT: no such file or directory, open 'C:\Users\user\akwen-web\.next\static\development\_buildManifest.js.tmp.41ldhnn4dqx'] {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'C:\\Users\\user\\akwen-web\\.next\\static\\development\\_buildManifest.js.tmp.41ldhnn4dqx'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open 'C:\Users\user\akwen-web\.next\static\development\_buildManifest.js.tmp.9ydmvlt9huf'] {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'C:\\Users\\user\\akwen-web\\.next\\static\\development\\_buildManifest.js.tmp.9ydmvlt9huf'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open 'C:\Users\user\akwen-web\.next\static\development\_buildManifest.js.tmp.sx1t1k310uh'] {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'C:\\Users\\user\\akwen-web\\.next\\static\\development\\_buildManifest.js.tmp.sx1t1k310uh'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open 'C:\Users\user\akwen-web\.next\static\development\_buildManifest.js.tmp.vfn387fnxch'] {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'C:\\Users\\user\\akwen-web\\.next\\static\\development\\_buildManifest.js.tmp.vfn387fnxch'
+}
+[Error: ENOENT: no such file or directory, open 'C:\Users\user\akwen-web\.next\static\development\_buildManifest.js.tmp.sx1t1k310uh'] {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'C:\\Users\\user\\akwen-web\\.next\\static\\development\\_buildManifest.js.tmp.sx1t1k310uh'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open 'C:\Users\user\akwen-web\.next\static\development\_buildManifest.js.tmp.g52w6j9jegm'] {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'C:\\Users\\user\\akwen-web\\.next\\static\\development\\_buildManifest.js.tmp.g52w6j9jegm'
+}
+[Error: ENOENT: no such file or directory, open 'C:\Users\user\akwen-web\.next\static\development\_buildManifest.js.tmp.851zfejfvfs'] {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'C:\\Users\\user\\akwen-web\\.next\\static\\development\\_buildManifest.js.tmp.851zfejfvfs'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open 'C:\Users\user\akwen-web\.next\static\development\_buildManifest.js.tmp.9ho31ywb9u9'] {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'C:\\Users\\user\\akwen-web\\.next\\static\\development\\_buildManifest.js.tmp.9ho31ywb9u9'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open 'C:\Users\user\akwen-web\.next\static\development\_buildManifest.js.tmp.fvne3pdo8ob'] {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'C:\\Users\\user\\akwen-web\\.next\\static\\development\\_buildManifest.js.tmp.fvne3pdo8ob'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open 'C:\Users\user\akwen-web\.next\static\development\_buildManifest.js.tmp.qu7jfzdedpj'] {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'C:\\Users\\user\\akwen-web\\.next\\static\\development\\_buildManifest.js.tmp.qu7jfzdedpj'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open 'C:\Users\user\akwen-web\.next\static\development\_buildManifest.js.tmp.jrr3m6r0oyh'] {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'C:\\Users\\user\\akwen-web\\.next\\static\\development\\_buildManifest.js.tmp.jrr3m6r0oyh'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open 'C:\Users\user\akwen-web\.next\static\development\_buildManifest.js.tmp.i04iz6cfxh'] {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'C:\\Users\\user\\akwen-web\\.next\\static\\development\\_buildManifest.js.tmp.i04iz6cfxh'
+}
+[Error: ENOENT: no such file or directory, open 'C:\Users\user\akwen-web\.next\static\development\_buildManifest.js.tmp.jrr3m6r0oyh'] {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'C:\\Users\\user\\akwen-web\\.next\\static\\development\\_buildManifest.js.tmp.jrr3m6r0oyh'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open 'C:\Users\user\akwen-web\.next\static\development\_buildManifest.js.tmp.x3cbirh5af'] {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'C:\\Users\\user\\akwen-web\\.next\\static\\development\\_buildManifest.js.tmp.x3cbirh5af'
+}
+[Error: ENOENT: no such file or directory, open 'C:\Users\user\akwen-web\.next\static\development\_buildManifest.js.tmp.t7yog872fri'] {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'C:\\Users\\user\\akwen-web\\.next\\static\\development\\_buildManifest.js.tmp.t7yog872fri'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open 'C:\Users\user\akwen-web\.next\static\development\_buildManifest.js.tmp.sexudu7qib'] {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'C:\\Users\\user\\akwen-web\\.next\\static\\development\\_buildManifest.js.tmp.sexudu7qib'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open 'C:\Users\user\akwen-web\.next\static\development\_buildManifest.js.tmp.81tysvbwwer'] {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'C:\\Users\\user\\akwen-web\\.next\\static\\development\\_buildManifest.js.tmp.81tysvbwwer'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open 'C:\Users\user\akwen-web\.next\static\development\_buildManifest.js.tmp.9unq07u7i6w'] {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'C:\\Users\\user\\akwen-web\\.next\\static\\development\\_buildManifest.js.tmp.9unq07u7i6w'
+}
+[Error: ENOENT: no such file or directory, open 'C:\Users\user\akwen-web\.next\static\development\_buildManifest.js.tmp.81tysvbwwer'] {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'C:\\Users\\user\\akwen-web\\.next\\static\\development\\_buildManifest.js.tmp.81tysvbwwer'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open 'C:\Users\user\akwen-web\.next\static\development\_buildManifest.js.tmp.3ym6dwsymnb'] {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'C:\\Users\\user\\akwen-web\\.next\\static\\development\\_buildManifest.js.tmp.3ym6dwsymnb'
+}
+[Error: ENOENT: no such file or directory, open 'C:\Users\user\akwen-web\.next\static\development\_buildManifest.js.tmp.blx6lgsqr27'] {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'C:\\Users\\user\\akwen-web\\.next\\static\\development\\_buildManifest.js.tmp.blx6lgsqr27'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open 'C:\Users\user\akwen-web\.next\static\development\_buildManifest.js.tmp.qx7q3krsina'] {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'C:\\Users\\user\\akwen-web\\.next\\static\\development\\_buildManifest.js.tmp.qx7q3krsina'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open 'C:\Users\user\akwen-web\.next\static\development\_buildManifest.js.tmp.wrznby9udmk'] {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'C:\\Users\\user\\akwen-web\\.next\\static\\development\\_buildManifest.js.tmp.wrznby9udmk'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open 'C:\Users\user\akwen-web\.next\static\development\_buildManifest.js.tmp.wlkjrnj8xas'] {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'C:\\Users\\user\\akwen-web\\.next\\static\\development\\_buildManifest.js.tmp.wlkjrnj8xas'
+}
+[Error: ENOENT: no such file or directory, open 'C:\Users\user\akwen-web\.next\static\development\_buildManifest.js.tmp.wrznby9udmk'] {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'C:\\Users\\user\\akwen-web\\.next\\static\\development\\_buildManifest.js.tmp.wrznby9udmk'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open 'C:\Users\user\akwen-web\.next\static\development\_buildManifest.js.tmp.somcy9x89zn'] {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'C:\\Users\\user\\akwen-web\\.next\\static\\development\\_buildManifest.js.tmp.somcy9x89zn'
+}
+[Error: ENOENT: no such file or directory, open 'C:\Users\user\akwen-web\.next\static\development\_buildManifest.js.tmp.qejdrgk96r'] {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'C:\\Users\\user\\akwen-web\\.next\\static\\development\\_buildManifest.js.tmp.qejdrgk96r'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open 'C:\Users\user\akwen-web\.next\static\development\_buildManifest.js.tmp.lj0w30brkzn'] {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'C:\\Users\\user\\akwen-web\\.next\\static\\development\\_buildManifest.js.tmp.lj0w30brkzn'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open 'C:\Users\user\akwen-web\.next\static\development\_buildManifest.js.tmp.0m8ukpu3u15'] {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'C:\\Users\\user\\akwen-web\\.next\\static\\development\\_buildManifest.js.tmp.0m8ukpu3u15'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open 'C:\Users\user\akwen-web\.next\static\development\_buildManifest.js.tmp.bf1et86fmxw'] {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'C:\\Users\\user\\akwen-web\\.next\\static\\development\\_buildManifest.js.tmp.bf1et86fmxw'
+}
+[Error: ENOENT: no such file or directory, open 'C:\Users\user\akwen-web\.next\static\development\_buildManifest.js.tmp.0m8ukpu3u15'] {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'C:\\Users\\user\\akwen-web\\.next\\static\\development\\_buildManifest.js.tmp.0m8ukpu3u15'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open 'C:\Users\user\akwen-web\.next\static\development\_buildManifest.js.tmp.nmzx6v3558n'] {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'C:\\Users\\user\\akwen-web\\.next\\static\\development\\_buildManifest.js.tmp.nmzx6v3558n'
+}
+[Error: ENOENT: no such file or directory, open 'C:\Users\user\akwen-web\.next\static\development\_buildManifest.js.tmp.zcmc6scmncr'] {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'C:\\Users\\user\\akwen-web\\.next\\static\\development\\_buildManifest.js.tmp.zcmc6scmncr'
+}

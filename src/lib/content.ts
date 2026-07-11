@@ -13,7 +13,7 @@ export const assets = {
     up: "/images/ornament-up.png",
     down: "/images/ornament-down.png",
   },
-  lithuanianProducts: "/images/oferta_litewskie.png",
+  lithuanianProducts: "/images/oferta-litewskie.png",
   awards: {
     gazela: "/images/gazele-biznesu.png",
     kpo: "/images/pcdr.png",

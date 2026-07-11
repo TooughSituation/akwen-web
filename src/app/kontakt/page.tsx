@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { PageHeader } from "@/components/page-header";
 import { Button } from "@/components/ui/button";
@@ -8,7 +9,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { company, aboutText } from "@/lib/content";
+import { company, aboutText, assets } from "@/lib/content";
 import { MapPin, Phone, Mail, ExternalLink } from "lucide-react";
 
 export default function KontaktPage() {
@@ -99,6 +100,19 @@ export default function KontaktPage() {
               </Button>
             </CardContent>
           </Card>
+        </div>
+
+        <div className="mt-12 flex flex-col items-center gap-6 rounded-2xl border border-border bg-muted/30 p-8">
+          <Image
+            src={assets.map}
+            alt="Mapa zasięgu działania Akwen — północno-wschodnia Polska"
+            width={480}
+            height={430}
+            className="h-auto w-full max-w-md"
+          />
+          <p className="max-w-xl text-center text-muted-foreground">
+            {aboutText.coverage}
+          </p>
         </div>
       </section>
     </>

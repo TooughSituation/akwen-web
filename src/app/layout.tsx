@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Inter, Playfair_Display, Montserrat } from "next/font/google";
 import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
 import { ThemeProvider } from "@/components/theme-provider";
@@ -8,6 +8,18 @@ import "./globals.css";
 const inter = Inter({
   variable: "--font-sans",
   subsets: ["latin", "latin-ext"],
+});
+
+const playfair = Playfair_Display({
+  variable: "--font-heading",
+  subsets: ["latin", "latin-ext"],
+  weight: ["400", "500", "600", "700"],
+});
+
+const montserrat = Montserrat({
+  variable: "--font-display",
+  subsets: ["latin", "latin-ext"],
+  weight: ["500", "600", "700"],
 });
 
 export const metadata: Metadata = {
@@ -23,7 +35,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="pl" suppressHydrationWarning>
-      <body className={`${inter.variable} min-h-screen antialiased`}>
+      <body
+        className={`${inter.variable} ${playfair.variable} ${montserrat.variable} min-h-screen antialiased`}
+      >
         <ThemeProvider>
           <div className="flex min-h-screen flex-col">
             <Header />

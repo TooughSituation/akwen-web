@@ -1,8 +1,10 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Menu, Fish } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
@@ -24,27 +26,53 @@ const navItems = [
 
 export function Header() {
   const pathname = usePathname();
+  const isHome = pathname === "/";
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 24);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  const isTransparent = isHome && !scrolled;
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border/60 bg-background/90 backdrop-blur-md">
-      <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6 lg:px-8">
-        <Link href="/" className="flex items-center gap-2 font-semibold tracking-tight">
-          <div className="flex size-9 items-center justify-center rounded-lg bg-navy-900 text-white dark:bg-turquoise-600">
-            <Fish className="size-5" />
-          </div>
-          <span className="text-lg text-navy-900 dark:text-foreground">Akwen</span>
+    <header
+      className={cn(
+        "sticky top-0 z-50 w-full transition-all duration-300",
+        isTransparent
+          ? "border-b border-white/10 bg-navy-900/20 backdrop-blur-sm"
+          : "border-b border-navy-800/50 bg-navy-900/95 shadow-lg shadow-navy-950/20 backdrop-blur-md"
+      )}
+    >
+      <div className="mx-auto flex h-[4.5rem] max-w-6xl items-center justify-between px-4 sm:px-6 lg:px-8">
+        <Link href="/" className="relative flex shrink-0 items-center">
+          <Image
+            src="/images/logo-white.png"
+            alt="Akwen"
+            width={140}
+            height={48}
+            className="h-10 w-auto object-contain sm:h-11"
+            priority
+          />
         </Link>
 
-        <nav className="hidden items-center gap-1 lg:flex">
+        <nav className="hidden items-center gap-0.5 lg:flex">
           {navItems.map((item) => (
             <Link
               key={item.href}
               href={item.href}
               className={cn(
-                "rounded-md px-3 py-2 text-sm font-medium transition-colors hover:bg-muted hover:text-foreground",
-                pathname === item.href
-                  ? "bg-muted text-foreground"
-                  : "text-muted-foreground"
+                "rounded-md px-3.5 py-2 text-sm font-medium transition-colors",
+                isTransparent
+                  ? "text-white/85 hover:bg-white/10 hover:text-white"
+                  : "text-ocean-100 hover:bg-white/10 hover:text-white",
+                pathname === item.href &&
+                  (isTransparent
+                    ? "bg-white/15 text-white"
+                    : "bg-turquoise-500/20 text-white")
               )}
             >
               {item.label}
@@ -52,29 +80,49 @@ export function Header() {
           ))}
         </nav>
 
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-2">
           <Button
-            variant="outline"
             size="sm"
-            className="hidden border-turquoise-500/40 text-turquoise-600 hover:bg-turquoise-500/10 md:inline-flex"
+            className="hidden bg-coral-500 text-white hover:bg-coral-400 md:inline-flex"
             render={<Link href="/b2b" />}
           >
-            Platforma B2B
+            Portal B2B
           </Button>
-          <ThemeToggle />
-
+          <ThemeToggle
+            className={cn(
+              isTransparent
+                ? "text-white hover:bg-white/10 hover:text-white"
+                : "text-ocean-100 hover:bg-white/10 hover:text-white"
+            )}
+          />
           <Sheet>
             <SheetTrigger
-              render={<Button variant="ghost" size="icon" className="lg:hidden" />}
+              render={
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className={cn(
+                    "lg:hidden",
+                    isTransparent
+                      ? "text-white hover:bg-white/10"
+                      : "text-ocean-100 hover:bg-white/10"
+                  )}
+                />
+              }
             >
               <Menu className="size-5" />
               <span className="sr-only">Otwórz menu</span>
             </SheetTrigger>
-            <SheetContent side="right" className="w-72">
+            <SheetContent side="right" className="w-72 border-navy-800 bg-navy-900">
               <SheetHeader>
-                <SheetTitle className="flex items-center gap-2">
-                  <Fish className="size-5 text-turquoise-600" />
-                  Akwen
+                <SheetTitle>
+                  <Image
+                    src="/images/logo-white.png"
+                    alt="Akwen"
+                    width={120}
+                    height={40}
+                    className="h-9 w-auto"
+                  />
                 </SheetTitle>
               </SheetHeader>
               <nav className="flex flex-col gap-1 px-4">
@@ -83,10 +131,10 @@ export function Header() {
                     key={item.href}
                     href={item.href}
                     className={cn(
-                      "rounded-md px-3 py-2.5 text-sm font-medium transition-colors hover:bg-muted",
+                      "rounded-md px-3 py-2.5 text-sm font-medium transition-colors hover:bg-white/10",
                       pathname === item.href
-                        ? "bg-muted text-foreground"
-                        : "text-muted-foreground"
+                        ? "bg-turquoise-500/20 text-white"
+                        : "text-ocean-100"
                     )}
                   >
                     {item.label}
@@ -94,9 +142,9 @@ export function Header() {
                 ))}
                 <Link
                   href="/b2b"
-                  className="mt-2 rounded-md border border-turquoise-500/40 px-3 py-2.5 text-center text-sm font-medium text-turquoise-600 hover:bg-turquoise-500/10"
+                  className="mt-3 rounded-md bg-coral-500 px-3 py-2.5 text-center text-sm font-semibold text-white hover:bg-coral-400"
                 >
-                  Platforma B2B
+                  Portal B2B
                 </Link>
               </nav>
             </SheetContent>

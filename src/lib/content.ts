@@ -1,8 +1,40 @@
+export const assets = {
+  logo: "/images/logo.png",
+  logoWhite: "/images/logo-white.png",
+  hero: "/images/bg-hero.jpg",
+  map: "/images/mapka.png",
+  bgMap: "/images/bg-map.jpg",
+  partnerLogos: [
+    "/images/loga-1.png",
+    "/images/loga-2.png",
+    "/images/loga-3.png",
+  ],
+  ornaments: {
+    up: "/images/ornament-up.png",
+    down: "/images/ornament-down.png",
+  },
+  lithuanianProducts: "/images/oferta_litewskie.png",
+  awards: {
+    gazela: "/images/gazele-biznesu.png",
+    kpo: "/images/pcdr.png",
+    poRyby: "/images/po-ryby.png",
+  },
+  euLogos: {
+    ue: "/images/loga-ue.png",
+    kpo: "/images/logo-kpo.png",
+    poRyby: "/images/po-ryby.png",
+  },
+} as const;
+
 export const company = {
   name: "AKWEN Sp. z o.o.",
+  heroTitle: "Morskie opowieści",
+  heroSubtitle:
+    "Dzięki nam świeże, pyszne ryby z całego świata trafiają na Twój stół.",
   slogan:
     "Dzięki nam świeże, pyszne ryby z całego świata trafiają na Twój stół.",
-  heroSubtitle: "Morskie opowieści",
+  b2bUrl: "https://b2b.akwen.bialystok.pl",
+  b2bNote: "wkrótce dostępna dla naszych partnerów handlowych",
   address: {
     street: "ul. Tkacka 9",
     city: "15-689 Białystok",
@@ -19,7 +51,8 @@ export const company = {
 };
 
 export const aboutText = {
-  headline: "Na morzach i oceanach całego świata wypatrujemy dla Ciebie najlepszych ryb",
+  headline:
+    "Na morzach i oceanach całego świata wypatrujemy dla Ciebie najlepszych ryb",
   since: "AKWEN kontynuuje działalność w branży rybnej od 1991 roku.",
   paragraphs: [
     "Zajmujemy się dystrybucją ryb i przetworów rybnych na terenie północno-wschodniej Polski oraz części województwa mazowieckiego. Bezpośrednio współpracujemy z czołowymi producentami ryb wędzonych, przetworów i konserw rybnych oraz importerami ryb mrożonych. Dystrybuujemy także produkty rybne lokalnych producentów.",
@@ -40,24 +73,28 @@ export const offerCategories = [
     description:
       "Szeroki asortyment ryb mrożonych od czołowych importerów. Stała dostępność i pełna kontrola łańcucha chłodniczego.",
     icon: "snowflake" as const,
+    image: "/images/oferta_mrozone.jpg",
   },
   {
     title: "Ryby wędzone",
     description:
       "Produkty od renomowanych wędzarni – klasyka smaku i najwyższa jakość wędzenia.",
     icon: "flame" as const,
+    image: "/images/oferta_wedzone.jpg",
   },
   {
     title: "Konserwy",
     description:
       "Konserwy rybne własnej marki BMC oraz produktów partnerskich – gotowe do sprzedaży detalicznej i hurtowej.",
     icon: "package" as const,
+    image: "/images/oferta_konserwy.jpg",
   },
   {
     title: "Przetwory rybne",
     description:
       "Szeroki wybór przetworów rybnych od lokalnych i międzynarodowych producentów.",
     icon: "fish" as const,
+    image: "/images/oferta_przetwory.jpg",
   },
 ];
 
@@ -88,9 +125,28 @@ export const lithuanianBrands = [
   },
 ];
 
+export const lithuanianIntro =
+  "Jesteśmy wyłącznym dystrybutorem produktów litewskich firm Dauparų žuvis i Norvelita. Dystrybuujemy również produkty Vičiūnai Group oraz ICECO žuvis.";
+
 export const awards = [
-  "Gazela Biznesu 2011 – Puls Biznesu",
-  "Orzeł Dystrybucji FMCG 2014–2015 – Życie Handlowe",
-  "KPO – Krajowy Plan Odbudowy",
-  "PO RYBY 2007–2013",
+  {
+    label: "Gazela Biznesu 2011 – Puls Biznesu",
+    image: assets.awards.gazela,
+    alt: "Gazela Biznesu 2011",
+  },
+  {
+    label: "Orzeł Dystrybucji FMCG 2014–2015 – Życie Handlowe",
+    image: assets.awards.gazela,
+    alt: "Orzeł Dystrybucji FMCG",
+  },
+  {
+    label: "KPO – Krajowy Plan Odbudowy",
+    image: assets.awards.kpo,
+    alt: "Krajowy Plan Odbudowy",
+  },
+  {
+    label: "PO RYBY 2007–2013",
+    image: assets.awards.poRyby,
+    alt: "PO RYBY 2007-2013",
+  },
 ];

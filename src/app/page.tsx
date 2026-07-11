@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import {
   Snowflake,
@@ -5,10 +6,10 @@ import {
   Package,
   Fish,
   ArrowRight,
-  Award,
   ExternalLink,
 } from "lucide-react";
 import { Hero } from "@/components/hero";
+import { PartnerLogos } from "@/components/partner-logos";
 import { SectionHeading } from "@/components/section-heading";
 import { WaveDivider } from "@/components/wave-divider";
 import { Button } from "@/components/ui/button";
@@ -24,7 +25,9 @@ import {
   aboutText,
   offerCategories,
   lithuanianBrands,
+  lithuanianIntro,
   awards,
+  assets,
   company,
 } from "@/lib/content";
 
@@ -39,43 +42,62 @@ export default function Home() {
   return (
     <>
       <Hero />
+      <PartnerLogos />
 
       {/* O nas – skrót */}
-      <section className="mx-auto max-w-6xl px-4 py-20 sm:px-6 lg:px-8">
-        <SectionHeading
-          label="O nas"
-          title={aboutText.headline}
-          description={aboutText.since}
-        />
-        <div className="mt-12 grid gap-8 lg:grid-cols-2 lg:items-center">
-          <div className="space-y-4 text-muted-foreground">
-            <p>{aboutText.paragraphs[0]}</p>
-            <p>{aboutText.paragraphs[1]}</p>
-            <p>
-              Należymy do{" "}
-              <strong className="text-foreground">Polskiej Grupy Rybnej (PGR)</strong>.
-              Promujemy markę{" "}
-              <strong className="text-foreground">BMC</strong> – konserwy rybne,
-              łososia w plasterkach i słoiki ze szprotkami.
-            </p>
-          </div>
-          <div className="space-y-3">
-            {awards.map((award) => (
-              <div
-                key={award}
-                className="flex items-center gap-3 rounded-lg border border-border bg-card px-4 py-3"
-              >
-                <Award className="size-5 shrink-0 text-turquoise-600" />
-                <span className="text-sm font-medium">{award}</span>
+      <section
+        className="relative overflow-hidden px-4 py-20 sm:px-6 lg:px-8"
+        style={{
+          backgroundImage: `url(${assets.bgMap})`,
+          backgroundSize: "cover",
+          backgroundPosition: "top center",
+        }}
+      >
+        <div className="absolute inset-0 bg-background/85" />
+        <div className="relative mx-auto max-w-6xl">
+          <SectionHeading
+            label="O nas"
+            title={aboutText.headline}
+            description={aboutText.since}
+          />
+          <div className="mt-12 grid gap-10 lg:grid-cols-2 lg:items-start">
+            <div className="space-y-4 text-muted-foreground">
+              <p>{aboutText.paragraphs[0]}</p>
+              <p>{aboutText.paragraphs[1]}</p>
+              <p>{aboutText.paragraphs[2]}</p>
+              <p>{aboutText.paragraphs[3]}</p>
+              <p>{aboutText.paragraphs[4]}</p>
+            </div>
+            <div className="space-y-6">
+              <div className="flex flex-wrap items-center gap-6">
+                {awards.map((award) => (
+                  <div key={award.label} className="flex flex-col items-center gap-2">
+                    <Image
+                      src={award.image}
+                      alt={award.alt}
+                      width={award.image.includes("po-ryby") ? 200 : 120}
+                      height={80}
+                      className="h-auto max-h-16 w-auto object-contain"
+                    />
+                    <span className="max-w-[160px] text-center text-xs text-muted-foreground">
+                      {award.label}
+                    </span>
+                  </div>
+                ))}
               </div>
-            ))}
+              <div className="rounded-xl border border-border bg-card p-4">
+                <p className="text-sm leading-relaxed text-muted-foreground">
+                  {aboutText.poRyby}
+                </p>
+              </div>
+            </div>
           </div>
-        </div>
-        <div className="mt-8 text-center">
-          <Button variant="outline" render={<Link href="/o-nas" />}>
-            Czytaj więcej o Akwen
-            <ArrowRight />
-          </Button>
+          <div className="mt-8 text-center">
+            <Button variant="outline" render={<Link href="/o-nas" />}>
+              Czytaj więcej o Akwen
+              <ArrowRight />
+            </Button>
+          </div>
         </div>
       </section>
 
@@ -95,12 +117,22 @@ export default function Home() {
               return (
                 <Card
                   key={item.title}
-                  className="border-border/60 transition-shadow hover:shadow-lg"
+                  className="group overflow-hidden border-border/60 p-0 transition-shadow hover:shadow-xl"
                 >
-                  <CardHeader>
-                    <div className="mb-2 flex size-11 items-center justify-center rounded-lg bg-navy-900 text-white dark:bg-turquoise-600">
+                  <div className="relative aspect-[4/3] overflow-hidden">
+                    <Image
+                      src={item.image}
+                      alt={item.title}
+                      fill
+                      className="object-cover transition-transform duration-500 group-hover:scale-105"
+                      sizes="(max-width: 768px) 50vw, 25vw"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-navy-950/80 via-navy-900/20 to-transparent" />
+                    <div className="absolute bottom-3 left-3 flex size-10 items-center justify-center rounded-lg bg-coral-500 text-white">
                       <Icon className="size-5" />
                     </div>
+                  </div>
+                  <CardHeader className="pb-2">
                     <CardTitle className="text-lg">{item.title}</CardTitle>
                   </CardHeader>
                   <CardContent>
@@ -123,37 +155,68 @@ export default function Home() {
 
       {/* Produkty litewskie */}
       <section className="mx-auto max-w-6xl px-4 py-20 sm:px-6 lg:px-8">
+        <div className="flex justify-center">
+          <Image
+            src={assets.ornaments.up}
+            alt=""
+            width={383}
+            height={27}
+            className="mb-6 h-auto w-48 opacity-60 sm:w-64"
+            aria-hidden
+          />
+        </div>
         <SectionHeading
           label="Produkty litewskie"
           title="Wiodący producenci z Litwy"
-          description="Jesteśmy wyłącznym dystrybutorem Dauparų žuvis i Norvelita. Dystrybuujemy również Vičiūnai Group oraz ICECO žuvis."
+          description={lithuanianIntro}
         />
-        <div className="mt-12 grid gap-6 sm:grid-cols-2">
-          {lithuanianBrands.map((brand) => (
-            <Card
-              key={brand.name}
-              className="overflow-hidden border-turquoise-500/20 transition-shadow hover:shadow-lg"
-            >
-              <CardHeader>
-                <div className="flex items-start justify-between gap-4">
-                  <CardTitle className="text-xl">{brand.name}</CardTitle>
-                  <Badge
-                    variant="secondary"
-                    className="shrink-0 bg-turquoise-500/10 text-turquoise-600"
-                  >
-                    {brand.role}
-                  </Badge>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <CardDescription className="text-sm leading-relaxed">
-                  {brand.description}
-                </CardDescription>
-              </CardContent>
-            </Card>
-          ))}
+        <div className="mt-12 grid items-center gap-10 lg:grid-cols-2">
+          <div className="relative mx-auto aspect-square w-full max-w-md overflow-hidden rounded-2xl shadow-xl">
+            <Image
+              src={assets.lithuanianProducts}
+              alt="Produkty litewskie Akwen"
+              fill
+              className="object-cover"
+              sizes="(max-width: 1024px) 100vw, 50vw"
+            />
+          </div>
+          <div className="grid gap-4 sm:grid-cols-2">
+            {lithuanianBrands.map((brand) => (
+              <Card
+                key={brand.name}
+                className="border-turquoise-500/20 transition-shadow hover:shadow-lg"
+              >
+                <CardHeader className="pb-2">
+                  <div className="flex items-start justify-between gap-2">
+                    <CardTitle className="text-base">{brand.name}</CardTitle>
+                    <Badge
+                      variant="secondary"
+                      className="shrink-0 bg-turquoise-500/10 text-turquoise-600 text-[10px]"
+                    >
+                      {brand.role}
+                    </Badge>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <CardDescription className="text-sm leading-relaxed">
+                    {brand.description}
+                  </CardDescription>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
         </div>
-        <div className="mt-10 text-center">
+        <div className="flex justify-center">
+          <Image
+            src={assets.ornaments.down}
+            alt=""
+            width={382}
+            height={27}
+            className="mt-10 h-auto w-48 opacity-60 sm:w-64"
+            aria-hidden
+          />
+        </div>
+        <div className="mt-6 text-center">
           <Button variant="outline" render={<Link href="/produkty" />}>
             Wszystkie produkty litewskie
             <ArrowRight />
@@ -173,10 +236,10 @@ export default function Home() {
           <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
             <Button
               size="lg"
-              className="bg-turquoise-500 text-white hover:bg-turquoise-400"
+              className="bg-coral-500 text-white hover:bg-coral-400"
               render={<Link href="/b2b" />}
             >
-              Przejdź do platformy B2B
+              Przejdź do portalu B2B
               <ExternalLink />
             </Button>
             <Button
@@ -188,7 +251,8 @@ export default function Home() {
               Skontaktuj się z działem handlowym
             </Button>
           </div>
-          <p className="mt-6 text-sm text-ocean-200">
+          <p className="mt-4 text-sm text-ocean-200">{company.b2bNote}</p>
+          <p className="mt-2 text-sm text-ocean-200">
             {company.contact.email} · {company.contact.mobile}
           </p>
         </div>

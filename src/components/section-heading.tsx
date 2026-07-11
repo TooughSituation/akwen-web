@@ -18,8 +18,8 @@ export function SectionHeading({
       {label && (
         <p
           className={cn(
-            "mb-3 text-sm font-medium uppercase tracking-[0.2em]",
-            light ? "text-turquoise-300" : "text-turquoise-600"
+            "font-display mb-3 text-sm font-semibold uppercase tracking-[0.2em]",
+            light ? "text-turquoise-300" : "text-turquoise-500"
           )}
         >
           {label}

@@ -7,51 +7,52 @@ import { WaveDivider } from "@/components/wave-divider";
 
 export function Hero() {
   return (
-    <section className="relative flex min-h-[90vh] items-center justify-center overflow-hidden">
+    <section className="relative flex min-h-[92vh] items-center overflow-hidden">
       <Image
-        src="https://images.unsplash.com/photo-1505142468610-359e7d316be0?auto=format&fit=crop&w=1920&q=80"
-        alt="Fale morskie"
+        src="/images/bg-hero.jpg"
+        alt="Świeże ryby i owoce morza — produkty Akwen"
         fill
         priority
-        className="object-cover"
+        className="object-cover object-center"
         sizes="100vw"
       />
-      <div className="absolute inset-0 bg-gradient-to-br from-navy-950/90 via-navy-900/75 to-turquoise-600/30" />
 
-      <div className="absolute inset-0 opacity-20">
-        <div className="absolute -left-20 top-20 size-96 rounded-full bg-turquoise-500 blur-3xl" />
-        <div className="absolute -right-20 bottom-20 size-80 rounded-full bg-turquoise-400 blur-3xl" />
-      </div>
+      <div className="absolute inset-0 bg-gradient-to-r from-navy-950/95 via-navy-900/80 to-navy-900/30" />
+      <div className="absolute inset-0 bg-gradient-to-t from-navy-950/60 via-transparent to-navy-950/20" />
 
-      <div className="relative z-10 mx-auto max-w-6xl px-4 py-24 text-center sm:px-6 lg:px-8">
-        <p className="mb-4 text-sm font-medium uppercase tracking-[0.25em] text-turquoise-300">
-          {company.heroSubtitle}
-        </p>
-        <h1 className="mx-auto max-w-4xl text-4xl font-bold leading-tight tracking-tight text-white sm:text-5xl lg:text-6xl">
-          {company.slogan}
-        </h1>
-        <p className="mx-auto mt-6 max-w-2xl text-lg text-ocean-100 sm:text-xl">
-          Dystrybucja ryb i przetworów rybnych od 1991 roku.
-          Północno-wschodnia Polska i województwo mazowieckie.
-        </p>
-        <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
-          <Button
-            size="lg"
-            className="bg-turquoise-500 text-white hover:bg-turquoise-400"
-            render={<Link href="/oferta" />}
-          >
-            Poznaj naszą ofertę
-            <ArrowRight />
-          </Button>
-          <Button
-            variant="outline"
-            size="lg"
-            className="border-white/40 bg-white/10 text-white hover:bg-white/20 hover:text-white"
-            render={<Link href="/b2b" />}
-          >
-            Przejdź do platformy B2B
-            <ExternalLink />
-          </Button>
+      <div className="relative z-10 mx-auto w-full max-w-6xl px-4 py-28 sm:px-6 lg:px-8">
+        <div className="max-w-2xl text-left">
+          <p className="font-display mb-5 text-sm font-semibold uppercase tracking-[0.3em] text-turquoise-300">
+            Dystrybutor ryb od 1991 roku
+          </p>
+
+          <h1 className="text-5xl font-semibold leading-[1.1] tracking-tight text-white sm:text-6xl lg:text-7xl">
+            {company.heroTitle}
+          </h1>
+
+          <p className="mt-6 max-w-xl text-lg leading-relaxed text-ocean-100 sm:text-xl">
+            {company.heroSubtitle}
+          </p>
+
+          <div className="mt-10 flex flex-col gap-4 sm:flex-row sm:items-center">
+            <Button
+              size="lg"
+              className="bg-coral-500 px-8 text-white shadow-lg shadow-coral-500/25 hover:bg-coral-400"
+              render={<Link href="/oferta" />}
+            >
+              Nasza oferta
+              <ArrowRight />
+            </Button>
+            <Button
+              variant="outline"
+              size="lg"
+              className="border-white/50 bg-white/5 px-8 text-white backdrop-blur-sm hover:border-turquoise-300 hover:bg-turquoise-500/20 hover:text-white"
+              render={<Link href="/b2b" />}
+            >
+              Przejdź do portalu B2B
+              <ExternalLink />
+            </Button>
+          </div>
         </div>
       </div>
 

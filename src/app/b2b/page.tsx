@@ -32,7 +32,7 @@ export default function B2BDashboardPage() {
       label: "Produkty w katalogu",
       value: catalog.totalCount.toString(),
       icon: Package,
-      hint: `${catalog.tags.tag1List.length} grup (Tag1)`,
+      hint: `${catalog.tags.tag1List.length} kategorii`,
     },
     {
       label: "Dostępne na magazynie",
@@ -113,7 +113,7 @@ export default function B2BDashboardPage() {
                 Polecane dla Ciebie
               </h2>
               <p className="text-sm text-muted-foreground">
-                {catalog.recommendedCount} produktów oznaczonych jako proponowane
+                Wybrane przez zespół Akwen — {catalog.recommendedCount} pozycji
                 w aktualnym cenniku
               </p>
             </div>

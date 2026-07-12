@@ -1,11 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import Image from "next/image";
-import { Check, Package } from "lucide-react";
+import { Check, Package, Sparkles } from "lucide-react";
 import type { B2BProduct } from "@/lib/b2b/types";
+import { formatCategoryLabel, formatKindLabel } from "@/lib/b2b/labels";
 import { formatPrice } from "@/lib/b2b/format";
 import { useCart } from "@/contexts/cart-context";
+import { ProductImage } from "@/components/b2b/product-image";
 import { Badge } from "@/components/ui/badge";
 import {
   Card,
@@ -47,7 +48,9 @@ function StockBadge({ stock }: { stock: number }) {
 export function ProductCard({ product, compact = false }: ProductCardProps) {
   const { addItem } = useCart();
   const [justAdded, setJustAdded] = useState(false);
-  const isExternalImage = product.imageUrl.startsWith("http");
+
+  const categoryLabel = formatCategoryLabel(product.tag1);
+  const kindLabel = formatKindLabel(product.tag2);
 
   function handleAddToCart() {
     addItem(product, 1);
@@ -64,37 +67,37 @@ export function ProductCard({ product, compact = false }: ProductCardProps) {
     >
       <div
         className={cn(
-          "relative overflow-hidden bg-muted",
+          "relative overflow-hidden",
           compact ? "aspect-square w-28 shrink-0" : "aspect-[4/3] w-full"
         )}
       >
-        <Image
-          src={product.imageUrl}
-          alt={product.name}
-          fill
-          className="object-cover"
-          sizes={compact ? "112px" : "(max-width: 768px) 50vw, 25vw"}
-          unoptimized={isExternalImage}
+        <ProductImage
+          imageUrl={product.imageUrl}
+          name={product.name}
+          tag1={product.tag1}
+          tag2={product.tag2}
+          compact={compact}
         />
         <div className="absolute top-2 left-2 flex flex-wrap gap-1">
-          {product.tag1 && (
+          {categoryLabel && (
             <Badge
               variant="secondary"
               className="bg-navy-900/80 text-[10px] text-white backdrop-blur-sm"
             >
-              {product.tag1}
+              {categoryLabel}
             </Badge>
           )}
-          {product.tag2 && (
+          {kindLabel && (
             <Badge
               variant="secondary"
               className="bg-turquoise-600/80 text-[10px] text-white backdrop-blur-sm"
             >
-              {product.tag2}
+              {kindLabel}
             </Badge>
           )}
           {product.isRecommended && (
             <Badge className="bg-coral-500/90 text-[10px] text-white backdrop-blur-sm">
+              <Sparkles className="mr-0.5 size-2.5" />
               Polecane
             </Badge>
           )}

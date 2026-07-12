@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { ArrowUpDown, Search, SlidersHorizontal, Sparkles } from "lucide-react";
 import type { B2BProduct, TagFilterData } from "@/lib/b2b/types";
+import { formatCategoryLabel, formatKindLabel } from "@/lib/b2b/labels";
 import { ProductCard } from "@/components/b2b/product-card";
 import { cn } from "@/lib/utils";
 
@@ -30,7 +31,7 @@ const SORT_LABELS: Record<SortOption, string> = {
   "price-desc": "Cena malejąco",
   "producer-asc": "Producent A–Z",
   "stock-desc": "Stan magazynowy",
-  "tag1-asc": "Grupa (Tag1)",
+  "tag1-asc": "Kategoria A–Z",
 };
 
 function sortProducts(products: B2BProduct[], sort: SortOption): B2BProduct[] {
@@ -77,22 +78,23 @@ export function CatalogClient({
       setView("recommended");
     }
   }, [searchParams]);
-  const [activeTag1, setActiveTag1] = useState<string>("all");
-  const [activeTag2, setActiveTag2] = useState<string>("all");
+
+  const [activeCategory, setActiveCategory] = useState<string>("all");
+  const [activeKind, setActiveKind] = useState<string>("all");
   const [inStockOnly, setInStockOnly] = useState(false);
   const [sort, setSort] = useState<SortOption>("name-asc");
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
 
-  const availableTag2 = useMemo(() => {
-    if (activeTag1 === "all") {
+  const availableKinds = useMemo(() => {
+    if (activeCategory === "all") {
       const all = new Set<string>();
       products.forEach((p) => {
         if (p.tag2) all.add(p.tag2);
       });
       return [...all].sort((a, b) => a.localeCompare(b, "pl"));
     }
-    return tags.tag2ByTag1[activeTag1] ?? [];
-  }, [activeTag1, products, tags.tag2ByTag1]);
+    return tags.tag2ByTag1[activeCategory] ?? [];
+  }, [activeCategory, products, tags.tag2ByTag1]);
 
   const filteredProducts = useMemo(() => {
     const query = search.trim().toLowerCase();
@@ -100,23 +102,23 @@ export function CatalogClient({
     const filtered = products.filter((product) => {
       const matchesView =
         view === "all" || (view === "recommended" && product.isRecommended);
-      const matchesTag1 =
-        activeTag1 === "all" || product.tag1 === activeTag1;
-      const matchesTag2 =
-        activeTag2 === "all" || product.tag2 === activeTag2;
+      const matchesCategory =
+        activeCategory === "all" || product.tag1 === activeCategory;
+      const matchesKind =
+        activeKind === "all" || product.tag2 === activeKind;
       const matchesStock = !inStockOnly || product.stock > 0;
       const matchesSearch =
         !query ||
         product.name.toLowerCase().includes(query) ||
         product.symbol.toLowerCase().includes(query) ||
         product.producer.toLowerCase().includes(query) ||
-        product.tag1.toLowerCase().includes(query) ||
-        product.tag2.toLowerCase().includes(query);
+        formatCategoryLabel(product.tag1).toLowerCase().includes(query) ||
+        formatKindLabel(product.tag2).toLowerCase().includes(query);
 
       return (
         matchesView &&
-        matchesTag1 &&
-        matchesTag2 &&
+        matchesCategory &&
+        matchesKind &&
         matchesStock &&
         matchesSearch
       );
@@ -127,13 +129,13 @@ export function CatalogClient({
     products,
     search,
     view,
-    activeTag1,
-    activeTag2,
+    activeCategory,
+    activeKind,
     inStockOnly,
     sort,
   ]);
 
-  const tag1Counts = useMemo(() => {
+  const categoryCounts = useMemo(() => {
     const counts: Record<string, number> = { all: products.length };
     products.forEach((p) => {
       if (p.tag1) counts[p.tag1] = (counts[p.tag1] || 0) + 1;
@@ -141,35 +143,35 @@ export function CatalogClient({
     return counts;
   }, [products]);
 
-  const tag2Counts = useMemo(() => {
+  const kindCounts = useMemo(() => {
     const counts: Record<string, number> = { all: 0 };
     const pool =
-      activeTag1 === "all"
+      activeCategory === "all"
         ? products
-        : products.filter((p) => p.tag1 === activeTag1);
+        : products.filter((p) => p.tag1 === activeCategory);
     counts.all = pool.length;
     pool.forEach((p) => {
       if (p.tag2) counts[p.tag2] = (counts[p.tag2] || 0) + 1;
     });
     return counts;
-  }, [products, activeTag1]);
+  }, [products, activeCategory]);
 
-  function handleTag1Change(tag1: string) {
-    setActiveTag1(tag1);
-    setActiveTag2("all");
+  function handleCategoryChange(category: string) {
+    setActiveCategory(category);
+    setActiveKind("all");
   }
 
   function clearFilters() {
-    setActiveTag1("all");
-    setActiveTag2("all");
+    setActiveCategory("all");
+    setActiveKind("all");
     setInStockOnly(false);
     setSearch("");
     setView("all");
   }
 
   const hasActiveFilters =
-    activeTag1 !== "all" ||
-    activeTag2 !== "all" ||
+    activeCategory !== "all" ||
+    activeKind !== "all" ||
     inStockOnly ||
     search.trim() !== "" ||
     view !== "all";
@@ -178,56 +180,56 @@ export function CatalogClient({
     <div className="space-y-4">
       <div className="flex items-center gap-2 text-sm font-medium text-foreground">
         <SlidersHorizontal className="size-4 text-turquoise-600" />
-        Filtry po tagach
+        Filtruj produkty
       </div>
 
       <div>
         <p className="mb-2 text-xs font-medium tracking-wide text-muted-foreground uppercase">
-          Tag1 — grupa produktu
+          Kategoria
         </p>
         <div className="max-h-52 space-y-1 overflow-y-auto pr-1">
           <FilterButton
-            label="Wszystkie grupy"
-            count={tag1Counts.all}
-            active={activeTag1 === "all"}
-            onClick={() => handleTag1Change("all")}
+            label="Wszystkie kategorie"
+            count={categoryCounts.all}
+            active={activeCategory === "all"}
+            onClick={() => handleCategoryChange("all")}
           />
-          {tags.tag1List.map((tag1) => (
+          {tags.tag1List.map((category) => (
             <FilterButton
-              key={tag1}
-              label={tag1}
-              count={tag1Counts[tag1] ?? 0}
-              active={activeTag1 === tag1}
-              onClick={() => handleTag1Change(tag1)}
+              key={category}
+              label={formatCategoryLabel(category)}
+              count={categoryCounts[category] ?? 0}
+              active={activeCategory === category}
+              onClick={() => handleCategoryChange(category)}
             />
           ))}
         </div>
       </div>
 
-      {availableTag2.length > 0 && (
+      {availableKinds.length > 0 && (
         <div>
           <p className="mb-2 text-xs font-medium tracking-wide text-muted-foreground uppercase">
-            Tag2 — szczegół
-            {activeTag1 !== "all" && (
-              <span className="ml-1 font-normal normal-case text-turquoise-600">
-                ({activeTag1})
+            Rodzaj
+            {activeCategory !== "all" && (
+              <span className="ml-1.5 font-normal normal-case text-turquoise-600">
+                · {formatCategoryLabel(activeCategory)}
               </span>
             )}
           </p>
           <div className="max-h-40 space-y-1 overflow-y-auto pr-1">
             <FilterButton
-              label="Wszystkie"
-              count={tag2Counts.all}
-              active={activeTag2 === "all"}
-              onClick={() => setActiveTag2("all")}
+              label="Wszystkie rodzaje"
+              count={kindCounts.all}
+              active={activeKind === "all"}
+              onClick={() => setActiveKind("all")}
             />
-            {availableTag2.map((tag2) => (
+            {availableKinds.map((kind) => (
               <FilterButton
-                key={tag2}
-                label={tag2}
-                count={tag2Counts[tag2] ?? 0}
-                active={activeTag2 === tag2}
-                onClick={() => setActiveTag2(tag2)}
+                key={kind}
+                label={formatKindLabel(kind)}
+                count={kindCounts[kind] ?? 0}
+                active={activeKind === kind}
+                onClick={() => setActiveKind(kind)}
               />
             ))}
           </div>
@@ -270,7 +272,7 @@ export function CatalogClient({
             <Search className="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
             <input
               type="search"
-              placeholder="Szukaj po nazwie, symbolu, producencie lub tagu..."
+              placeholder="Szukaj po nazwie, symbolu, producencie lub kategorii..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className="w-full rounded-lg border border-border bg-card py-2.5 pr-4 pl-10 text-sm outline-none transition-colors focus:border-turquoise-500 focus:ring-2 focus:ring-turquoise-500/20"
@@ -321,7 +323,7 @@ export function CatalogClient({
           <ViewTab
             active={view === "recommended"}
             onClick={() => setView("recommended")}
-            label="Proponowane"
+            label="Polecane"
             count={recommendedCount}
             icon={<Sparkles className="size-3.5" />}
           />
@@ -330,9 +332,8 @@ export function CatalogClient({
         {view === "recommended" && (
           <p className="rounded-lg border border-turquoise-500/20 bg-turquoise-500/5 px-4 py-3 text-sm text-muted-foreground">
             <Sparkles className="mr-1.5 inline size-4 text-turquoise-600" />
-            Produkty oznaczone w arkuszu kolumną{" "}
-            <span className="font-medium text-foreground">Proponowany = Tak</span>{" "}
-            — nasza rekomendacja dla Twojego asortymentu.
+            Nasze rekomendacje dla Twojego asortymentu — produkty
+            wybrane przez zespół Akwen.
           </p>
         )}
 
@@ -342,18 +343,22 @@ export function CatalogClient({
             {filteredProducts.length}
           </span>{" "}
           z {products.length} produktów
-          {activeTag1 !== "all" && (
+          {activeCategory !== "all" && (
             <>
               {" "}
-              · grupa:{" "}
-              <span className="font-medium text-foreground">{activeTag1}</span>
+              · kategoria:{" "}
+              <span className="font-medium text-foreground">
+                {formatCategoryLabel(activeCategory)}
+              </span>
             </>
           )}
-          {activeTag2 !== "all" && (
+          {activeKind !== "all" && (
             <>
               {" "}
-              · szczegół:{" "}
-              <span className="font-medium text-foreground">{activeTag2}</span>
+              · rodzaj:{" "}
+              <span className="font-medium text-foreground">
+                {formatKindLabel(activeKind)}
+              </span>
             </>
           )}
         </p>

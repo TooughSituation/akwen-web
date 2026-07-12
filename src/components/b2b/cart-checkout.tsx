@@ -1,9 +1,13 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { Minus, Plus, ShoppingCart, Trash2 } from "lucide-react";
 import { useCart } from "@/contexts/cart-context";
+import { OrderForm } from "@/components/b2b/order-form";
+import { OrderSuccess } from "@/components/b2b/order-success";
 import { formatPrice } from "@/lib/b2b/format";
+import type { B2BOrder } from "@/lib/b2b/types";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -22,9 +26,13 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
-export function CartView() {
+type CheckoutStep = "cart" | "form" | "success";
+
+export function CartCheckout() {
   const { items, isHydrated, totalItems, totalNet, updateQuantity, removeItem, clearCart } =
     useCart();
+  const [step, setStep] = useState<CheckoutStep>("cart");
+  const [completedOrder, setCompletedOrder] = useState<B2BOrder | null>(null);
 
   if (!isHydrated) {
     return (
@@ -33,6 +41,30 @@ export function CartView() {
           Ładowanie koszyka…
         </CardContent>
       </Card>
+    );
+  }
+
+  if (step === "success" && completedOrder) {
+    return (
+      <OrderSuccess
+        order={completedOrder}
+        onNewOrder={() => {
+          setCompletedOrder(null);
+          setStep("cart");
+        }}
+      />
+    );
+  }
+
+  if (step === "form") {
+    return (
+      <OrderForm
+        onSuccess={(order) => {
+          setCompletedOrder(order);
+          setStep("success");
+        }}
+        onCancel={() => setStep("cart")}
+      />
     );
   }
 
@@ -187,8 +219,7 @@ export function CartView() {
             </Button>
             <Button
               className="bg-turquoise-500 hover:bg-turquoise-600"
-              disabled
-              title="Moduł składania zamówienia — wkrótce"
+              onClick={() => setStep("form")}
             >
               Złóż zamówienie
             </Button>

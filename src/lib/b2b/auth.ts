@@ -11,6 +11,12 @@ export const MOCK_CUSTOMER: B2BCustomer = {
   discountPercent: 5,
 };
 
+export const SAVED_DELIVERY_ADDRESSES = [
+  MOCK_CUSTOMER.address,
+  "Magazyn chłodniczy, ul. Ełcka 88, 15-001 Białystok",
+  "Punkt odbioru — hala targowa, ul. Baranowicka 117, Białystok",
+] as const;
+
 export function getMockCustomer(): B2BCustomer {
   return MOCK_CUSTOMER;
 }

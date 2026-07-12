@@ -52,3 +52,43 @@ export interface CartItem {
   stock: number;
   quantity: number;
 }
+
+export type OrderStatus =
+  | "new"
+  | "processing"
+  | "shipped"
+  | "delivered"
+  | "cancelled";
+
+export interface OrderItem {
+  productId: string;
+  symbol: string;
+  name: string;
+  unit: string;
+  priceNet: number;
+  quantity: number;
+  lineTotal: number;
+}
+
+export interface B2BOrder {
+  id: string;
+  orderNumber: string;
+  customerId: string;
+  companyName: string;
+  status: OrderStatus;
+  items: OrderItem[];
+  totalNet: number;
+  deliveryDate: string;
+  deliveryAddress: string;
+  notes: string;
+  createdAt: string;
+}
+
+export interface CreateOrderInput {
+  items: CartItem[];
+  customerId: string;
+  companyName: string;
+  deliveryDate: string;
+  deliveryAddress: string;
+  notes: string;
+}

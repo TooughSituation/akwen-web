@@ -88,3 +88,13 @@ export function getOrderStatusLabel(status: B2BOrder["status"]): string {
   };
   return labels[status];
 }
+
+export function countOrderItems(order: B2BOrder): number {
+  return order.items.reduce((sum, item) => sum + item.quantity, 0);
+}
+
+export function countOpenOrders(orders: B2BOrder[]): number {
+  return orders.filter(
+    (order) => order.status === "new" || order.status === "processing"
+  ).length;
+}

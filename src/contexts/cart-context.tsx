@@ -9,7 +9,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import type { B2BProduct, CartItem } from "@/lib/b2b/types";
+import type { B2BOrder, B2BProduct, CartItem } from "@/lib/b2b/types";
 
 const STORAGE_KEY = "akwen-b2b-cart";
 
@@ -22,6 +22,8 @@ interface CartContextValue {
   removeItem: (productId: string) => void;
   updateQuantity: (productId: string, quantity: number) => void;
   clearCart: () => void;
+  addCartItem: (item: CartItem) => void;
+  reorderFromOrder: (order: B2BOrder) => void;
 }
 
 const CartContext = createContext<CartContextValue | null>(null);
@@ -125,6 +127,55 @@ export function CartProvider({ children }: { children: ReactNode }) {
     setItems([]);
   }, []);
 
+  const addCartItem = useCallback((item: CartItem) => {
+    if (item.quantity <= 0) return;
+
+    setItems((current) => {
+      const existing = current.find((i) => i.productId === item.productId);
+
+      if (existing) {
+        return current.map((i) =>
+          i.productId === item.productId
+            ? {
+                ...i,
+                priceNet: item.priceNet,
+                stock: Math.max(i.stock, item.stock),
+                quantity: clampQuantity(
+                  i.quantity + item.quantity,
+                  Math.max(i.stock, item.stock)
+                ),
+              }
+            : i
+        );
+      }
+
+      return [
+        ...current,
+        {
+          ...item,
+          quantity: clampQuantity(item.quantity, item.stock),
+        },
+      ];
+    });
+  }, []);
+
+  const reorderFromOrder = useCallback(
+    (order: B2BOrder) => {
+      order.items.forEach((item) => {
+        addCartItem({
+          productId: item.productId,
+          symbol: item.symbol,
+          name: item.name,
+          unit: item.unit,
+          priceNet: item.priceNet,
+          stock: Math.max(item.quantity, 9999),
+          quantity: item.quantity,
+        });
+      });
+    },
+    [addCartItem]
+  );
+
   const totalItems = useMemo(
     () => items.reduce((sum, item) => sum + item.quantity, 0),
     [items]
@@ -146,6 +197,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
       removeItem,
       updateQuantity,
       clearCart,
+      addCartItem,
+      reorderFromOrder,
     }),
     [
       items,
@@ -156,6 +209,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
       removeItem,
       updateQuantity,
       clearCart,
+      addCartItem,
+      reorderFromOrder,
     ]
   );
 

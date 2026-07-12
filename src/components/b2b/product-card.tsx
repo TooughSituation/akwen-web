@@ -61,7 +61,7 @@ export function ProductCard({ product, compact = false }: ProductCardProps) {
   return (
     <Card
       className={cn(
-        "overflow-hidden border-border/60 p-0 transition-shadow hover:shadow-lg",
+        "group overflow-hidden border-border/60 p-0 transition-shadow hover:shadow-lg",
         compact && "flex-row"
       )}
     >

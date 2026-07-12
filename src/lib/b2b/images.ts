@@ -1,4 +1,66 @@
+import fs from "fs";
+import path from "path";
 import type { ProductCategoryId } from "./types";
+import {
+  buildImaginePrompt,
+  getGeneratedImagePublicPath,
+  getTagComboKey,
+  getTagComboSlug,
+} from "./image-prompts";
+
+export { buildImaginePrompt, getTagComboKey, getTagComboSlug };
+
+const PRODUCTS_DIR = path.join(process.cwd(), "public/images/products");
+const MANIFEST_PATH = path.join(process.cwd(), "public/data/product-image-manifest.json");
+
+type ImageManifest = Record<string, string>;
+
+let manifestCache: ImageManifest | null = null;
+
+function loadManifest(): ImageManifest {
+  if (manifestCache) return manifestCache;
+  try {
+    if (fs.existsSync(MANIFEST_PATH)) {
+      manifestCache = JSON.parse(
+        fs.readFileSync(MANIFEST_PATH, "utf-8")
+      ) as ImageManifest;
+      return manifestCache;
+    }
+  } catch {
+    // ignore corrupt manifest
+  }
+  manifestCache = {};
+  return manifestCache;
+}
+
+function fileExistsPublic(publicPath: string): boolean {
+  const full = path.join(process.cwd(), "public", publicPath.replace(/^\//, ""));
+  return fs.existsSync(full);
+}
+
+export function getGeneratedImageUrl(tag1: string, tag2: string): string | null {
+  if (!tag1) return null;
+
+  const slug = getTagComboSlug(tag1, tag2);
+  const key = getTagComboKey(tag1, tag2);
+  const manifest = loadManifest();
+
+  if (manifest[slug] && fileExistsPublic(manifest[slug])) {
+    return manifest[slug];
+  }
+  if (manifest[key] && fileExistsPublic(manifest[key])) {
+    return manifest[key];
+  }
+
+  const defaultPath = getGeneratedImagePublicPath(tag1, tag2);
+  if (fileExistsPublic(defaultPath)) {
+    return defaultPath;
+  }
+
+  return null;
+}
+
+export { isGeneratedProductPhoto } from "./image-prompts";
 
 const CATEGORY_IMAGES: Record<ProductCategoryId, string> = {
   mrozone: "/images/oferta_mrozone.jpg",
@@ -7,14 +69,14 @@ const CATEGORY_IMAGES: Record<ProductCategoryId, string> = {
   przetwory: "/images/oferta_przetwory.jpg",
   litewskie: "/images/oferta-litewskie.png",
   "owoce-morza":
-    "https://images.unsplash.com/photo-1565680018434-b513d5e5fd47?w=400&h=300&fit=crop",
+    "https://images.unsplash.com/photo-1565680018434-b513d5e5fd47?w=800&h=600&fit=crop",
   swieze:
-    "https://images.unsplash.com/photo-1544943910-04c54e739fe7?w=400&h=300&fit=crop",
+    "https://images.unsplash.com/photo-1544943910-04c54e739fe7?w=800&h=600&fit=crop",
   inne:
-    "https://images.unsplash.com/photo-1519708227418-c8fd9a32b779?w=400&h=300&fit=crop",
+    "https://images.unsplash.com/photo-1519708227418-c8fd9a32b779?w=800&h=600&fit=crop",
 };
 
-const TAG1_IMAGES: Record<string, string> = {
+const TAG1_FALLBACK: Record<string, string> = {
   Pasty: CATEGORY_IMAGES.przetwory,
   "Ryba Wędzona": CATEGORY_IMAGES.wedzone,
   Mrożonki: CATEGORY_IMAGES.mrozone,
@@ -39,57 +101,41 @@ const TAG1_IMAGES: Record<string, string> = {
   Inne: CATEGORY_IMAGES.inne,
 };
 
-const TAG2_IMAGES: Record<string, string> = {
-  Łosoś: "https://images.unsplash.com/photo-1519708227418-c8fd9a32b779?w=400&h=300&fit=crop",
-  Dorsz: "https://images.unsplash.com/photo-1559339352-11d035aa65de?w=400&h=300&fit=crop",
-  Makrela: "https://images.unsplash.com/photo-1574781330855-d0db8cc6a79c?w=400&h=300&fit=crop",
-  Śledź: "https://images.unsplash.com/photo-1606853818589-9d1946bdcb7d?w=400&h=300&fit=crop",
-  Krewetki: "https://images.unsplash.com/photo-1565680018434-b513d5e5fd47?w=400&h=300&fit=crop",
-  Kawior: "https://images.unsplash.com/photo-1544943910-04c54e739fe7?w=400&h=300&fit=crop",
-  Tuńczyk: "https://images.unsplash.com/photo-1559339352-11d035aa65de?w=400&h=300&fit=crop",
-};
-
-const PRODUCT_IMAGE_POOL = [
-  "https://images.unsplash.com/photo-1519708227418-c8fd9a32b779?w=400&h=300&fit=crop",
-  "https://images.unsplash.com/photo-1544943910-04c54e739fe7?w=400&h=300&fit=crop",
-  "https://images.unsplash.com/photo-1565680018434-b513d5e5fd47?w=400&h=300&fit=crop",
-  "https://images.unsplash.com/photo-1559339352-11d035aa65de?w=400&h=300&fit=crop",
-  "https://images.unsplash.com/photo-1574781330855-d0db8cc6a79c?w=400&h=300&fit=crop",
-  "https://images.unsplash.com/photo-1606853818589-9d1946bdcb7d?w=400&h=300&fit=crop",
-];
-
-function hashString(value: string): number {
-  let hash = 0;
-  for (let i = 0; i < value.length; i++) {
-    hash = (hash << 5) - hash + value.charCodeAt(i);
-    hash |= 0;
-  }
-  return Math.abs(hash);
-}
-
 export function getProductImage(
   productId: string,
   categoryId: ProductCategoryId,
   tag1?: string,
   tag2?: string
 ): string {
-  if (tag2 && TAG2_IMAGES[tag2]) {
-    const useVariation = hashString(productId) % 4 !== 0;
-    if (useVariation) return TAG2_IMAGES[tag2];
+  const generated = tag1 ? getGeneratedImageUrl(tag1, tag2 || "") : null;
+  if (generated) return generated;
+
+  if (tag1 && TAG1_FALLBACK[tag1]) {
+    return TAG1_FALLBACK[tag1];
   }
 
-  if (tag1 && TAG1_IMAGES[tag1]) {
-    const useVariation = hashString(productId) % 3 === 0;
-    if (!useVariation) return TAG1_IMAGES[tag1];
-  }
-
-  const categoryImage = CATEGORY_IMAGES[categoryId];
-  const useVariation = hashString(productId) % 3 === 0;
-  if (!useVariation) return categoryImage;
-  const poolIndex = hashString(productId) % PRODUCT_IMAGE_POOL.length;
-  return PRODUCT_IMAGE_POOL[poolIndex];
+  return CATEGORY_IMAGES[categoryId] ?? CATEGORY_IMAGES.inne;
 }
 
 export function getCategoryImage(categoryId: ProductCategoryId): string {
   return CATEGORY_IMAGES[categoryId];
+}
+
+export function listMissingImageCombos(
+  combos: Array<{ tag1: string; tag2: string }>
+): Array<{ tag1: string; tag2: string; slug: string; prompt: string }> {
+  return combos
+    .filter(({ tag1, tag2 }) => !getGeneratedImageUrl(tag1, tag2))
+    .map(({ tag1, tag2 }) => ({
+      tag1,
+      tag2,
+      slug: getTagComboSlug(tag1, tag2),
+      prompt: buildImaginePrompt(tag1, tag2),
+    }));
+}
+
+export function ensureProductsImageDir(): void {
+  if (!fs.existsSync(PRODUCTS_DIR)) {
+    fs.mkdirSync(PRODUCTS_DIR, { recursive: true });
+  }
 }

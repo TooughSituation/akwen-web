@@ -13,6 +13,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { formatCategoryLabel, formatKindLabel } from "@/lib/b2b/labels";
+import { isGeneratedProductPhoto } from "@/lib/b2b/image-prompts";
 import { cn } from "@/lib/utils";
 
 const CATEGORY_ICONS: Record<string, LucideIcon> = {
@@ -55,18 +56,65 @@ export function ProductImage({
   tag2,
   compact = false,
 }: ProductImageProps) {
+  const [imgFailed, setImgFailed] = useState(false);
+  const isGenerated = isGeneratedProductPhoto(imageUrl);
+  const isExternalImage = imageUrl.startsWith("http");
+  const showPhoto = imageUrl && !imgFailed;
+
+  if (isGenerated && showPhoto) {
+    return (
+      <div className="relative h-full w-full overflow-hidden bg-white">
+        <Image
+          src={imageUrl}
+          alt={name}
+          fill
+          className="object-cover transition-transform duration-300 group-hover:scale-105"
+          sizes={compact ? "112px" : "(max-width: 768px) 50vw, 25vw"}
+          onError={() => setImgFailed(true)}
+        />
+      </div>
+    );
+  }
+
+  return (
+    <ProductImagePlaceholder
+      imageUrl={showPhoto ? imageUrl : ""}
+      name={name}
+      tag1={tag1}
+      tag2={tag2}
+      compact={compact}
+      isExternalImage={isExternalImage}
+      onImageError={() => setImgFailed(true)}
+    />
+  );
+}
+
+function ProductImagePlaceholder({
+  imageUrl,
+  name,
+  tag1,
+  tag2,
+  compact,
+  isExternalImage,
+  onImageError,
+}: {
+  imageUrl: string;
+  name: string;
+  tag1: string;
+  tag2: string;
+  compact?: boolean;
+  isExternalImage: boolean;
+  onImageError: () => void;
+}) {
   const [bgLoaded, setBgLoaded] = useState(false);
-  const [bgFailed, setBgFailed] = useState(false);
 
   const categoryLabel = formatCategoryLabel(tag1);
   const kindLabel = formatKindLabel(tag2);
   const Icon = CATEGORY_ICONS[tag1] ?? Fish;
-  const isExternalImage = imageUrl.startsWith("http");
-  const showBackground = imageUrl && !bgFailed;
 
   return (
     <div className="relative h-full w-full overflow-hidden bg-gradient-to-br from-navy-900 via-[#004d73] to-turquoise-600">
-      {showBackground && (
+      {imageUrl && (
         <Image
           src={imageUrl}
           alt=""
@@ -74,12 +122,12 @@ export function ProductImage({
           aria-hidden
           className={cn(
             "object-cover transition-opacity duration-300",
-            bgLoaded ? "opacity-35" : "opacity-0"
+            bgLoaded ? "opacity-30" : "opacity-0"
           )}
           sizes={compact ? "112px" : "(max-width: 768px) 50vw, 25vw"}
           unoptimized={isExternalImage}
           onLoad={() => setBgLoaded(true)}
-          onError={() => setBgFailed(true)}
+          onError={onImageError}
         />
       )}
 

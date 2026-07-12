@@ -42,3 +42,13 @@ export interface ProductCatalog {
   totalCount: number;
   lastUpdated: string;
 }
+
+export interface CartItem {
+  productId: string;
+  symbol: string;
+  name: string;
+  unit: string;
+  priceNet: number;
+  stock: number;
+  quantity: number;
+}

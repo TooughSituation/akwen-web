@@ -1,6 +1,9 @@
+"use client";
+
 import { Bell, Search } from "lucide-react";
 import type { B2BCustomer } from "@/lib/b2b/types";
 import { Badge } from "@/components/ui/badge";
+import { CartHeaderLink } from "@/components/b2b/cart-header-link";
 
 interface B2BHeaderProps {
   customer: B2BCustomer;
@@ -26,6 +29,8 @@ export function B2BHeader({ customer, title, description }: B2BHeaderProps) {
             <Search className="size-4" />
             <span>Szybkie wyszukiwanie w katalogu</span>
           </div>
+
+          <CartHeaderLink />
 
           <button
             type="button"

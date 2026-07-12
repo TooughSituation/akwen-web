@@ -11,6 +11,7 @@ import {
   UserCircle,
   ExternalLink,
 } from "lucide-react";
+import { useCart } from "@/contexts/cart-context";
 import { cn } from "@/lib/utils";
 
 const navItems = [
@@ -23,6 +24,7 @@ const navItems = [
 
 export function B2BSidebar() {
   const pathname = usePathname();
+  const { totalItems, isHydrated } = useCart();
 
   return (
     <aside className="flex w-64 shrink-0 flex-col border-r border-navy-800/50 bg-navy-900 text-white">
@@ -60,7 +62,12 @@ export function B2BSidebar() {
               )}
             >
               <Icon className="size-4 shrink-0" />
-              {item.label}
+              <span className="flex-1">{item.label}</span>
+              {item.href === "/b2b/koszyk" && isHydrated && totalItems > 0 && (
+                <span className="rounded-full bg-coral-500 px-2 py-0.5 text-[10px] font-bold text-white">
+                  {totalItems > 99 ? "99+" : totalItems}
+                </span>
+              )}
             </Link>
           );
         })}

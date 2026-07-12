@@ -1,7 +1,11 @@
+"use client";
+
+import { useState } from "react";
 import Image from "next/image";
-import { Package } from "lucide-react";
+import { Check, Package } from "lucide-react";
 import type { B2BProduct } from "@/lib/b2b/types";
 import { formatPrice } from "@/lib/b2b/format";
+import { useCart } from "@/contexts/cart-context";
 import { Badge } from "@/components/ui/badge";
 import {
   Card,
@@ -35,13 +39,21 @@ function StockBadge({ stock }: { stock: number }) {
   }
   return (
     <Badge className="bg-turquoise-500/15 text-turquoise-600">
-      Dostępne: {stock} {stock === 1 ? "szt." : "szt."}
+      Dostępne: {stock} szt.
     </Badge>
   );
 }
 
 export function ProductCard({ product, compact = false }: ProductCardProps) {
+  const { addItem } = useCart();
+  const [justAdded, setJustAdded] = useState(false);
   const isExternalImage = product.imageUrl.startsWith("http");
+
+  function handleAddToCart() {
+    addItem(product, 1);
+    setJustAdded(true);
+    window.setTimeout(() => setJustAdded(false), 1500);
+  }
 
   return (
     <Card
@@ -107,11 +119,26 @@ export function ProductCard({ product, compact = false }: ProductCardProps) {
           {!compact && (
             <Button
               size="sm"
-              className="w-full bg-turquoise-500 hover:bg-turquoise-600"
+              className={cn(
+                "w-full",
+                justAdded
+                  ? "bg-green-600 hover:bg-green-600"
+                  : "bg-turquoise-500 hover:bg-turquoise-600"
+              )}
               disabled={product.stock <= 0}
+              onClick={handleAddToCart}
             >
-              <Package className="size-4" />
-              Dodaj do koszyka
+              {justAdded ? (
+                <>
+                  <Check className="size-4" />
+                  Dodano!
+                </>
+              ) : (
+                <>
+                  <Package className="size-4" />
+                  Dodaj do koszyka
+                </>
+              )}
             </Button>
           )}
         </CardContent>

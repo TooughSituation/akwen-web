@@ -8,6 +8,7 @@ import {
   Truck,
 } from "lucide-react";
 import { B2BHeader } from "@/components/b2b/b2b-header";
+import { CartCountBadge } from "@/components/b2b/cart-count-badge";
 import { ProductCard } from "@/components/b2b/product-card";
 import { getMockCustomer } from "@/lib/b2b/auth";
 import { getFeaturedProducts, getProductCatalog } from "@/lib/b2b/products";
@@ -51,7 +52,7 @@ export default function B2BDashboardPage() {
     },
     {
       label: "Pozycje w koszyku",
-      value: "0",
+      value: "cart",
       icon: ShoppingCart,
       hint: "Gotowe do wysłania",
     },
@@ -98,7 +99,7 @@ export default function B2BDashboardPage() {
                 </CardHeader>
                 <CardContent>
                   <p className="text-3xl font-semibold text-navy-900 dark:text-white">
-                    {stat.value}
+                    {stat.value === "cart" ? <CartCountBadge /> : stat.value}
                   </p>
                   <p className="mt-1 text-xs text-muted-foreground">{stat.hint}</p>
                 </CardContent>

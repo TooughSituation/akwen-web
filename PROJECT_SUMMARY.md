@@ -1,154 +1,191 @@
-# Projekt: Nowa strona Akwen (akwen-web)
+# Projekt: akwen-web — Portal B2B MVP (Akwen)
 
-> Ostatnia aktualizacja: 11.07.2026
-
-## Cel projektu
-
-Przebudowa strony firmowej **AKWEN Sp. z o.o.** (dystrybutor ryb z Białegostoku, działalność od 1991) z zachowaniem 100% treści i logów ze starej strony https://www.akwen.bialystok.pl/, w nowoczesnym, premium designie.
-
-## Brief projektowy (wersja 2.0, 11.07.2026)
-
-- **Paleta:** Granat `#001F3F`, Teal `#0077B6`, Koral `#FF6B35`
-- **Typografia:** Playfair Display / Montserrat (nagłówki), Inter (tekst)
-- Duży nacisk na apetyczne zdjęcia produktów
-- **Slogan:** „Morskie opowieści”
-- **CTA:** „Nasza oferta” + „Przejdź do portalu B2B”
-
-## Stack technologiczny
-
-- Next.js 15.5.20 (App Router)
-- React 19
-- Tailwind CSS v4
-- shadcn/ui + Base UI
-- next-themes (tryb jasny/ciemny)
-- TypeScript
-- Deploy: Vercel (auto-deploy z GitHub)
+> Ostatnia aktualizacja: 12.07.2026  
+> Commit: `bf6d8d7`  
+> Kontekst dla SuperGrok Web / kolejnych sesji AI
 
 ## Linki
 
 | Zasób | URL |
 |-------|-----|
-| Strona live | https://akwen-web.vercel.app |
-| GitHub | https://github.com/TooughSituation/akwen-web |
+| **Produkcja** | https://akwen-web.vercel.app |
+| **GitHub** | https://github.com/TooughSituation/akwen-web |
 | Stara strona (referencja) | https://www.akwen.bialystok.pl/ |
-| Portal B2B (docelowy) | https://b2b.akwen.bialystok.pl |
+| Portal B2B (legacy) | https://b2b.akwen.bialystok.pl |
 
-## Struktura projektu
+## Stack
+
+- Next.js 15.5.20, React 19, TypeScript, Tailwind v4, shadcn/ui, xlsx
+- Deploy: Vercel (auto-deploy z GitHub `master`)
+- Kolory: Granat `#001F3F`, Turkus `#0077B6`, Koral `#FF6B35`
+
+---
+
+## Stan projektu — kompletny MVP B2B
+
+Portal hurtowy `/b2b/*` jest **funkcjonalny i wdrożony na produkcji**.
+
+### Moduły B2B
+
+| Moduł | Ścieżka | Opis |
+|-------|---------|------|
+| Dashboard | `/b2b` | Statystyki + sekcja **„Polecane dla Ciebie"** (6 produktów z flagi Proponowany) |
+| Katalog | `/b2b/katalog` | 517 produktów, filtry Kategoria/Rodzaj, sortowanie, zakładka Polecane |
+| Koszyk | `/b2b/koszyk` | React Context + localStorage `akwen-b2b-cart` |
+| Zamówienia | `/b2b/zamowienia` | Lista, szczegóły, „Zamów ponownie" |
+| Moje dane | `/b2b/moje-dane` | Profil firmy + adresy dostawy, localStorage `akwen-b2b-profile` |
+| Checkout | w koszyku | 3-krokowy flow, numer `AKW-YYYYMMDD-NNN` |
+
+### Strona publiczna
+
+`/`, `/o-nas`, `/oferta`, `/produkty`, `/kontakt`
+
+---
+
+## Dane produktów (Excel)
+
+**Plik:** `public/data/produkty.xlsx`  
+**Arkusz:** „Magazyn akt dla Jarka"  
+**Wiersze:** 517
+
+| Kolumna Excel | Pole w kodzie | Opis |
+|---|---|---|
+| Symbol | `symbol` / `id` | ID produktu |
+| Nazwa | `name` | Nazwa produktu |
+| Tag1 | `tag1` | Kategoria (22 wartości) |
+| Tag2 | `tag2` | Rodzaj (76 wartości) |
+| Proponowany | `isRecommended` | „Tak" = 134 produkty polecane |
+| Ilość W magazynie Dostępna | `stock` | Stan magazynowy |
+| Cena z cennika… Netto | `priceNet` | Cena hurtowa netto |
+| Producent | `producer` | Producent |
+| Jm | `unit` | Jednostka miary |
+
+---
+
+## Zdjęcia produktów (Grok Imagine)
+
+**146 wygenerowanych zdjęć** w `public/images/products/*.jpg`  
+**Pokrycie:** 517/517 produktów (100%) — jedno zdjęcie na parę Tag1+Tag2 (147 kombinacji)
+
+### Przepływ
 
 ```
-src/
-  app/
-    page.tsx          — strona główna
-    o-nas/page.tsx    — o firmie
-    oferta/page.tsx   — oferta
-    produkty/page.tsx — produkty litewskie
-    kontakt/page.tsx  — kontakt
-    b2b/page.tsx      — portal B2B (placeholder)
-    layout.tsx        — layout + fonty
-    globals.css       — paleta kolorów z briefu
-  components/
-    header.tsx        — sticky navbar z logo, scroll-aware
-    hero.tsx          — sekcja hero
-    footer.tsx        — stopka z mapą i logotypami UE/KPO
-    partner-logos.tsx — pasek logo partnerów
-    section-heading.tsx, wave-divider.tsx, page-header.tsx, theme-toggle.tsx
-  lib/
-    content.ts        — wszystkie treści + ścieżki do assetów
-
-public/images/        — grafiki pobrane ze starej strony
+Excel (Tag1 + Tag2)
+    ↓
+buildImaginePrompt()  →  prompt dla Grok Imagine
+    ↓
+public/images/products/{slug}.jpg  (np. pasty-losos.jpg)
+    ↓
+product-image-manifest.json
+    ↓
+getProductImage()  →  ProductImage na kartach
 ```
 
-## Co zostało zrobione
+**Przykład:** Tag1 „Pasty" + Tag2 „Łosoś" → pasta z łososiem w słoiku, fotografia produktowa, jasne tło.
 
-### Design i UX
+**Fallback:** gradient morski + ikona kategorii gdy brak pliku.
 
-- [x] Paleta kolorów z briefu (granat, teal, koral)
-- [x] Fonty: Inter, Playfair Display, Montserrat
-- [x] Sticky navbar — przezroczysty nad hero, solidny granat po scrollu
-- [x] Hero: duże zdjęcie (`bg-hero.jpg`), slogan, 2 CTA
-- [x] Pasek logo partnerów pod hero (`loga-1/2/3.png`)
-- [x] Karty oferty ze zdjęciami produktów (hover zoom)
-- [x] Sekcja produktów litewskich ze zdjęciem + ornamenty
-- [x] Footer z białym logo, mapą, logotypami UE/KPO/PO RYBY
+### Pliki zdjęć
 
-### Treści (migracja ze starej strony)
-
-- [x] 100% tekstów w `src/lib/content.ts`
-- [x] Dane kontaktowe, NIP, KRS
-- [x] Sekcja O nas (5 akapitów + PO RYBY + zasięg)
-- [x] 4 kategorie oferty (mrożone, wędzone, konserwy, przetwory)
-- [x] 4 marki litewskie (Dauparų žuvis, Norvelita, Vičiūnai, ICECO)
-- [x] Wyróżnienia: Gazela Biznesu, Orzeł Dystrybucji, KPO, PO RYBY
-
-### Grafiki (pobrane z akwen.bialystok.pl)
-
-- `logo.png`, `logo-white.png`
-- `bg-hero.jpg` (tło hero)
-- `oferta_mrozone.jpg`, `oferta_wedzone.jpg`, `oferta_konserwy.jpg`, `oferta_przetwory.jpg`
-- `oferta-litewskie.png`
-- `gazele-biznesu.png`, `pcdr.png`, `po-ryby.png`
-- `mapka.png`, `bg-map.jpg`
-- `loga-1.png`, `loga-2.png`, `loga-3.png`
-- `loga-ue.png`, `logo-kpo.png`
-- `ornament-up.png`, `ornament-down.png`
-
-### Deploy
-
-- [x] Repo na GitHub (`TooughSituation/akwen-web`)
-- [x] Vercel — strona live i działająca
-- [x] Naprawiony bug: ścieżka obrazka produktów litewskich (`oferta-litewskie.png`)
-
-## Strony i status
-
-| URL | Status |
-|-----|--------|
-| `/` | OK — pełna strona główna |
-| `/o-nas` | OK — pełna treść + nagrody |
-| `/oferta` | OK — karty ze zdjęciami |
-| `/produkty` | OK — marki + zdjęcie |
-| `/kontakt` | OK — dane + mapa |
-| `/b2b` | OK — placeholder |
-
-## Backlog
-
-- [ ] Podlinkowanie B2B do https://b2b.akwen.bialystok.pl (obecnie wewnętrzna strona `/b2b`)
-- [ ] Własna domena (`www.akwen.bialystok.pl`) w Vercel
-- [ ] Osobna grafika „Orzeł Dystrybucji FMCG” (obecnie reużywana Gazela)
-- [ ] Favicon ze starej strony
-- [ ] Zdjęcia poszczególnych marek litewskich
-- [ ] Dopracowanie mobile UX
-- [ ] SEO: meta tagi, Open Graph, structured data
-- [ ] Formularz kontaktowy
-- [ ] Aktualizacja README.md
-
-## Jak pracować lokalnie
-
-```powershell
-cd C:\Users\user\akwen-web
-npx next dev --turbopack
-# → http://localhost:3000
+```
+src/lib/b2b/image-prompts.ts
+src/lib/b2b/images.ts
+src/components/b2b/product-image.tsx
+public/data/product-image-manifest.json
+public/images/products/*.jpg
+scripts/sync-image-manifest.mjs
+scripts/coverage-report.mjs
+scripts/generate-product-images-batch.mjs
 ```
 
-## Jak wdrażać zmiany
+---
 
-```powershell
-git add .
-git commit -m "Opis zmiany"
-git push
-# → Vercel auto-deploy w ~1-2 min
+## UX katalogu
+
+- Filtry: **Kategoria** (Tag1) + **Rodzaj** (Tag2)
+- Sortowanie: nazwa, cena, producent, stan, kategoria A–Z
+- Zakładka **Polecane** — `/b2b/katalog?widok=proponowane`
+- Brak żargonu technicznego (Tag1/Tag2) w UI
+- Mobile: hamburger + Sheet
+- Etykiety: `src/lib/b2b/labels.ts`
+
+---
+
+## Architektura
+
+| Warstwa | Technologia |
+|---------|-------------|
+| Server | Server Components, `server-only`, React `cache()` |
+| Produkty | Excel przy buildzie (`products.ts`) |
+| Stan klienta | Context + localStorage |
+| Auth | Mock (`auth.ts`) |
+
+### Kluczowe pliki
+
+```
+src/lib/b2b/
+  types.ts, products.ts, images.ts, image-prompts.ts, labels.ts
+  categories.ts, orders.ts, profile.ts, auth.ts, format.ts
+
+src/contexts/
+  cart-context.tsx, profile-context.tsx
+
+src/components/b2b/
+  catalog-client.tsx, product-card.tsx, product-image.tsx
+  mobile-nav.tsx, sidebar.tsx, cart-checkout.tsx
+  order-form.tsx, profile-form.tsx, orders-list.tsx
+
+src/app/b2b/
+  page.tsx, katalog/, koszyk/, zamowienia/, moje-dane/
 ```
 
-## Kluczowe pliki do edycji
+---
 
-| Plik | Zawartość |
-|------|-----------|
-| `src/lib/content.ts` | Wszystkie teksty i ścieżki grafik |
-| `src/app/page.tsx` | Układ strony głównej |
-| `src/components/hero.tsx` | Sekcja hero |
-| `src/components/header.tsx` | Nawigacja |
-| `src/components/footer.tsx` | Stopka |
-| `src/app/globals.css` | Kolory i style globalne |
+## Historia commitów (ostatnie)
 
-## Status projektu
+```
+bf6d8d7  Wygenerowane zdjecia produktow B2B: 146 obrazow Grok Imagine
+5281423  Poprawa UX katalogu: przyjazne etykiety, placeholdery
+e8d8ac7  Dopracowanie MVP: tagi Tag1/Tag2, filtry, Proponowane
+431ccc7  Modul Moje dane: profil firmy i adresy dostawy
+```
 
-**Działający prototyp podglądowy** — gotowy do pokazania zespołowi. Treści i grafiki ze starej strony przeniesione. Design zgodny z briefem v2.0. Następne kroki zależą od feedbacku zespołu.
+---
+
+## Testowanie na produkcji
+
+| Co | URL |
+|----|-----|
+| Dashboard | https://akwen-web.vercel.app/b2b |
+| Katalog | https://akwen-web.vercel.app/b2b/katalog |
+| Polecane | https://akwen-web.vercel.app/b2b/katalog?widok=proponowane |
+| Koszyk | https://akwen-web.vercel.app/b2b/koszyk |
+| Moje dane | https://akwen-web.vercel.app/b2b/moje-dane |
+
+---
+
+## Ograniczenia MVP
+
+- Brak prawdziwego logowania i API backend
+- localStorage — brak sync między urządzeniami
+- Rabat 5% nie stosowany do cen w koszyku
+- Excel + zdjęcia wczytywane przy buildzie (zmiana = redeploy)
+- Zdjęcia AI — nie są fotografiami rzeczywistych opakowań
+
+---
+
+## Sugerowane następne kroki
+
+1. Prawdziwe zdjęcia produktów (fotografia studyjna)
+2. Logowanie (Clerk / Auth0)
+3. API + baza danych zamiast Excela/localStorage
+4. Rabat % w koszyku
+5. Filtry w URL (`?kategoria=Pasty&rodzaj=Łosoś`)
+6. Eksport zamówienia (PDF / email)
+7. Kolumna „Powód proponowania" w Excelu
+
+---
+
+## Kontekst developera
+
+Użytkownik uczy się od podstaw (doświadczenie VBA/Excel). Preferuje wyjaśnienia krok po kroku z analogiami do Excela. Komunikacja po polsku.

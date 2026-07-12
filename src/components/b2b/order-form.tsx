@@ -5,7 +5,7 @@ import { format } from "date-fns";
 import { pl } from "date-fns/locale";
 import { CalendarIcon } from "lucide-react";
 import { useCart } from "@/contexts/cart-context";
-import { MOCK_CUSTOMER, SAVED_DELIVERY_ADDRESSES } from "@/lib/b2b/auth";
+import { useProfile } from "@/contexts/profile-context";
 import { formatPrice } from "@/lib/b2b/format";
 import { createOrder, saveOrder } from "@/lib/b2b/orders";
 import type { B2BOrder } from "@/lib/b2b/types";
@@ -36,6 +36,8 @@ interface OrderFormProps {
 
 export function OrderForm({ onSuccess, onCancel }: OrderFormProps) {
   const { items, totalItems, totalNet, clearCart } = useCart();
+  const { profile } = useProfile();
+  const deliveryAddresses = profile.deliveryAddresses;
   const [deliveryDate, setDeliveryDate] = useState<Date | undefined>();
   const [calendarOpen, setCalendarOpen] = useState(false);
   const [addressMode, setAddressMode] = useState<"saved" | "custom">("saved");
@@ -47,7 +49,7 @@ export function OrderForm({ onSuccess, onCancel }: OrderFormProps) {
 
   function getDeliveryAddress(): string {
     if (addressMode === "custom") return customAddress.trim();
-    return SAVED_DELIVERY_ADDRESSES[selectedAddressIndex];
+    return deliveryAddresses[selectedAddressIndex]?.address ?? "";
   }
 
   function handleSubmit(event: React.FormEvent) {
@@ -75,8 +77,8 @@ export function OrderForm({ onSuccess, onCancel }: OrderFormProps) {
     try {
       const order = createOrder({
         items,
-        customerId: MOCK_CUSTOMER.id,
-        companyName: MOCK_CUSTOMER.companyName,
+        customerId: profile.id,
+        companyName: profile.companyName,
         deliveryDate: format(deliveryDate, "yyyy-MM-dd"),
         deliveryAddress,
         notes,
@@ -148,9 +150,9 @@ export function OrderForm({ onSuccess, onCancel }: OrderFormProps) {
           <div className="space-y-3">
             <Label>Adres dostawy</Label>
             <div className="space-y-2">
-              {SAVED_DELIVERY_ADDRESSES.map((address, index) => (
+              {deliveryAddresses.map((address, index) => (
                 <label
-                  key={address}
+                  key={address.id}
                   className={cn(
                     "flex cursor-pointer items-start gap-3 rounded-lg border p-3 transition-colors",
                     addressMode === "saved" && selectedAddressIndex === index
@@ -170,7 +172,11 @@ export function OrderForm({ onSuccess, onCancel }: OrderFormProps) {
                     }}
                     className="mt-1 accent-turquoise-500"
                   />
-                  <span className="text-sm leading-relaxed">{address}</span>
+                  <span className="text-sm leading-relaxed">
+                    <span className="font-medium">{address.label}</span>
+                    <br />
+                    {address.address}
+                  </span>
                 </label>
               ))}
 

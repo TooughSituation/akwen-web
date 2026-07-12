@@ -7,11 +7,10 @@ import {
   ArrowRight,
   Truck,
 } from "lucide-react";
-import { B2BHeader } from "@/components/b2b/b2b-header";
+import { DashboardHeader } from "@/components/b2b/dashboard-header";
 import { CartCountBadge } from "@/components/b2b/cart-count-badge";
 import { OpenOrdersCountBadge } from "@/components/b2b/open-orders-count-badge";
 import { ProductCard } from "@/components/b2b/product-card";
-import { getMockCustomer } from "@/lib/b2b/auth";
 import { getFeaturedProducts, getProductCatalog } from "@/lib/b2b/products";
 import { Button } from "@/components/ui/button";
 import {
@@ -23,7 +22,6 @@ import {
 } from "@/components/ui/card";
 
 export default function B2BDashboardPage() {
-  const customer = getMockCustomer();
   const catalog = getProductCatalog();
   const featured = getFeaturedProducts(6);
 
@@ -82,11 +80,7 @@ export default function B2BDashboardPage() {
 
   return (
     <>
-      <B2BHeader
-        customer={customer}
-        title={`Witaj, ${customer.contactPerson.split(" ")[0]}!`}
-        description={`${customer.companyName} · Panel partnera handlowego Akwen`}
-      />
+      <DashboardHeader />
 
       <div className="space-y-8 p-6">
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">

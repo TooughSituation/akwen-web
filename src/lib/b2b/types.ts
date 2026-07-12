@@ -92,3 +92,22 @@ export interface CreateOrderInput {
   deliveryAddress: string;
   notes: string;
 }
+
+export interface DeliveryAddress {
+  id: string;
+  label: string;
+  address: string;
+  isDefault?: boolean;
+}
+
+export interface B2BProfile {
+  id: string;
+  companyName: string;
+  nip: string;
+  regon: string;
+  contactPerson: string;
+  email: string;
+  phone: string;
+  discountPercent: number;
+  deliveryAddresses: DeliveryAddress[];
+}

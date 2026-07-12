@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { Clock } from "lucide-react";
 import { B2BHeader } from "@/components/b2b/b2b-header";
-import { getMockCustomer } from "@/lib/b2b/auth";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -17,11 +16,9 @@ interface PlaceholderPageProps {
 }
 
 export function B2BPlaceholderPage({ title, description }: PlaceholderPageProps) {
-  const customer = getMockCustomer();
-
   return (
     <>
-      <B2BHeader customer={customer} title={title} description={description} />
+      <B2BHeader title={title} description={description} />
       <div className="p-6">
         <Card className="max-w-lg border-turquoise-500/30">
           <CardHeader>

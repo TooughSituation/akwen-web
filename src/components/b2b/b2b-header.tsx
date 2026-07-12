@@ -1,17 +1,18 @@
 "use client";
 
 import { Bell, Search } from "lucide-react";
-import type { B2BCustomer } from "@/lib/b2b/types";
+import { useProfile } from "@/contexts/profile-context";
 import { Badge } from "@/components/ui/badge";
 import { CartHeaderLink } from "@/components/b2b/cart-header-link";
 
 interface B2BHeaderProps {
-  customer: B2BCustomer;
   title: string;
   description?: string;
 }
 
-export function B2BHeader({ customer, title, description }: B2BHeaderProps) {
+export function B2BHeader({ title, description }: B2BHeaderProps) {
+  const { customer } = useProfile();
+
   return (
     <header className="border-b border-border bg-card px-6 py-5">
       <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">

@@ -1,5 +1,16 @@
 import Link from "next/link";
-import { PageHeader } from "@/components/page-header";
+import {
+  Package,
+  ShoppingCart,
+  ClipboardList,
+  TrendingUp,
+  ArrowRight,
+  Truck,
+} from "lucide-react";
+import { B2BHeader } from "@/components/b2b/b2b-header";
+import { ProductCard } from "@/components/b2b/product-card";
+import { getMockCustomer } from "@/lib/b2b/auth";
+import { getFeaturedProducts, getProductCatalog } from "@/lib/b2b/products";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -8,93 +19,144 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { company } from "@/lib/content";
-import { Clock, Mail, Phone, ShoppingCart, Truck, BarChart3 } from "lucide-react";
 
-const plannedFeatures = [
-  {
-    icon: ShoppingCart,
-    title: "Zamówienia online",
-    description: "Składaj zamówienia hurtowe bezpośrednio przez platformę, 24/7.",
-  },
-  {
-    icon: Truck,
-    title: "Śledzenie dostaw",
-    description: "Monitoruj status realizacji i transportu chłodniczego w czasie rzeczywistym.",
-  },
-  {
-    icon: BarChart3,
-    title: "Historia i raporty",
-    description: "Przeglądaj historię zamówień i generuj raporty dla swojej firmy.",
-  },
-];
+export default function B2BDashboardPage() {
+  const customer = getMockCustomer();
+  const catalog = getProductCatalog();
+  const featured = getFeaturedProducts(6);
 
-export default function B2BPage() {
+  const inStockCount = catalog.products.filter((p) => p.stock > 0).length;
+  const categoryCount = catalog.categories.filter((c) =>
+    catalog.products.some((p) => p.category.id === c.id)
+  ).length;
+
+  const stats = [
+    {
+      label: "Produkty w katalogu",
+      value: catalog.totalCount.toString(),
+      icon: Package,
+      hint: `${categoryCount} kategorii`,
+    },
+    {
+      label: "Dostępne na magazynie",
+      value: inStockCount.toString(),
+      icon: TrendingUp,
+      hint: `${Math.round((inStockCount / catalog.totalCount) * 100)}% asortymentu`,
+    },
+    {
+      label: "Otwarte zamówienia",
+      value: "2",
+      icon: ClipboardList,
+      hint: "W realizacji",
+    },
+    {
+      label: "Pozycje w koszyku",
+      value: "0",
+      icon: ShoppingCart,
+      hint: "Gotowe do wysłania",
+    },
+  ];
+
+  const quickActions = [
+    {
+      title: "Przeglądaj katalog",
+      description: `${catalog.totalCount} produktów z aktualnymi cenami hurtowymi`,
+      href: "/b2b/katalog",
+      icon: Package,
+    },
+    {
+      title: "Powtórz zamówienie",
+      description: "Szybko zamów ostatni asortyment",
+      href: "/b2b/zamowienia",
+      icon: ClipboardList,
+    },
+    {
+      title: "Śledź dostawę",
+      description: "Sprawdź status transportu chłodniczego",
+      href: "/b2b/zamowienia",
+      icon: Truck,
+    },
+  ];
+
   return (
     <>
-      <PageHeader
-        label="Platforma B2B"
-        title="Platforma B2B Akwen"
-        description="Wkrótce dostępna dla naszych partnerów handlowych."
+      <B2BHeader
+        customer={customer}
+        title={`Witaj, ${customer.contactPerson.split(" ")[0]}!`}
+        description={`${customer.companyName} · Panel partnera handlowego Akwen`}
       />
-      <section className="mx-auto max-w-6xl px-4 py-12 sm:px-6 lg:px-8">
-        <Card className="border-turquoise-500/30 bg-turquoise-500/5">
-          <CardHeader>
-            <div className="flex items-center gap-3">
-              <Clock className="size-6 text-turquoise-600" />
-              <div>
-                <CardTitle className="text-xl">Strona w przygotowaniu</CardTitle>
-                <CardDescription className="mt-1 text-base">
-                  Pracujemy nad platformą B2B, która ułatwi współpracę handlową.
-                  Docelowo będzie dostępna pod adresem{" "}
-                  <span className="font-medium text-foreground">
-                    b2b.akwen.bialystok.pl
-                  </span>
-                </CardDescription>
-              </div>
-            </div>
-          </CardHeader>
-        </Card>
 
-        <h2 className="mt-12 text-2xl font-bold">Planowane funkcje</h2>
-        <div className="mt-6 grid gap-6 sm:grid-cols-3">
-          {plannedFeatures.map((feature) => (
-            <Card key={feature.title}>
-              <CardHeader>
-                <feature.icon className="size-8 text-turquoise-600" />
-                <CardTitle className="mt-2">{feature.title}</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <CardDescription className="text-sm leading-relaxed">
-                  {feature.description}
-                </CardDescription>
-              </CardContent>
-            </Card>
-          ))}
+      <div className="space-y-8 p-6">
+        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          {stats.map((stat) => {
+            const Icon = stat.icon;
+            return (
+              <Card key={stat.label} className="border-border/60">
+                <CardHeader className="flex flex-row items-center justify-between pb-2">
+                  <CardDescription>{stat.label}</CardDescription>
+                  <Icon className="size-4 text-turquoise-600" />
+                </CardHeader>
+                <CardContent>
+                  <p className="text-3xl font-semibold text-navy-900 dark:text-white">
+                    {stat.value}
+                  </p>
+                  <p className="mt-1 text-xs text-muted-foreground">{stat.hint}</p>
+                </CardContent>
+              </Card>
+            );
+          })}
         </div>
 
-        <Card className="mt-10">
-          <CardHeader>
-            <CardTitle>Chcesz zostać partnerem?</CardTitle>
-            <CardDescription>
-              Skontaktuj się z działem handlowym – chętnie omówimy warunki współpracy.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="flex flex-col gap-4 sm:flex-row sm:items-center">
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <Phone className="size-4 text-turquoise-600" />
-              {company.contact.mobile}
+        <div>
+          <div className="mb-4 flex items-center justify-between">
+            <div>
+              <h2 className="font-heading text-xl font-semibold">
+                Polecane produkty
+              </h2>
+              <p className="text-sm text-muted-foreground">
+                Największy stan magazynowy – gotowe do natychmiastowej wysyłki
+              </p>
             </div>
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <Mail className="size-4 text-turquoise-600" />
-              {company.contact.email}
-            </div>
-            <Button className="sm:ml-auto" render={<Link href="/kontakt" />}>
-              Przejdź do kontaktu
+            <Button
+              variant="outline"
+              size="sm"
+              render={<Link href="/b2b/katalog" />}
+            >
+              Cały katalog
+              <ArrowRight />
             </Button>
-          </CardContent>
-        </Card>
-      </section>
+          </div>
+          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+            {featured.map((product) => (
+              <ProductCard key={product.id} product={product} />
+            ))}
+          </div>
+        </div>
+
+        <div>
+          <h2 className="mb-4 font-heading text-xl font-semibold">
+            Szybkie akcje
+          </h2>
+          <div className="grid gap-4 sm:grid-cols-3">
+            {quickActions.map((action) => {
+              const Icon = action.icon;
+              return (
+                <Link key={action.title} href={action.href}>
+                  <Card className="h-full border-border/60 transition-shadow hover:shadow-md">
+                    <CardHeader>
+                      <Icon className="size-6 text-turquoise-600" />
+                      <CardTitle className="mt-2 text-base">
+                        {action.title}
+                      </CardTitle>
+                      <CardDescription>{action.description}</CardDescription>
+                    </CardHeader>
+                  </Card>
+                </Link>
+              );
+            })}
+          </div>
+        </div>
+      </div>
     </>
   );
 }

@@ -21,8 +21,16 @@ export interface B2BProduct {
   stock: number;
   priceNet: number;
   producer: string;
+  tag1: string;
+  tag2: string;
+  isRecommended: boolean;
   category: ProductCategory;
   imageUrl: string;
+}
+
+export interface TagFilterData {
+  tag1List: string[];
+  tag2ByTag1: Record<string, string[]>;
 }
 
 export interface B2BCustomer {
@@ -39,7 +47,9 @@ export interface B2BCustomer {
 export interface ProductCatalog {
   products: B2BProduct[];
   categories: ProductCategory[];
+  tags: TagFilterData;
   totalCount: number;
+  recommendedCount: number;
   lastUpdated: string;
 }
 

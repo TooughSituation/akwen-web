@@ -14,7 +14,7 @@ import {
 import { useCart } from "@/contexts/cart-context";
 import { cn } from "@/lib/utils";
 
-const navItems = [
+export const navItems = [
   { href: "/b2b", label: "Dashboard", icon: LayoutDashboard, exact: true },
   { href: "/b2b/katalog", label: "Katalog", icon: Package },
   { href: "/b2b/koszyk", label: "Koszyk", icon: ShoppingCart },
@@ -22,14 +22,18 @@ const navItems = [
   { href: "/b2b/moje-dane", label: "Moje dane", icon: UserCircle },
 ];
 
-export function B2BSidebar() {
+interface B2BSidebarContentProps {
+  onNavigate?: () => void;
+}
+
+export function B2BSidebarContent({ onNavigate }: B2BSidebarContentProps) {
   const pathname = usePathname();
   const { totalItems, isHydrated } = useCart();
 
   return (
-    <aside className="flex w-64 shrink-0 flex-col border-r border-navy-800/50 bg-navy-900 text-white">
+    <>
       <div className="border-b border-navy-800/50 px-5 py-5">
-        <Link href="/b2b" className="flex items-center gap-3">
+        <Link href="/b2b" className="flex items-center gap-3" onClick={onNavigate}>
           <Image
             src="/images/logo-white.png"
             alt="Akwen B2B"
@@ -54,6 +58,7 @@ export function B2BSidebar() {
             <Link
               key={item.href}
               href={item.href}
+              onClick={onNavigate}
               className={cn(
                 "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
                 isActive
@@ -76,12 +81,21 @@ export function B2BSidebar() {
       <div className="border-t border-navy-800/50 p-4">
         <Link
           href="/"
+          onClick={onNavigate}
           className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-ocean-200 transition-colors hover:bg-white/10 hover:text-white"
         >
           <ExternalLink className="size-4" />
           Strona publiczna
         </Link>
       </div>
+    </>
+  );
+}
+
+export function B2BSidebar() {
+  return (
+    <aside className="hidden w-64 shrink-0 flex-col border-r border-navy-800/50 bg-navy-900 text-white lg:flex">
+      <B2BSidebarContent />
     </aside>
   );
 }

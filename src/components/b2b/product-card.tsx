@@ -76,13 +76,28 @@ export function ProductCard({ product, compact = false }: ProductCardProps) {
           sizes={compact ? "112px" : "(max-width: 768px) 50vw, 25vw"}
           unoptimized={isExternalImage}
         />
-        <div className="absolute top-2 left-2">
-          <Badge
-            variant="secondary"
-            className="bg-navy-900/80 text-[10px] text-white backdrop-blur-sm"
-          >
-            {product.category.label}
-          </Badge>
+        <div className="absolute top-2 left-2 flex flex-wrap gap-1">
+          {product.tag1 && (
+            <Badge
+              variant="secondary"
+              className="bg-navy-900/80 text-[10px] text-white backdrop-blur-sm"
+            >
+              {product.tag1}
+            </Badge>
+          )}
+          {product.tag2 && (
+            <Badge
+              variant="secondary"
+              className="bg-turquoise-600/80 text-[10px] text-white backdrop-blur-sm"
+            >
+              {product.tag2}
+            </Badge>
+          )}
+          {product.isRecommended && (
+            <Badge className="bg-coral-500/90 text-[10px] text-white backdrop-blur-sm">
+              Polecane
+            </Badge>
+          )}
         </div>
       </div>
 

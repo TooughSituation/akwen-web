@@ -11,7 +11,7 @@ import { DashboardHeader } from "@/components/b2b/dashboard-header";
 import { CartCountBadge } from "@/components/b2b/cart-count-badge";
 import { OpenOrdersCountBadge } from "@/components/b2b/open-orders-count-badge";
 import { ProductCard } from "@/components/b2b/product-card";
-import { getFeaturedProducts, getProductCatalog } from "@/lib/b2b/products";
+import { getProductCatalog, getRecommendedProducts } from "@/lib/b2b/products";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -23,19 +23,16 @@ import {
 
 export default function B2BDashboardPage() {
   const catalog = getProductCatalog();
-  const featured = getFeaturedProducts(6);
+  const recommended = getRecommendedProducts(6);
 
   const inStockCount = catalog.products.filter((p) => p.stock > 0).length;
-  const categoryCount = catalog.categories.filter((c) =>
-    catalog.products.some((p) => p.category.id === c.id)
-  ).length;
 
   const stats = [
     {
       label: "Produkty w katalogu",
       value: catalog.totalCount.toString(),
       icon: Package,
-      hint: `${categoryCount} kategorii`,
+      hint: `${catalog.tags.tag1List.length} grup (Tag1)`,
     },
     {
       label: "Dostępne na magazynie",
@@ -110,26 +107,36 @@ export default function B2BDashboardPage() {
         </div>
 
         <div>
-          <div className="mb-4 flex items-center justify-between">
+          <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <h2 className="font-heading text-xl font-semibold">
-                Polecane produkty
+                Polecane dla Ciebie
               </h2>
               <p className="text-sm text-muted-foreground">
-                Największy stan magazynowy – gotowe do natychmiastowej wysyłki
+                {catalog.recommendedCount} produktów oznaczonych jako proponowane
+                w aktualnym cenniku
               </p>
             </div>
-            <Button
-              variant="outline"
-              size="sm"
-              render={<Link href="/b2b/katalog" />}
-            >
-              Cały katalog
-              <ArrowRight />
-            </Button>
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                render={<Link href="/b2b/katalog?widok=proponowane" />}
+              >
+                Wszystkie proponowane
+                <ArrowRight />
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                render={<Link href="/b2b/katalog" />}
+              >
+                Cały katalog
+              </Button>
+            </div>
           </div>
           <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-            {featured.map((product) => (
+            {recommended.map((product) => (
               <ProductCard key={product.id} product={product} />
             ))}
           </div>

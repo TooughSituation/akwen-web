@@ -173,3 +173,60 @@
     font-family: var(--font-display), var(--font-sans), ui-sans-serif, sans-serif;
   }
 }
+
+/* Treść strony Dotacje (HTML z mammoth / .docx) */
+@layer components {
+  .dotacje-content {
+    @apply max-w-none text-base leading-relaxed text-muted-foreground;
+  }
+
+  .dotacje-content > p {
+    @apply mb-4;
+  }
+
+  .dotacje-content > p:first-child {
+    @apply mb-8 flex justify-center rounded-xl border border-border bg-white p-4 sm:p-6 dark:bg-navy-950/40;
+  }
+
+  .dotacje-content img {
+    @apply h-auto w-full max-w-3xl object-contain;
+  }
+
+  .dotacje-content .dotacje-project-title {
+    @apply my-6 rounded-xl border border-turquoise-500/25 bg-turquoise-500/5 px-5 py-4 text-center text-lg font-semibold leading-snug text-navy-900 dark:text-foreground sm:text-xl;
+  }
+
+  .dotacje-content .dotacje-project-title strong,
+  .dotacje-content .dotacje-project-title em {
+    @apply font-semibold not-italic;
+  }
+
+  .dotacje-content strong {
+    @apply font-semibold text-navy-900 dark:text-foreground;
+  }
+
+  .dotacje-content ul {
+    @apply my-6 list-none space-y-2.5 rounded-xl border border-border bg-muted/40 p-5 sm:p-6;
+  }
+
+  .dotacje-content li {
+    @apply relative pl-6 text-muted-foreground;
+  }
+
+  .dotacje-content li::before {
+    content: "";
+    @apply absolute top-2.5 left-0 size-2 rounded-full bg-turquoise-500;
+  }
+
+  .dotacje-content .dotacje-highlight {
+    @apply my-4 rounded-lg border border-navy-200/60 bg-navy-50/80 px-4 py-3 text-navy-900 dark:border-navy-700 dark:bg-navy-900/50 dark:text-ocean-100;
+  }
+
+  .dotacje-content .dotacje-stat {
+    @apply my-3 rounded-lg border border-border bg-card px-4 py-3 font-medium text-navy-900 shadow-sm dark:text-foreground;
+  }
+
+  .dotacje-content .dotacje-stat-accent {
+    @apply border-turquoise-500/30 bg-turquoise-500/10 text-turquoise-600 dark:text-turquoise-300;
+  }
+}

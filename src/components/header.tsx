@@ -21,6 +21,7 @@ const navItems = [
   { href: "/o-nas", label: "O nas" },
   { href: "/oferta", label: "Oferta" },
   { href: "/produkty", label: "Produkty litewskie" },
+  { href: "/dotacje", label: "Dotacje" },
   { href: "/kontakt", label: "Kontakt" },
 ];
 

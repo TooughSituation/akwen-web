@@ -38,6 +38,9 @@ export function Footer() {
               <Link href="/produkty" className="hover:text-turquoise-300">
                 Produkty litewskie
               </Link>
+              <Link href="/dotacje" className="hover:text-turquoise-300">
+                Dotacje
+              </Link>
               <Link href="/kontakt" className="hover:text-turquoise-300">
                 Kontakt
               </Link>

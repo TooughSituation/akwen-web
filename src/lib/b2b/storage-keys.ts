@@ -14,6 +14,8 @@ export const STORAGE_BASE = {
   loyalty: "akwen-b2b-loyalty",
   /** Arkusz „Ulubione” — lista ID produktów per firma. */
   favorites: "akwen-b2b-favorites",
+  /** Historia czatu z handlowcem per firma. */
+  chat: "akwen-b2b-chat",
 } as const;
 
 export function userScopedKey(base: string, userId: string | null | undefined): string {
@@ -43,4 +45,8 @@ export function loyaltyStorageKey(userId: string | null | undefined): string {
 
 export function favoritesStorageKey(userId: string | null | undefined): string {
   return userScopedKey(STORAGE_BASE.favorites, userId);
+}
+
+export function chatStorageKey(userId: string | null | undefined): string {
+  return userScopedKey(STORAGE_BASE.chat, userId);
 }

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Bell, Heart, LogOut, Star } from "lucide-react";
+import { Heart, LogOut, Star } from "lucide-react";
 import { signOut } from "next-auth/react";
 import { useFavorites } from "@/contexts/favorites-context";
 import { useLoyalty } from "@/contexts/loyalty-context";
@@ -10,6 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { CartHeaderLink } from "@/components/b2b/cart-header-link";
 import { GlobalSearch } from "@/components/b2b/global-search";
+import { LiveChatHeaderButton } from "@/components/b2b/live-chat";
 import { cn } from "@/lib/utils";
 
 interface B2BHeaderProps {
@@ -66,13 +67,7 @@ export function B2BHeader({ title, description }: B2BHeaderProps) {
               {loyaltyHydrated ? `${balance} pkt` : "…"}
             </Link>
 
-            <button
-              type="button"
-              className="rounded-lg p-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-              aria-label="Powiadomienia"
-            >
-              <Bell className="size-5" />
-            </button>
+            <LiveChatHeaderButton />
 
             <div className="flex items-center gap-2 rounded-lg border border-border bg-muted/30 px-2 py-1.5 sm:gap-3 sm:px-3 sm:py-2">
               <div className="flex size-9 items-center justify-center rounded-full bg-turquoise-500 text-sm font-semibold text-white">

@@ -81,8 +81,8 @@ export default function B2BDashboardPage() {
     <>
       <DashboardHeader />
 
-      <div className="space-y-8 p-6">
-        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="space-y-12 p-5 sm:space-y-14 sm:p-8 lg:p-10">
+        <div className="grid gap-5 sm:grid-cols-2 sm:gap-6 xl:grid-cols-4">
           {stats.map((stat) => {
             const Icon = stat.icon;
             return (
@@ -138,7 +138,7 @@ export default function B2BDashboardPage() {
               </Button>
             </div>
           </div>
-          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+          <div className="grid gap-5 sm:grid-cols-2 sm:gap-6 xl:grid-cols-3 xl:gap-8">
             {recommended.map((product) => (
               <ProductCard key={product.id} product={product} />
             ))}

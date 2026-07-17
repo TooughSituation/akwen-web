@@ -422,14 +422,14 @@ export function CatalogClient({
   );
 
   return (
-    <div className="flex flex-col gap-6 lg:flex-row">
-      <aside className="hidden w-full shrink-0 lg:block lg:w-60">
-        <div className="sticky top-4 rounded-xl border border-border bg-card p-4">
+    <div className="flex flex-col gap-8 lg:flex-row lg:gap-10">
+      <aside className="hidden w-full shrink-0 lg:block lg:w-64">
+        <div className="sticky top-6 rounded-2xl border border-border/60 bg-card/90 p-5 shadow-sm shadow-navy-900/[0.02]">
           {filterPanel}
         </div>
       </aside>
 
-      <div className="min-w-0 flex-1 space-y-4">
+      <div className="min-w-0 flex-1 space-y-5 sm:space-y-6">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
           <div className="relative min-w-0 flex-1">
             <Search className="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
@@ -619,7 +619,7 @@ export function CatalogClient({
             )}
           </div>
         ) : (
-          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+          <div className="grid gap-5 sm:grid-cols-2 sm:gap-6 xl:grid-cols-3 xl:gap-8">
             {filteredProducts.map((product) => (
               <ProductCard key={product.id} product={product} />
             ))}

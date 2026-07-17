@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { motion } from "framer-motion";
 import { Check, Heart, Package, Sparkles, Tag } from "lucide-react";
 import type { B2BProduct } from "@/lib/b2b/types";
 import { formatCategoryLabel, formatKindLabel } from "@/lib/b2b/labels";
@@ -39,20 +40,18 @@ function StockBadge({ stock }: { stock: number }) {
   if (stock <= 0) {
     return (
       <Badge variant="secondary" className="bg-muted text-muted-foreground">
-        Brak na stanie
+        Brak
       </Badge>
     );
   }
   if (stock < 20) {
     return (
-      <Badge className="bg-coral-500/15 text-coral-600">
-        Niski stan: {stock} szt.
-      </Badge>
+      <Badge className="bg-coral-500/12 text-coral-600">Niski stan</Badge>
     );
   }
   return (
-    <Badge className="bg-turquoise-500/15 text-turquoise-600">
-      Dostępne: {stock} szt.
+    <Badge className="bg-turquoise-500/12 text-turquoise-600">
+      {stock} szt.
     </Badge>
   );
 }
@@ -75,10 +74,8 @@ export function ProductCard({ product, compact = false }: ProductCardProps) {
     product.priceNet,
     discountPercent
   );
-  // Domyślnie: Twoja cena (katalogowa + rabat + oszczędność). Toggle „Katalogowa” = sam cennik.
   const showDiscounted = hasDiscount && showYourPrice;
 
-  // Suma koszyka netto (po rabacie) → „brakuje do promocji” na żywo
   const cartNet = useMemo(
     () => sumCartNet(items, discountPercent),
     [items, discountPercent]
@@ -87,9 +84,7 @@ export function ProductCard({ product, compact = false }: ProductCardProps) {
     () => getNextPromotionProgress(cartNet),
     [cartNet]
   );
-  // Badge: najniższy próg (pierwsza promocja w tabeli) + ewentualnie gratis
   const primaryPromoBadge = CART_PROMOTIONS[0];
-  const secondaryPromoBadge = CART_PROMOTIONS[1];
 
   function handleAddToCart() {
     addItem(product, 1);
@@ -104,248 +99,206 @@ export function ProductCard({ product, compact = false }: ProductCardProps) {
   }
 
   return (
-    <Card
-      className={cn(
-        "group overflow-hidden border-border/60 p-0 transition-shadow hover:shadow-lg",
-        compact && "flex-row"
-      )}
+    <motion.div
+      initial={{ opacity: 0, y: 12 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-20px" }}
+      transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+      whileHover={compact ? undefined : { y: -3 }}
+      className="h-full"
     >
-      <div
+      <Card
         className={cn(
-          "relative overflow-hidden",
-          compact ? "aspect-square w-28 shrink-0" : "aspect-[4/3] w-full"
+          "group h-full overflow-hidden border-border/50 bg-card p-0 shadow-none transition-shadow duration-500 hover:shadow-xl hover:shadow-navy-900/[0.06]",
+          compact && "flex-row"
         )}
       >
-        <ProductImage
-          imageUrl={product.imageUrl}
-          name={product.name}
-          tag1={product.tag1}
-          tag2={product.tag2}
-          compact={compact}
-        />
-        {/* Serce — jak checkbox „Ulubione” w Access */}
-        <button
-          type="button"
-          onClick={handleToggleFavorite}
+        <div
           className={cn(
-            "absolute top-2 right-2 z-10 flex size-8 items-center justify-center rounded-full",
-            "bg-white/90 shadow-sm backdrop-blur-sm transition-colors",
-            "hover:bg-white focus-visible:ring-2 focus-visible:ring-coral-500 focus-visible:outline-none",
-            favorite && "bg-coral-500/15"
+            "relative overflow-hidden bg-muted/30",
+            compact
+              ? "aspect-square w-28 shrink-0 sm:w-32"
+              : "aspect-[4/5] w-full sm:aspect-[5/6]"
           )}
-          aria-label={
-            favorite
-              ? `Usuń z ulubionych: ${product.name}`
-              : `Dodaj do ulubionych: ${product.name}`
-          }
-          aria-pressed={favorite}
-          title={favorite ? "Usuń z ulubionych" : "Dodaj do ulubionych"}
         >
-          <Heart
-            className={cn(
-              "size-4 transition-colors",
-              favorite
-                ? "fill-coral-500 text-coral-500"
-                : "text-navy-900/70"
-            )}
+          <ProductImage
+            imageUrl={product.imageUrl}
+            name={product.name}
+            tag1={product.tag1}
+            tag2={product.tag2}
+            compact={compact}
           />
-        </button>
-        <div className="absolute top-2 left-2 flex flex-wrap gap-1">
-          {categoryLabel && (
-            <Badge
-              variant="secondary"
-              className="bg-navy-900/80 text-[10px] text-white backdrop-blur-sm"
-            >
-              {categoryLabel}
-            </Badge>
-          )}
-          {kindLabel && (
-            <Badge
-              variant="secondary"
-              className="bg-turquoise-600/80 text-[10px] text-white backdrop-blur-sm"
-            >
-              {kindLabel}
-            </Badge>
-          )}
-          {product.isRecommended && (
-            <Badge className="bg-coral-500/90 text-[10px] text-white backdrop-blur-sm">
-              <Sparkles className="mr-0.5 size-2.5" />
-              Polecane
-            </Badge>
-          )}
-          {product.recommendReason && (
-            <Badge
-              variant="secondary"
-              className="bg-white/90 text-[10px] text-navy-900 shadow-sm backdrop-blur-sm"
-              title={product.recommendReasonDetail ?? product.recommendReason}
-            >
-              {product.recommendReason}
-            </Badge>
-          )}
-          {primaryPromoBadge && (
-            <Badge
-              className="bg-coral-500/90 text-[10px] text-white backdrop-blur-sm"
-              title={primaryPromoBadge.title}
-            >
-              <Tag className="mr-0.5 size-2.5" />
-              {primaryPromoBadge.badgeLabel}
-            </Badge>
-          )}
-          {secondaryPromoBadge && !compact && (
-            <Badge
-              className="bg-navy-900/75 text-[10px] text-white backdrop-blur-sm"
-              title={secondaryPromoBadge.title}
-            >
-              {secondaryPromoBadge.badgeLabel}
-            </Badge>
-          )}
-        </div>
-      </div>
-
-      <div className="flex flex-1 flex-col">
-        <CardHeader className={cn("pb-2", compact && "py-3")}>
-          <CardTitle
+          <button
+            type="button"
+            onClick={handleToggleFavorite}
             className={cn(
-              "line-clamp-2 leading-snug",
-              compact ? "text-sm" : "text-base"
+              "absolute top-3 right-3 z-10 flex size-9 items-center justify-center rounded-full",
+              "bg-white/90 shadow-sm backdrop-blur-md transition-all duration-300",
+              "hover:scale-105 hover:bg-white focus-visible:ring-2 focus-visible:ring-coral-500/40 focus-visible:outline-none",
+              favorite && "bg-coral-500/12"
             )}
+            aria-label={
+              favorite
+                ? `Usuń z ulubionych: ${product.name}`
+                : `Dodaj do ulubionych: ${product.name}`
+            }
+            aria-pressed={favorite}
+            title={favorite ? "Usuń z ulubionych" : "Dodaj do ulubionych"}
           >
-            {product.name}
-          </CardTitle>
-          <CardDescription className="text-xs">
-            Symbol: {product.symbol}
-            {product.producer ? ` · ${product.producer}` : ""}
-          </CardDescription>
-          {product.isRecommended &&
-            product.recommendReasonDetail &&
-            !compact && (
-              <p className="mt-1.5 text-xs leading-snug text-turquoise-700 dark:text-turquoise-400">
-                {product.recommendReasonDetail}
+            <Heart
+              className={cn(
+                "size-4 transition-colors",
+                favorite
+                  ? "fill-coral-500 text-coral-500"
+                  : "text-navy-900/55"
+              )}
+            />
+          </button>
+          {/* Mniej badge'y — quiet luxury: max 2 na raz */}
+          <div className="absolute top-3 left-3 flex max-w-[70%] flex-col items-start gap-1.5">
+            {categoryLabel && (
+              <Badge
+                variant="secondary"
+                className="bg-navy-900/70 text-[10px] font-medium text-white backdrop-blur-md"
+              >
+                {categoryLabel}
+              </Badge>
+            )}
+            {product.isRecommended ? (
+              <Badge className="bg-coral-500/85 text-[10px] text-white backdrop-blur-md">
+                <Sparkles className="mr-0.5 size-2.5" />
+                Polecane
+              </Badge>
+            ) : (
+              primaryPromoBadge &&
+              !compact && (
+                <Badge
+                  className="bg-white/90 text-[10px] font-medium text-navy-900 shadow-sm backdrop-blur-md"
+                  title={primaryPromoBadge.title}
+                >
+                  <Tag className="mr-0.5 size-2.5 text-coral-500" />
+                  {primaryPromoBadge.badgeLabel}
+                </Badge>
+              )
+            )}
+          </div>
+        </div>
+
+        <div className="flex flex-1 flex-col">
+          <CardHeader className={cn("space-y-1.5 px-5 pt-5 pb-2", compact && "px-3 py-3")}>
+            <CardTitle
+              className={cn(
+                "line-clamp-2 font-semibold tracking-tight",
+                compact ? "text-sm leading-snug" : "text-[0.95rem] leading-snug sm:text-base"
+              )}
+            >
+              {product.name}
+            </CardTitle>
+            {!compact && (
+              <CardDescription className="line-clamp-1 text-[11px] tracking-wide">
+                {product.symbol}
+                {kindLabel ? ` · ${kindLabel}` : ""}
+              </CardDescription>
+            )}
+            {!compact && nextPromo && !nextPromo.unlocked && (
+              <p className="text-[11px] font-medium text-coral-600/90 dark:text-coral-400">
+                Brakuje {formatPrice(nextPromo.remaining)} do promocji
               </p>
             )}
-          {!compact && nextPromo && (
-            <p
-              className={cn(
-                "mt-1.5 text-xs font-medium leading-snug",
-                nextPromo.unlocked
-                  ? "text-turquoise-700 dark:text-turquoise-400"
-                  : "text-coral-600 dark:text-coral-400"
-              )}
-            >
-              {nextPromo.unlocked
-                ? `✓ ${nextPromo.promotion.badgeLabel}`
-                : `Brakuje Ci ${formatPrice(nextPromo.remaining)} do ${
-                    nextPromo.promotion.rewardType === "cart_discount_percent"
-                      ? `rabatu −${nextPromo.promotion.discountPercent}%`
-                      : "gratisu"
-                  }`}
-            </p>
-          )}
-        </CardHeader>
+          </CardHeader>
 
-        <CardContent className="mt-auto space-y-3 pb-4">
-          <div className="flex items-end justify-between gap-2">
-            <div>
-              {showDiscounted ? (
-                <div className="space-y-0.5">
-                  <p className="text-xs text-muted-foreground">
-                    Cena katalogowa netto
-                  </p>
-                  {/* Jak w Excelu: stara cena przekreślona, nowa pogrubiona, oszczędność w nawiasie */}
-                  <p className="text-sm text-muted-foreground line-through decoration-muted-foreground/70">
-                    {formatPrice(product.priceNet)}
-                    <span className="text-xs"> /{product.unit}</span>
-                  </p>
-                  <p className="text-lg font-bold text-turquoise-700 dark:text-turquoise-400">
-                    {formatPrice(yourPrice)}
-                    <span className="text-xs font-normal text-muted-foreground">
-                      /{product.unit}
-                    </span>
-                  </p>
-                  {savingsLabel && (
-                    <p className="text-xs font-medium text-coral-600 dark:text-coral-400">
-                      {savingsLabel}
+          <CardContent className={cn("mt-auto space-y-4 px-5 pb-5", compact && "px-3 pb-3")}>
+            <div className="flex items-end justify-between gap-2">
+              <div>
+                {showDiscounted ? (
+                  <div className="space-y-0.5">
+                    <p className="text-xs text-muted-foreground line-through decoration-muted-foreground/50">
+                      {formatPrice(product.priceNet)}
                     </p>
-                  )}
-                </div>
-              ) : (
-                <div>
-                  <p className="text-xs text-muted-foreground">
-                    Cena katalogowa netto
-                  </p>
-                  <p className="text-lg font-semibold text-navy-900 dark:text-white">
-                    {formatPrice(product.priceNet)}
-                    <span className="text-xs font-normal text-muted-foreground">
-                      /{product.unit}
-                    </span>
-                  </p>
-                  {hasDiscount && savingsLabel && (
-                    <p className="text-[10px] text-muted-foreground">
-                      Z rabatem:{" "}
-                      <span className="font-semibold text-turquoise-700 dark:text-turquoise-400">
-                        {formatPrice(yourPrice)}
-                      </span>{" "}
-                      <span className="text-coral-600">({savingsLabel})</span>
+                    <p className="text-xl font-semibold tracking-tight text-turquoise-600 dark:text-turquoise-400">
+                      {formatPrice(yourPrice)}
+                      <span className="ml-0.5 text-xs font-normal text-muted-foreground">
+                        /{product.unit}
+                      </span>
                     </p>
-                  )}
-                </div>
-              )}
-            </div>
-            <StockBadge stock={product.stock} />
-          </div>
-
-          {!compact && (
-            <div className="flex gap-2">
-              <Button
-                size="sm"
-                className={cn(
-                  "min-w-0 flex-1",
-                  justAdded
-                    ? "bg-green-600 hover:bg-green-600"
-                    : "bg-turquoise-500 hover:bg-turquoise-600"
-                )}
-                disabled={product.stock <= 0}
-                onClick={handleAddToCart}
-              >
-                {justAdded ? (
-                  <>
-                    <Check className="size-4" />
-                    Dodano!
-                  </>
+                    {savingsLabel && (
+                      <p className="text-[11px] font-medium text-coral-600/90">
+                        {savingsLabel}
+                      </p>
+                    )}
+                  </div>
                 ) : (
-                  <>
-                    <Package className="size-4" />
-                    Do koszyka
-                  </>
+                  <div>
+                    <p className="text-xl font-semibold tracking-tight text-navy-900 dark:text-white">
+                      {formatPrice(product.priceNet)}
+                      <span className="ml-0.5 text-xs font-normal text-muted-foreground">
+                        /{product.unit}
+                      </span>
+                    </p>
+                    {hasDiscount && savingsLabel && (
+                      <p className="text-[11px] text-muted-foreground">
+                        Z rabatem:{" "}
+                        <span className="font-medium text-turquoise-600">
+                          {formatPrice(yourPrice)}
+                        </span>
+                      </p>
+                    )}
+                  </div>
                 )}
-              </Button>
-              <Button
-                type="button"
-                size="sm"
-                variant="outline"
-                className={cn(
-                  "shrink-0",
-                  favorite &&
-                    "border-coral-500/40 bg-coral-500/10 text-coral-600 hover:bg-coral-500/15"
-                )}
-                onClick={handleToggleFavorite}
-                aria-pressed={favorite}
-                title={favorite ? "Usuń z ulubionych" : "Dodaj do ulubionych"}
-              >
-                <Heart
-                  className={cn(
-                    "size-4",
-                    favorite && "fill-coral-500 text-coral-500"
-                  )}
-                />
-                <span className="sr-only sm:not-sr-only sm:inline">
-                  {favorite ? "W ulubionych" : "Ulubione"}
-                </span>
-              </Button>
+              </div>
+              <StockBadge stock={product.stock} />
             </div>
-          )}
-        </CardContent>
-      </div>
-    </Card>
+
+            {!compact && (
+              <div className="flex gap-2">
+                <Button
+                  size="sm"
+                  className={cn(
+                    "h-10 min-w-0 flex-1 rounded-full",
+                    justAdded
+                      ? "bg-green-600/90 hover:bg-green-600"
+                      : "bg-turquoise-500/95 hover:bg-turquoise-600"
+                  )}
+                  disabled={product.stock <= 0}
+                  onClick={handleAddToCart}
+                >
+                  {justAdded ? (
+                    <>
+                      <Check className="size-4" />
+                      Dodano
+                    </>
+                  ) : (
+                    <>
+                      <Package className="size-4" />
+                      Do koszyka
+                    </>
+                  )}
+                </Button>
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="outline"
+                  className={cn(
+                    "h-10 shrink-0 rounded-full px-3",
+                    favorite &&
+                      "border-coral-500/30 bg-coral-500/8 text-coral-600 hover:bg-coral-500/12"
+                  )}
+                  onClick={handleToggleFavorite}
+                  aria-pressed={favorite}
+                  title={favorite ? "Usuń z ulubionych" : "Dodaj do ulubionych"}
+                >
+                  <Heart
+                    className={cn(
+                      "size-4",
+                      favorite && "fill-coral-500 text-coral-500"
+                    )}
+                  />
+                </Button>
+              </div>
+            )}
+          </CardContent>
+        </div>
+      </Card>
+    </motion.div>
   );
 }

@@ -9,6 +9,7 @@ import {
   ExternalLink,
 } from "lucide-react";
 import { Hero } from "@/components/hero";
+import { MotionFade } from "@/components/motion-fade";
 import { PartnerLogos } from "@/components/partner-logos";
 import { SectionHeading } from "@/components/section-heading";
 import { WaveDivider } from "@/components/wave-divider";
@@ -46,197 +47,215 @@ export default function Home() {
 
       {/* O nas – skrót */}
       <section
-        className="relative overflow-hidden px-4 py-20 sm:px-6 lg:px-8"
+        className="relative overflow-hidden section-pad"
         style={{
           backgroundImage: `url(${assets.bgMap})`,
           backgroundSize: "cover",
           backgroundPosition: "top center",
         }}
       >
-        <div className="absolute inset-0 bg-background/85" />
-        <div className="relative mx-auto max-w-6xl">
-          <SectionHeading
-            label="O nas"
-            title={aboutText.headline}
-            description={aboutText.since}
-          />
-          <div className="mt-12 grid gap-10 lg:grid-cols-2 lg:items-start">
-            <div className="space-y-4 text-muted-foreground">
+        <div className="absolute inset-0 bg-background/90" />
+        <div className="content-width relative">
+          <MotionFade>
+            <SectionHeading
+              label="O nas"
+              title={aboutText.headline}
+              description={aboutText.since}
+            />
+          </MotionFade>
+          <div className="mt-16 grid gap-14 lg:grid-cols-2 lg:items-start lg:gap-20">
+            <MotionFade delay={0.08} className="space-y-5 text-muted-foreground">
               <p>{aboutText.paragraphs[0]}</p>
               <p>{aboutText.paragraphs[1]}</p>
-              <p>{aboutText.paragraphs[2]}</p>
-              <p>{aboutText.paragraphs[3]}</p>
-              <p>{aboutText.paragraphs[4]}</p>
-            </div>
-            <div className="space-y-6">
-              <div className="flex flex-wrap items-center gap-6">
+              <p className="hidden sm:block">{aboutText.paragraphs[2]}</p>
+              <p className="hidden md:block">{aboutText.paragraphs[3]}</p>
+            </MotionFade>
+            <MotionFade delay={0.15} className="space-y-8">
+              <div className="flex flex-wrap items-center justify-center gap-8 sm:justify-start">
                 {awards.map((award) => (
-                  <div key={award.label} className="flex flex-col items-center gap-2">
+                  <div
+                    key={award.label}
+                    className="flex flex-col items-center gap-3"
+                  >
                     <Image
                       src={award.image}
                       alt={award.alt}
                       width={award.image.includes("po-ryby") ? 200 : 120}
                       height={80}
-                      className="h-auto max-h-16 w-auto object-contain"
+                      className="h-auto max-h-14 w-auto object-contain opacity-90"
                     />
-                    <span className="max-w-[160px] text-center text-xs text-muted-foreground">
+                    <span className="max-w-[140px] text-center text-[11px] leading-snug text-muted-foreground">
                       {award.label}
                     </span>
                   </div>
                 ))}
               </div>
-              <div className="rounded-xl border border-border bg-card p-4">
-                <p className="text-sm leading-relaxed text-muted-foreground">
+              <div className="rounded-2xl border border-border/70 bg-card/80 p-6 backdrop-blur-sm">
+                <p className="text-sm leading-[1.75] text-muted-foreground">
                   {aboutText.poRyby}
                 </p>
               </div>
-            </div>
+            </MotionFade>
           </div>
-          <div className="mt-8 text-center">
-            <Button variant="outline" render={<Link href="/o-nas" />}>
+          <MotionFade delay={0.2} className="mt-14 text-center">
+            <Button
+              variant="outline"
+              className="h-11 rounded-full px-6"
+              render={<Link href="/o-nas" />}
+            >
               Czytaj więcej o Akwen
               <ArrowRight />
             </Button>
-          </div>
+          </MotionFade>
         </div>
       </section>
 
       <WaveDivider variant="turquoise" />
 
-      {/* Oferta */}
-      <section className="bg-muted/30 px-4 py-20 sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-6xl">
-          <SectionHeading
-            label="Oferta"
-            title="Kompleksowa dystrybucja produktów rybnych"
-            description="Bezpośrednia współpraca z producentami, importerami i lokalnymi dostawcami."
-          />
-          <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            {offerCategories.map((item) => {
+      {/* Oferta — duże zdjęcia, mniej tekstu */}
+      <section className="bg-muted/40 section-pad">
+        <div className="content-width">
+          <MotionFade>
+            <SectionHeading
+              label="Oferta"
+              title="Kompleksowa dystrybucja produktów rybnych"
+              description="Bezpośrednia współpraca z producentami, importerami i lokalnymi dostawcami."
+            />
+          </MotionFade>
+          <div className="mt-16 grid gap-6 sm:grid-cols-2 sm:gap-8 lg:grid-cols-4">
+            {offerCategories.map((item, index) => {
               const Icon = offerIcons[item.icon];
               return (
-                <Card
-                  key={item.title}
-                  className="group overflow-hidden border-border/60 p-0 transition-shadow hover:shadow-xl"
-                >
-                  <div className="relative aspect-[4/3] overflow-hidden">
-                    <Image
-                      src={item.image}
-                      alt={item.title}
-                      fill
-                      className="object-cover transition-transform duration-500 group-hover:scale-105"
-                      sizes="(max-width: 768px) 50vw, 25vw"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-navy-950/80 via-navy-900/20 to-transparent" />
-                    <div className="absolute bottom-3 left-3 flex size-10 items-center justify-center rounded-lg bg-coral-500 text-white">
-                      <Icon className="size-5" />
+                <MotionFade key={item.title} delay={0.05 * index}>
+                  <Card className="group h-full overflow-hidden border-border/50 bg-card p-0 shadow-none transition-all duration-500 hover:-translate-y-1 hover:shadow-xl hover:shadow-navy-900/5">
+                    <div className="relative aspect-[3/4] overflow-hidden sm:aspect-[4/5]">
+                      <Image
+                        src={item.image}
+                        alt={item.title}
+                        fill
+                        className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-navy-950/75 via-navy-900/10 to-transparent" />
+                      <div className="absolute bottom-4 left-4 flex size-11 items-center justify-center rounded-full bg-white/15 text-white backdrop-blur-md">
+                        <Icon className="size-5" />
+                      </div>
                     </div>
-                  </div>
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-lg">{item.title}</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <CardDescription className="text-sm leading-relaxed">
-                      {item.description}
-                    </CardDescription>
-                  </CardContent>
-                </Card>
+                    <CardHeader className="space-y-2 px-5 pt-5 pb-2">
+                      <CardTitle className="text-lg font-semibold tracking-tight">
+                        {item.title}
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="px-5 pb-6">
+                      <CardDescription className="line-clamp-3 text-sm leading-[1.7]">
+                        {item.description}
+                      </CardDescription>
+                    </CardContent>
+                  </Card>
+                </MotionFade>
               );
             })}
           </div>
-          <div className="mt-10 text-center">
-            <Button render={<Link href="/oferta" />}>
+          <MotionFade delay={0.2} className="mt-14 text-center">
+            <Button className="h-11 rounded-full px-8" render={<Link href="/oferta" />}>
               Pełna oferta
               <ArrowRight />
             </Button>
-          </div>
+          </MotionFade>
         </div>
       </section>
 
       {/* Produkty litewskie */}
-      <section className="mx-auto max-w-6xl px-4 py-20 sm:px-6 lg:px-8">
-        <div className="flex justify-center">
+      <section className="content-width section-pad">
+        <MotionFade className="flex justify-center">
           <Image
             src={assets.ornaments.up}
             alt=""
             width={383}
             height={27}
-            className="mb-6 h-auto w-48 opacity-60 sm:w-64"
+            className="mb-8 h-auto w-40 opacity-40 sm:w-52"
             aria-hidden
           />
-        </div>
-        <SectionHeading
-          label="Produkty litewskie"
-          title="Wiodący producenci z Litwy"
-          description={lithuanianIntro}
-        />
-        <div className="mt-12 grid items-center gap-10 lg:grid-cols-2">
-          <div className="relative mx-auto aspect-square w-full max-w-md overflow-hidden rounded-2xl shadow-xl">
-            <Image
-              src={assets.lithuanianProducts}
-              alt="Produkty litewskie Akwen"
-              fill
-              className="object-cover"
-              sizes="(max-width: 1024px) 100vw, 50vw"
-            />
-          </div>
-          <div className="grid gap-4 sm:grid-cols-2">
-            {lithuanianBrands.map((brand) => (
-              <Card
-                key={brand.name}
-                className="border-turquoise-500/20 transition-shadow hover:shadow-lg"
-              >
-                <CardHeader className="pb-2">
-                  <div className="flex items-start justify-between gap-2">
-                    <CardTitle className="text-base">{brand.name}</CardTitle>
-                    <Badge
-                      variant="secondary"
-                      className="shrink-0 bg-turquoise-500/10 text-turquoise-600 text-[10px]"
-                    >
-                      {brand.role}
-                    </Badge>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <CardDescription className="text-sm leading-relaxed">
-                    {brand.description}
-                  </CardDescription>
-                </CardContent>
-              </Card>
+        </MotionFade>
+        <MotionFade>
+          <SectionHeading
+            label="Produkty litewskie"
+            title="Wiodący producenci z Litwy"
+            description={lithuanianIntro}
+          />
+        </MotionFade>
+        <div className="mt-16 grid items-center gap-12 lg:grid-cols-2 lg:gap-16">
+          <MotionFade>
+            <div className="relative mx-auto aspect-[4/5] w-full max-w-md overflow-hidden rounded-3xl shadow-2xl shadow-navy-900/10">
+              <Image
+                src={assets.lithuanianProducts}
+                alt="Produkty litewskie Akwen"
+                fill
+                className="object-cover"
+                sizes="(max-width: 1024px) 100vw, 50vw"
+              />
+            </div>
+          </MotionFade>
+          <div className="grid gap-5 sm:grid-cols-2">
+            {lithuanianBrands.map((brand, index) => (
+              <MotionFade key={brand.name} delay={0.06 * index}>
+                <Card className="h-full border-border/50 bg-card/80 shadow-none transition-all duration-300 hover:border-turquoise-500/25 hover:shadow-lg hover:shadow-navy-900/5">
+                  <CardHeader className="space-y-3 pb-2">
+                    <div className="flex items-start justify-between gap-2">
+                      <CardTitle className="text-base font-semibold tracking-tight">
+                        {brand.name}
+                      </CardTitle>
+                      <Badge
+                        variant="secondary"
+                        className="shrink-0 bg-turquoise-500/10 text-[10px] font-medium text-turquoise-600"
+                      >
+                        {brand.role}
+                      </Badge>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <CardDescription className="line-clamp-4 text-sm leading-[1.7]">
+                      {brand.description}
+                    </CardDescription>
+                  </CardContent>
+                </Card>
+              </MotionFade>
             ))}
           </div>
         </div>
-        <div className="flex justify-center">
+        <MotionFade className="mt-14 flex flex-col items-center gap-8">
           <Image
             src={assets.ornaments.down}
             alt=""
             width={382}
             height={27}
-            className="mt-10 h-auto w-48 opacity-60 sm:w-64"
+            className="h-auto w-40 opacity-40 sm:w-52"
             aria-hidden
           />
-        </div>
-        <div className="mt-6 text-center">
-          <Button variant="outline" render={<Link href="/produkty" />}>
+          <Button
+            variant="outline"
+            className="h-11 rounded-full px-6"
+            render={<Link href="/produkty" />}
+          >
             Wszystkie produkty litewskie
             <ArrowRight />
           </Button>
-        </div>
+        </MotionFade>
       </section>
 
       {/* CTA B2B */}
-      <section className="maritime-gradient px-4 py-20 text-white sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-3xl text-center">
+      <section className="maritime-gradient section-pad text-white">
+        <MotionFade className="mx-auto max-w-2xl text-center">
           <SectionHeading
             label="Dla partnerów handlowych"
             title="Platforma B2B Akwen"
-            description="Wkrótce dostępna dla naszych partnerów handlowych. Zamawiaj online, śledź dostawy i zarządzaj zamówieniami."
+            description="Zamawiaj online, śledź promocje i zarządzaj zamówieniami w spokojnym, nowoczesnym portalu."
             light
           />
-          <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
+          <div className="mt-12 flex flex-col items-center justify-center gap-3 sm:flex-row sm:gap-4">
             <Button
               size="lg"
-              className="bg-coral-500 text-white hover:bg-coral-400"
+              className="h-12 rounded-full bg-coral-500/95 px-8 text-white hover:bg-coral-400"
               render={<Link href="/b2b" />}
             >
               Przejdź do portalu B2B
@@ -245,17 +264,19 @@ export default function Home() {
             <Button
               variant="outline"
               size="lg"
-              className="border-white/40 bg-white/10 text-white hover:bg-white/20 hover:text-white"
+              className="h-12 rounded-full border-white/30 bg-white/5 px-8 text-white hover:bg-white/12 hover:text-white"
               render={<Link href="/kontakt" />}
             >
-              Skontaktuj się z działem handlowym
+              Kontakt handlowy
             </Button>
           </div>
-          <p className="mt-4 text-sm text-ocean-200">{company.b2bNote}</p>
-          <p className="mt-2 text-sm text-ocean-200">
+          <p className="mt-8 text-sm leading-relaxed text-white/55">
+            {company.b2bNote}
+          </p>
+          <p className="mt-2 text-sm text-white/55">
             {company.contact.email} · {company.contact.mobile}
           </p>
-        </div>
+        </MotionFade>
       </section>
     </>
   );

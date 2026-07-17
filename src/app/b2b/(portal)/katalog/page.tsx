@@ -13,7 +13,7 @@ export default function B2BCatalogPage() {
         description={`${catalog.totalCount} pozycji · ceny hurtowe netto · dane z magazynu`}
       />
 
-      <div className="p-6">
+      <div className="p-5 sm:p-8 lg:p-10">
         <Suspense
           fallback={
             <p className="text-sm text-muted-foreground">Ładowanie katalogu…</p>

@@ -48,7 +48,7 @@ export function Header() {
           : "border-b border-navy-800/50 bg-navy-900/95 shadow-lg shadow-navy-950/20 backdrop-blur-md"
       )}
     >
-      <div className="mx-auto flex h-[4.5rem] max-w-6xl items-center justify-between px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-5 sm:h-[4.75rem] sm:px-8 lg:px-10">
         <Link href="/" className="relative flex shrink-0 items-center">
           <Image
             src="/images/logo-white.png"

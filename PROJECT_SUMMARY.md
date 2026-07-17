@@ -38,6 +38,7 @@
 | **Promocje** | ✅ | Progi 500 zł (−5%) i 800 zł (gratis), licznik „brakuje” live |
 | **Czat mock** | ✅ | Sheet z handlowcem, auto-odpowiedź 2–3 s, historia per user |
 | **Przewodnik** | ✅ | Tour po B2B (overlay), start z sidebara, localStorage tour-seen |
+| **UI 2026** | ✅ | Quiet luxury: white space, typografia, Framer Motion, karty |
 | Etap 7+ | ⏳ | Prawdziwa baza, Resend SMTP, ERP… |
 
 ### Moduły B2B

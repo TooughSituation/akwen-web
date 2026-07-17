@@ -25,27 +25,29 @@ const navItems = [
   { href: "/kontakt", label: "Kontakt" },
 ];
 
+/**
+ * Header publiczny — zawsze ciemny granat (czytelny tekst/logo).
+ * Przy scrollu: nieco gęstsze tło + cień.
+ */
 export function Header() {
   const pathname = usePathname();
-  const isHome = pathname === "/";
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 24);
+    const onScroll = () => setScrolled(window.scrollY > 16);
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  const isTransparent = isHome && !scrolled;
-
   return (
     <header
       className={cn(
-        "sticky top-0 z-50 w-full transition-all duration-300",
-        isTransparent
-          ? "border-b border-white/10 bg-navy-900/20 backdrop-blur-sm"
-          : "border-b border-navy-800/50 bg-navy-900/95 shadow-lg shadow-navy-950/20 backdrop-blur-md"
+        "sticky top-0 z-50 w-full border-b transition-all duration-300",
+        /* Zawsze granat — od razu na /, nie dopiero po scrollu */
+        scrolled
+          ? "border-navy-950/80 bg-navy-950 shadow-lg shadow-navy-950/40 backdrop-blur-md"
+          : "border-navy-900/60 bg-navy-900 shadow-md shadow-navy-950/25"
       )}
     >
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-5 sm:h-[4.75rem] sm:px-8 lg:px-10">
@@ -66,14 +68,8 @@ export function Header() {
               key={item.href}
               href={item.href}
               className={cn(
-                "rounded-md px-3.5 py-2 text-sm font-medium transition-colors",
-                isTransparent
-                  ? "text-white/85 hover:bg-white/10 hover:text-white"
-                  : "text-ocean-100 hover:bg-white/10 hover:text-white",
-                pathname === item.href &&
-                  (isTransparent
-                    ? "bg-white/15 text-white"
-                    : "bg-turquoise-500/20 text-white")
+                "rounded-md px-3.5 py-2 text-sm font-medium text-ocean-100 transition-colors hover:bg-white/10 hover:text-white",
+                pathname === item.href && "bg-turquoise-500/20 text-white"
               )}
             >
               {item.label}
@@ -89,25 +85,14 @@ export function Header() {
           >
             Portal B2B
           </Button>
-          <ThemeToggle
-            className={cn(
-              isTransparent
-                ? "text-white hover:bg-white/10 hover:text-white"
-                : "text-ocean-100 hover:bg-white/10 hover:text-white"
-            )}
-          />
+          <ThemeToggle className="text-ocean-100 hover:bg-white/10 hover:text-white" />
           <Sheet>
             <SheetTrigger
               render={
                 <Button
                   variant="ghost"
                   size="icon"
-                  className={cn(
-                    "lg:hidden",
-                    isTransparent
-                      ? "text-white hover:bg-white/10"
-                      : "text-ocean-100 hover:bg-white/10"
-                  )}
+                  className="text-ocean-100 hover:bg-white/10 lg:hidden"
                 />
               }
             >

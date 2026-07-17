@@ -10,6 +10,8 @@ export const STORAGE_BASE = {
   profile: "akwen-b2b-profile",
   orders: "akwen-b2b-orders",
   priceMode: "akwen-b2b-price-mode",
+  /** Arkusz „Punkty” per firma. */
+  loyalty: "akwen-b2b-loyalty",
 } as const;
 
 export function userScopedKey(base: string, userId: string | null | undefined): string {
@@ -31,4 +33,8 @@ export function ordersStorageKey(userId: string | null | undefined): string {
 
 export function priceModeStorageKey(userId: string | null | undefined): string {
   return userScopedKey(STORAGE_BASE.priceMode, userId);
+}
+
+export function loyaltyStorageKey(userId: string | null | undefined): string {
+  return userScopedKey(STORAGE_BASE.loyalty, userId);
 }

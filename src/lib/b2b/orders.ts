@@ -1,4 +1,5 @@
 import { applyDiscount, roundMoney } from "./format";
+import { calculatePointsFromNet, earnPointsForOrder } from "./loyalty";
 import { ordersStorageKey, STORAGE_BASE } from "./storage-keys";
 import type {
   B2BOrder,
@@ -62,6 +63,8 @@ export function saveOrder(order: B2BOrder, userId?: string | null): void {
   const orders = readOrders(scope);
   orders.unshift(order);
   localStorage.setItem(ordersStorageKey(scope), JSON.stringify(orders));
+  // Naliczenie punktów lojalnościowych (arkusz „Punkty”) — przy zapisie zamówienia
+  earnPointsForOrder(order, scope);
   if (typeof window !== "undefined") {
     window.dispatchEvent(new Event("akwen-orders-updated"));
   }
@@ -121,6 +124,7 @@ export function createOrder(
   const totalNet = roundMoney(
     orderItems.reduce((sum, item) => sum + item.lineTotal, 0)
   );
+  const loyaltyPointsEarned = calculatePointsFromNet(totalNet);
 
   return {
     id: crypto.randomUUID(),
@@ -131,6 +135,7 @@ export function createOrder(
     items: orderItems,
     totalNet,
     discountPercent,
+    loyaltyPointsEarned,
     deliveryDate: input.deliveryDate,
     deliveryAddress: input.deliveryAddress,
     notes: input.notes.trim(),

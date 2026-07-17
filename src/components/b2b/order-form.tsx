@@ -13,6 +13,7 @@ import {
   sumDiscountSavings,
 } from "@/lib/b2b/format";
 import { apiCreateOrder } from "@/lib/b2b/api-client";
+import { calculatePointsFromNet } from "@/lib/b2b/loyalty";
 import { createOrder, getOrders, saveOrder } from "@/lib/b2b/orders";
 import type { B2BOrder } from "@/lib/b2b/types";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -50,6 +51,7 @@ export function OrderForm({ onSuccess, onCancel }: OrderFormProps) {
   const totalListNet = sumCartNet(items, 0);
   const totalNet = sumCartNet(items, discountPercent);
   const savings = sumDiscountSavings(items, discountPercent);
+  const estimatedPoints = calculatePointsFromNet(totalNet);
   const [deliveryDate, setDeliveryDate] = useState<Date | undefined>();
   const [calendarOpen, setCalendarOpen] = useState(false);
   const [addressMode, setAddressMode] = useState<"saved" | "custom">("saved");
@@ -298,6 +300,12 @@ export function OrderForm({ onSuccess, onCancel }: OrderFormProps) {
             <div className="flex justify-between text-sm text-turquoise-700 dark:text-turquoise-400">
               <span>Oszczędność (rabat −{discountPercent}%)</span>
               <span>−{formatPrice(savings)}</span>
+            </div>
+          )}
+          {estimatedPoints > 0 && (
+            <div className="flex justify-between text-sm text-turquoise-700 dark:text-turquoise-400">
+              <span>Punkty lojalnościowe (po złożeniu)</span>
+              <span>+{estimatedPoints} pkt</span>
             </div>
           )}
           <div className="flex items-end justify-between border-t border-border pt-4">

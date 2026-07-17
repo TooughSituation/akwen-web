@@ -1,7 +1,9 @@
 "use client";
 
-import { Bell, LogOut } from "lucide-react";
+import Link from "next/link";
+import { Bell, LogOut, Star } from "lucide-react";
 import { signOut } from "next-auth/react";
+import { useLoyalty } from "@/contexts/loyalty-context";
 import { useProfile } from "@/contexts/profile-context";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -15,6 +17,7 @@ interface B2BHeaderProps {
 
 export function B2BHeader({ title, description }: B2BHeaderProps) {
   const { customer } = useProfile();
+  const { balance, isHydrated: loyaltyHydrated } = useLoyalty();
 
   return (
     <header className="border-b border-border bg-card px-4 py-4 sm:px-6 sm:py-5">
@@ -33,6 +36,15 @@ export function B2BHeader({ title, description }: B2BHeaderProps) {
             <GlobalSearch className="hidden min-w-[220px] flex-1 md:block lg:min-w-[300px]" />
 
             <CartHeaderLink />
+
+            <Link
+              href="/b2b/moje-dane"
+              className="hidden items-center gap-1.5 rounded-lg border border-border bg-muted/30 px-2.5 py-2 text-xs font-medium text-turquoise-700 transition-colors hover:bg-turquoise-500/10 sm:inline-flex dark:text-turquoise-400"
+              title="Program lojalnościowy"
+            >
+              <Star className="size-3.5" />
+              {loyaltyHydrated ? `${balance} pkt` : "…"}
+            </Link>
 
             <button
               type="button"

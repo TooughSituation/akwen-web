@@ -117,6 +117,12 @@ export function OrderSuccess({ order, onNewOrder }: OrderSuccessProps) {
               </span>
               <span>{formatPrice(order.totalNet)}</span>
             </div>
+            {(order.loyaltyPointsEarned ?? 0) > 0 && (
+              <p className="mt-2 text-sm font-medium text-turquoise-700 dark:text-turquoise-400">
+                +{order.loyaltyPointsEarned} pkt lojalnościowych (1 pkt / 10 zł
+                netto)
+              </p>
+            )}
           </div>
 
           <div className="flex flex-col gap-2 sm:flex-row">

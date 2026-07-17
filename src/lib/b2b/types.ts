@@ -101,10 +101,58 @@ export interface B2BOrder {
   totalNet: number;
   /** Rabat procentowy zastosowany przy składaniu zamówienia. */
   discountPercent: number;
+  /** Punkty lojalnościowe naliczone za to zamówienie (1 pkt / 10 zł netto). */
+  loyaltyPointsEarned?: number;
   deliveryDate: string;
   deliveryAddress: string;
   notes: string;
   createdAt: string;
+}
+
+/** Typ nagrody w katalogu lojalnościowym. */
+export type LoyaltyRewardCategory = "discount" | "product" | "gadget";
+
+export interface LoyaltyReward {
+  id: string;
+  name: string;
+  description: string;
+  pointsCost: number;
+  category: LoyaltyRewardCategory;
+}
+
+export type LoyaltyLedgerType = "earn" | "redeem";
+
+/** Wiersz arkusza „Punkty” — przyrost lub wymiana. */
+export interface LoyaltyLedgerEntry {
+  id: string;
+  type: LoyaltyLedgerType;
+  /** Wartość ruchu: +przy naliczeniu, −przy wymianie. */
+  points: number;
+  balanceAfter: number;
+  description: string;
+  orderId?: string;
+  orderNumber?: string;
+  rewardId?: string;
+  rewardName?: string;
+  createdAt: string;
+}
+
+export interface LoyaltyRedemption {
+  id: string;
+  rewardId: string;
+  rewardName: string;
+  pointsSpent: number;
+  createdAt: string;
+  status: "requested" | "fulfilled" | "cancelled";
+}
+
+/** Konto lojalnościowe partnera (per userId). */
+export interface LoyaltyAccount {
+  userId: string;
+  balance: number;
+  ledger: LoyaltyLedgerEntry[];
+  redemptions: LoyaltyRedemption[];
+  updatedAt: string;
 }
 
 export interface CreateOrderInput {

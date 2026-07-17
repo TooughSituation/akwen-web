@@ -32,7 +32,8 @@
 | **Etap 2** | ✅ | Kolumna Excel PowodProponowania, rabat na kartach, prompty Imagine |
 | **Etap 3** | ✅ | Globalne wyszukiwanie w headerze, mock API Route Handlers, E2E smoke |
 | **Etap 4** | ✅ | Auth.js (Credentials), `/b2b/login`, middleware, localStorage per user |
-| Etap 5+ | ⏳ | Prawdziwa baza, Clerk produkcyjny, ERP… |
+| **Etap 5** | ✅ | Program lojalnościowy: punkty, nagrody, wymiana, historia |
+| Etap 6+ | ⏳ | Prawdziwa baza, Clerk produkcyjny, ERP… |
 
 ### Moduły B2B
 
@@ -226,14 +227,29 @@ scripts/
 
 ---
 
-## Checklist dalszych kroków (Etap 5+)
+## Etap 5 — program lojalnościowy
 
-- [ ] Ustaw `AUTH_SECRET` w Vercel Project Settings (jeśli brak)  
+| Element | Szczegóły |
+|---------|-----------|
+| Reguła | 1 punkt za każde pełne **10 zł netto** (po rabacie) |
+| Naliczanie | `createOrder` → `loyaltyPointsEarned`; `saveOrder` → `earnPointsForOrder` |
+| Storage | `akwen-b2b-loyalty:{userId}` |
+| UI | `/b2b/moje-dane` — saldo, katalog nagród, wymiana, historia |
+| Header | Badge „X pkt” → Moje dane |
+| Pliki | `loyalty.ts`, `loyalty-context.tsx`, `loyalty-panel.tsx` |
+
+Analogia Excel: arkusz **Punkty** (ledger), **Nagrody** (katalog), **Wymiany** (redemptions).
+
+---
+
+## Checklist dalszych kroków (Etap 6+)
+
 - [ ] Regeneracja batch Imagine  
 - [ ] Eksport zamówienia PDF / e-mail  
 - [ ] Migracja na Clerk produkcyjny (opcjonalnie)  
 - [ ] Prawdziwa baza zamiast localStorage  
 - [ ] VAT / cenniki wielopoziomowe  
+- [ ] Realizacja nagród po stronie handlowca (status fulfilled)  
 
 ---
 

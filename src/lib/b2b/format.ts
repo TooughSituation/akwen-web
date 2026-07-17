@@ -48,3 +48,26 @@ export function sumDiscountSavings(
   const discountedTotal = sumCartNet(items, discountPercent);
   return roundMoney(listTotal - discountedTotal);
 }
+
+/** Oszczędność jednostkowa (cena katalogowa − cena po rabacie). */
+export function unitDiscountSavings(
+  priceNet: number,
+  discountPercent: number
+): number {
+  return roundMoney(
+    priceNet - applyDiscount(priceNet, discountPercent)
+  );
+}
+
+/**
+ * Tekst oszczędności na karcie, np. „−5% (−1,23 zł)”.
+ */
+export function formatDiscountSavingsLabel(
+  priceNet: number,
+  discountPercent: number
+): string | null {
+  if (!Number.isFinite(discountPercent) || discountPercent <= 0) return null;
+  const savings = unitDiscountSavings(priceNet, discountPercent);
+  if (savings <= 0) return null;
+  return `−${discountPercent}% (−${formatPrice(savings).replace(/\s/g, "\u00a0")})`;
+}

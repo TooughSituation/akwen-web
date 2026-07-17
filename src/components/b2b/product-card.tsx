@@ -4,7 +4,11 @@ import { useState } from "react";
 import { Check, Package, Sparkles } from "lucide-react";
 import type { B2BProduct } from "@/lib/b2b/types";
 import { formatCategoryLabel, formatKindLabel } from "@/lib/b2b/labels";
-import { applyDiscount, formatPrice } from "@/lib/b2b/format";
+import {
+  applyDiscount,
+  formatDiscountSavingsLabel,
+  formatPrice,
+} from "@/lib/b2b/format";
 import { useCart } from "@/contexts/cart-context";
 import { usePriceDisplay } from "@/contexts/price-display-context";
 import { useProfile } from "@/contexts/profile-context";
@@ -59,7 +63,12 @@ export function ProductCard({ product, compact = false }: ProductCardProps) {
   const discountPercent = profile.discountPercent ?? 0;
   const hasDiscount = discountPercent > 0;
   const yourPrice = applyDiscount(product.priceNet, discountPercent);
-  const displayYourPrice = hasDiscount && showYourPrice;
+  const savingsLabel = formatDiscountSavingsLabel(
+    product.priceNet,
+    discountPercent
+  );
+  // Domyślnie: Twoja cena (katalogowa + rabat + oszczędność). Toggle „Katalogowa” = sam cennik.
+  const showDiscounted = hasDiscount && showYourPrice;
 
   function handleAddToCart() {
     addItem(product, 1);
@@ -136,50 +145,58 @@ export function ProductCard({ product, compact = false }: ProductCardProps) {
             Symbol: {product.symbol}
             {product.producer ? ` · ${product.producer}` : ""}
           </CardDescription>
-          {product.isRecommended && product.recommendReasonDetail && !compact && (
-            <p className="mt-1.5 text-xs leading-snug text-turquoise-700 dark:text-turquoise-400">
-              {product.recommendReasonDetail}
-            </p>
-          )}
+          {product.isRecommended &&
+            product.recommendReasonDetail &&
+            !compact && (
+              <p className="mt-1.5 text-xs leading-snug text-turquoise-700 dark:text-turquoise-400">
+                {product.recommendReasonDetail}
+              </p>
+            )}
         </CardHeader>
 
         <CardContent className="mt-auto space-y-3 pb-4">
           <div className="flex items-end justify-between gap-2">
             <div>
-              <p className="text-xs text-muted-foreground">
-                {displayYourPrice
-                  ? "Twoja cena netto"
-                  : "Cena katalogowa netto"}
-              </p>
-              {displayYourPrice ? (
-                <div>
-                  <p className="text-xs text-muted-foreground line-through">
-                    {formatPrice(product.priceNet)}
+              {showDiscounted ? (
+                <div className="space-y-0.5">
+                  <p className="text-xs text-muted-foreground">
+                    Cena katalogowa netto
                   </p>
-                  <p className="text-lg font-semibold text-turquoise-700 dark:text-turquoise-400">
+                  {/* Jak w Excelu: stara cena przekreślona, nowa pogrubiona, oszczędność w nawiasie */}
+                  <p className="text-sm text-muted-foreground line-through decoration-muted-foreground/70">
+                    {formatPrice(product.priceNet)}
+                    <span className="text-xs"> /{product.unit}</span>
+                  </p>
+                  <p className="text-lg font-bold text-turquoise-700 dark:text-turquoise-400">
                     {formatPrice(yourPrice)}
                     <span className="text-xs font-normal text-muted-foreground">
                       /{product.unit}
                     </span>
                   </p>
-                  <p className="text-[10px] font-medium text-turquoise-700 dark:text-turquoise-400">
-                    Rabat −{discountPercent}%
-                  </p>
+                  {savingsLabel && (
+                    <p className="text-xs font-medium text-coral-600 dark:text-coral-400">
+                      {savingsLabel}
+                    </p>
+                  )}
                 </div>
               ) : (
                 <div>
+                  <p className="text-xs text-muted-foreground">
+                    Cena katalogowa netto
+                  </p>
                   <p className="text-lg font-semibold text-navy-900 dark:text-white">
                     {formatPrice(product.priceNet)}
                     <span className="text-xs font-normal text-muted-foreground">
                       /{product.unit}
                     </span>
                   </p>
-                  {hasDiscount && (
+                  {hasDiscount && savingsLabel && (
                     <p className="text-[10px] text-muted-foreground">
                       Z rabatem:{" "}
-                      <span className="font-medium text-turquoise-700 dark:text-turquoise-400">
+                      <span className="font-semibold text-turquoise-700 dark:text-turquoise-400">
                         {formatPrice(yourPrice)}
-                      </span>
+                      </span>{" "}
+                      <span className="text-coral-600">({savingsLabel})</span>
                     </p>
                   )}
                 </div>

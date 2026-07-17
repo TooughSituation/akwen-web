@@ -1,8 +1,8 @@
-# Projekt: akwen-web — Portal B2B MVP (Akwen)
+# Projekt: akwen-web — Portal B2B (Akwen)
 
 > Ostatnia aktualizacja: 17.07.2026  
-> Commit Etapu 1: `279080f`  
-> Kontekst dla GrokWeb / SuperGrok / kolejnych sesji AI (Grok Build)
+> Etap 1: `279080f` · Etap 2.1: `faa73b7` · Etap 2 (Powód + karty + prompty): ten push  
+> Kontekst dla GrokWeb / Grok Build
 
 ## Linki
 
@@ -11,96 +11,112 @@
 | **Produkcja** | https://akwen-web.vercel.app |
 | **GitHub** | https://github.com/TooughSituation/akwen-web |
 | Branch | `master` (Vercel auto-deploy) |
-| Stara strona (referencja) | https://www.akwen.bialystok.pl/ |
-| Portal B2B (legacy) | https://b2b.akwen.bialystok.pl |
+| Stara strona | https://www.akwen.bialystok.pl/ |
 
 ## Stack
 
 - Next.js 15.5, React 19, TypeScript, Tailwind v4, shadcn/ui, xlsx
-- Deploy: Vercel (auto-deploy z GitHub `master`)
-- Stan klienta: localStorage (MVP — bez backendu auth/DB)
+- Deploy: Vercel (auto z `master`)
+- Stan: localStorage (MVP — bez backend auth/DB)
 - Kolory: Granat `#001F3F`, Turkus `#0077B6`, Koral `#FF6B35`
 
 ---
 
-## Stan projektu — MVP + Etap 1
+## Stan projektu
 
-Portal hurtowy `/b2b/*` jest **funkcjonalny, wdrożony i dopracowany o rabat, proponowane, shareable filtry i lepsze zdjęcia**.
+| Etap | Status | Opis |
+|------|--------|------|
+| MVP B2B | ✅ | Katalog, koszyk, zamówienia, profil, dashboard |
+| **Etap 1** | ✅ | Rabat w koszyku, proponowane z powodami, shareable filtry, zdjęcia |
+| **Etap 2** | ✅ | Kolumna Excel PowodProponowania, rabat na kartach (katalogowa + po rabacie + oszczędność), lepsze prompty Imagine |
+| Etap 3+ | ⏳ | Auth, API, E2E, ERP… |
 
 ### Moduły B2B
 
 | Moduł | Ścieżka | Stan |
 |-------|---------|------|
-| Dashboard | `/b2b` | Statystyki + Polecane z wyjaśnieniem i badge’ami powodów |
-| Katalog | `/b2b/katalog` | 517 produktów, filtry Tag1/Tag2, Polecane, **shareable URL** |
-| Koszyk | `/b2b/koszyk` | Context + localStorage; **rabat % z profilu** na cenach |
-| Zamówienia | `/b2b/zamowienia` | Lista, szczegóły, reorder (bez podwójnego rabatu) |
-| Moje dane | `/b2b/moje-dane` | Profil + adresy + rabat handlowy **read-only** |
-| Checkout | w koszyku | 3-krokowy flow, numer `AKW-YYYYMMDD-NNN` |
+| Dashboard | `/b2b` | Polecane + toggle ceny + badge powodów |
+| Katalog | `/b2b/katalog` | 517 produktów, filtry URL, rabat na kartach |
+| Koszyk | `/b2b/koszyk` | Rabat % z profilu |
+| Zamówienia | `/b2b/zamowienia` | Reorder bez double discount |
+| Moje dane | `/b2b/moje-dane` | Profil + adresy + rabat read-only |
 
-### Strona publiczna
-
-`/`, `/o-nas`, `/oferta`, `/produkty`, `/kontakt`, `/dotacje`
+Strona publiczna: `/`, `/o-nas`, `/oferta`, `/produkty`, `/kontakt`, `/dotacje`
 
 ---
 
-## Etap 1 — szczegóły implementacji (commit `279080f`)
+## Etap 1 (przypomnienie)
 
-### 1) Rabat klienta
-
-- Źródło: `profile.discountPercent` (mock default **5%** w `src/lib/b2b/auth.ts`)
-- Helpery: `applyDiscount`, `sumCartNet`, `sumDiscountSavings` w `src/lib/b2b/format.ts`
-- Koszyk trzyma **ceny katalogowe**; rabat nakładany w UI i w `createOrder`
-- Zamówienie zapisuje: `discountPercent`, `listPriceNet`, `priceNet` (po rabacie)
-- Reorder bierze `listPriceNet` → **nie dubluje rabatu**
-- Pliki: `cart-checkout.tsx`, `order-form.tsx`, `orders.ts`, `types.ts`, `profile-form.tsx`, `cart-context.tsx`
-
-### 2) Proponowane — powody
-
-- Excel **nie ma** kolumny „powód”
-- Wyliczanie: `src/lib/b2b/recommend.ts` z marży (cena vs wartość/szt), stanu, rozpiętości dat dostaw
-- Powody: **Wysoka marża** | **Świeża partia** | **Duży stan** | **Oferta limitowana** | **Wybór handlowca**
-- UI: badge + opis na `product-card.tsx`; hint na Dashboard i w Katalogu (widok Polecane)
-- Pola produktu: `recommendReason`, `recommendReasonDetail`
-
-### 3) Shareable filtry katalogu
-
-- URL: `?tag1=Pasty&tag2=Łosoś&widok=proponowane&q=...&stock=1&sort=price-asc`
-- Sync dwukierunkowy w `catalog-client.tsx` (`router.replace`, back/forward)
-- Przycisk **Udostępnij** kopiuje pełny URL
-- Helper: `buildCatalogSearchParams`
-
-### 4) Zdjęcia produktów
-
-- **146** obrazów Grok Imagine, 100% pokrycie po Tag1+Tag2 w `public/images/products/`
-- Lepsze prompty: `src/lib/b2b/image-prompts.ts` (pełne KIND_EN, sceny Tag1, struktura quality)
-- Fallback chain: generated → lokalne oferty (`/images/oferta_*.jpg`) → HQ Unsplash → gradient
-- UI: `product-image.tsx` z kolejnymi fallbackami przy `onError`
-- Batch: `scripts/generate-product-images-batch.mjs` → `public/data/image-generation-batch.json`
+1. **Rabat w koszyku** — `applyDiscount` / `sumCartNet`; koszyk trzyma ceny katalogowe  
+2. **Proponowane** — badge + opis (najpierw heurystyka)  
+3. **Shareable URL** — `?tag1=&tag2=&widok=&q=&stock=&sort=` + Udostępnij  
+4. **Zdjęcia** — prompty Tag1+Tag2, fallback chain  
 
 ---
 
-## Dane produktów (Excel)
+## Etap 2 — szczegóły
 
-**Plik:** `public/data/produkty.xlsx`  
-**Arkusz:** „Magazyn akt dla Jarka”  
-**Wiersze:** 517  
-**Proponowany=Tak:** ~134
+### 1) Kolumna Excel `PowodProponowania`
+
+**Analogia do Excela:** nowa kolumna obok `Proponowany` (jak ręczna lista rozwijana).
+
+| Wartość przykładowa | Znaczenie |
+|---------------------|-----------|
+| Wysoka marża | Atrakcyjna marża |
+| Krótki termin | Krótki horyzont rotacji / świeża partia |
+| Bestseller | Duży stan / popularny asortyment |
+| Oferta limitowana | Niski stan |
+| Wybór handlowca | Fallback handlowy |
+
+- Plik: `public/data/produkty.xlsx`  
+- Skrypt uzupełniający: `scripts/add-powod-proponowania.cjs`  
+- Odczyt: `products.ts` → pole `PowodProponowania`  
+- Mapowanie: `recommend.ts` → `reasonFromExcelLabel` (Excel ma priorytet, heurystyka = fallback)  
+- UI: badge na karcie + `recommendReasonDetail`  
+
+### 2) Rabat na kartach katalogu
+
+**Analogia do Excela:** trzy „kolumny” na karcie — cennik, po rabacie, różnica.
+
+Gdy klient ma rabat (np. 5%) i tryb **Twoja cena** (domyślny):
+
+1. Cena katalogowa — **przekreślona**  
+2. Cena po rabacie — **pogrubiona** (turkus)  
+3. Oszczędność — np. `−5% (−1,23 zł)`  
+
+- Helpery: `formatDiscountSavingsLabel`, `unitDiscountSavings` w `format.ts`  
+- Toggle: `PriceModeToggle` — Twoja cena / Katalogowa (`akwen-b2b-price-mode`)  
+- Pliki: `product-card.tsx`, `price-display-context.tsx`  
+
+### 3) Prompty Grok Imagine (ulepszone)
+
+Szczególnie: **Mięsne**, **Warzywa**, **Mrożonki**, **Konserwy rybne** — więcej detali (opakowanie, mróz, metal puszki, marbling mięsa).
+
+Struktura promptu: subject → composition → backdrop → lighting (softboxy) → lens 85mm → quality → negatives.
+
+- `src/lib/b2b/image-prompts.ts`  
+- Batch: `scripts/generate-product-images-batch.mjs`  
+
+---
+
+## Dane (Excel)
+
+**Plik:** `public/data/produkty.xlsx` · arkusz „Magazyn akt dla Jarka” · **517** wierszy
 
 | Kolumna Excel | Pole w kodzie | Opis |
 |---|---|---|
-| Symbol | `symbol` / `id` | ID produktu |
-| Nazwa | `name` | Nazwa produktu |
-| Tag1 | `tag1` | Kategoria (22 wartości) |
-| Tag2 | `tag2` | Rodzaj (~76 wartości) |
-| Proponowany | `isRecommended` | „Tak” = polecane |
-| Ilość OGÓŁEM | (sygnał recommend) | Do szacunku marży |
-| Ilość W magazynie Dostępna | `stock` | Stan magazynowy |
-| Wartość ogółem | (sygnał recommend) | Do szacunku marży |
-| Data dostawy Różnica dni | (sygnał recommend) | Świeżość partii |
-| Cena z cennika… Netto | `priceNet` | Cena hurtowa netto (katalog) |
+| Symbol | `symbol` / `id` | ID |
+| Nazwa | `name` | Nazwa |
+| Tag1 | `tag1` | Kategoria (22) |
+| Tag2 | `tag2` | Rodzaj (~76) |
+| Proponowany | `isRecommended` | Tak ≈ 134 |
+| **PowodProponowania** | `recommendReason` | Etap 2 — powód z arkusza |
+| Ilość W magazynie Dostępna | `stock` | Stan |
+| Cena z cennika… Netto | `priceNet` | Cennik |
 | Producent | `producer` | Producent |
-| Jm | `unit` | Jednostka miary |
+| Jm | `unit` | Jm |
+| Wartość ogółem / Ilość OGÓŁEM | (heurystyka) | Fallback marży |
+| Data dostawy Różnica dni | (heurystyka) | Fallback świeżości |
 
 ---
 
@@ -109,120 +125,56 @@ Portal hurtowy `/b2b/*` jest **funkcjonalny, wdrożony i dopracowany o rabat, pr
 | Klucz | Zawartość |
 |-------|-----------|
 | `akwen-b2b-cart` | Koszyk (ceny katalogowe) |
-| `akwen-b2b-profile` | Profil + adresy + rabat % |
-| `akwen-b2b-orders` | Zamówienia (ceny po rabacie) |
+| `akwen-b2b-profile` | Profil + rabat % |
+| `akwen-b2b-orders` | Zamówienia |
+| `akwen-b2b-price-mode` | `yours` \| `list` |
 
 ---
 
-## Architektura
-
-| Warstwa | Technologia |
-|---------|-------------|
-| Server | Server Components, `server-only`, React `cache()` |
-| Produkty | Excel przy buildzie (`products.ts`) |
-| Stan klienta | Context + localStorage |
-| Auth | Mock (`auth.ts`) |
-
-### Kluczowe pliki
+## Kluczowe pliki
 
 ```
 src/lib/b2b/
-  types.ts, products.ts, recommend.ts, format.ts
-  images.ts, image-prompts.ts, labels.ts
-  categories.ts, orders.ts, profile.ts, auth.ts
+  products.ts, recommend.ts, format.ts, types.ts
+  image-prompts.ts, images.ts, orders.ts, profile.ts
 
 src/contexts/
-  cart-context.tsx, profile-context.tsx
+  cart-context.tsx, profile-context.tsx, price-display-context.tsx
 
 src/components/b2b/
-  catalog-client.tsx, product-card.tsx, product-image.tsx
-  cart-checkout.tsx, order-form.tsx, order-success.tsx
-  profile-form.tsx, orders-list.tsx, mobile-nav.tsx, sidebar.tsx
-
-src/app/b2b/
-  page.tsx, katalog/, koszyk/, zamowienia/, moje-dane/
+  product-card.tsx, price-mode-toggle.tsx, catalog-client.tsx
+  cart-checkout.tsx, product-image.tsx
 
 scripts/
+  add-powod-proponowania.cjs
   generate-product-images-batch.mjs
   sync-image-manifest.mjs
-  coverage-report.mjs
 ```
 
 ---
 
-## Weryfikacja na produkcji (Etap 1)
+## Weryfikacja produkcji
 
-1. `/b2b/koszyk` — ceny z −5%, linia oszczędności  
-2. `/b2b` — Polecane z badge’ami powodów  
-3. `/b2b/katalog?tag1=Pasty&tag2=Łosoś` — filtry z URL + Udostępnij  
-4. `/b2b/moje-dane` — rabat handlowy read-only  
-5. Złóż zamówienie → podsumowanie z rabatem → **Zamów ponownie** bez double discount  
-
-| Co | URL |
-|----|-----|
-| Dashboard | https://akwen-web.vercel.app/b2b |
-| Katalog | https://akwen-web.vercel.app/b2b/katalog |
-| Polecane | https://akwen-web.vercel.app/b2b/katalog?widok=proponowane |
-| Koszyk | https://akwen-web.vercel.app/b2b/koszyk |
-| Moje dane | https://akwen-web.vercel.app/b2b/moje-dane |
+1. `/b2b/koszyk` — rabat −5%, oszczędność  
+2. `/b2b` — Polecane: badge powodów z Excela + toggle cen  
+3. `/b2b/katalog?tag1=Pasty&tag2=Łosoś` — filtry URL; na kartach: przekreślona katalogowa, pogrubiona po rabacie, `−5% (−X zł)`  
+4. `/b2b/moje-dane` — rabat read-only  
+5. Reorder zamówienia — bez double discount  
 
 ---
 
-## Ograniczenia (kandydaci Etap 2+)
+## Checklist dalszych kroków (Etap 3+)
 
-- Brak prawdziwego logowania / ról / multi-tenant  
-- Backend API + baza — wszystko w localStorage  
-- Edycja rabatu przez admina (UI tylko read-only)  
-- VAT / cenniki wielopoziomowe  
-- Real-time stany z ERP  
-- Wyszukiwanie globalne w headerze (placeholder UI)  
-- Testy automatyczne e2e  
-- Osobna kolumna „powód proponowania” w Excelu (obecnie heurystyka)  
-- Zdjęcia AI — nie są fotografiami rzeczywistych opakowań  
-- Excel + zdjęcia przy buildzie (zmiana = redeploy)  
-
----
-
-## Checklist Etapu 2
-
-- [x] **Rabat na kartach katalogu** — toggle „Twoja cena (−X%) / Katalogowa”  
-  - Context: `price-display-context.tsx` (localStorage `akwen-b2b-price-mode`)  
-  - UI: `price-mode-toggle.tsx` na Dashboardzie i w Katalogu  
-  - Karty: `product-card.tsx` — cena po rabacie + przekreślona katalogowa (tryb „Twoja”)  
-  - Domyślnie: **Twoja cena**; preferencja zapamiętana w przeglądarce  
-- [ ] **Kolumna Powód w Excelu** — mapowanie zamiast heurystyki w `recommend.ts`  
-- [ ] **Globalne wyszukiwanie w headerze** — zamiast placeholdera  
-- [ ] **E2E smoke** — koszyk + rabat + checkout + reorder  
-- [ ] **Mock API (Route Handlers)** — zamówienia zamiast samego localStorage  
-- [ ] **Ulepszenie promptów Imagine** — słabe Tag1 (Mięsne, Warzywa) + regeneracja batch  
-- [ ] **Eksport zamówienia** — PDF / e-mail  
-- [ ] **Auth** — Clerk / Auth0 (gdy właściciel gotowy na konta)  
-
-### Gotowe prompty dla sesji Grok Build
-
-1. ~~PROJECT_SUMMARY Etap 1 + checklista~~ ✅  
-2. ~~Rabat na kartach + toggle~~ ✅  
-3. „Dodaj kolumnę Powód do Excelu i mapuj zamiast heurystyki w recommend.ts.”  
-4. „E2E smoke: koszyk + rabat + checkout + reorder.”  
-5. „Backend mock API (Route Handlers) zamiast localStorage dla zamówień.”  
-6. „Ulepsz prompty Imagine dla konkretnych słabych Tag1 (np. Mięsne, Warzywa) i regeneruj batch.”  
-
----
-
-## Historia commitów (istotne)
-
-```
-279080f  Etap 1 B2B: rabat, proponowane z powodami, shareable filtry, lepsze zdjęcia
-d0557bc  Strona Dotacje (KPO)
-32b1961  PROJECT_SUMMARY (wcześniejszy kontekst)
-bf6d8d7  146 obrazów Grok Imagine Tag1+Tag2
-5281423  UX katalogu: etykiety, placeholdery
-e8d8ac7  MVP: Tag1/Tag2, filtry, Proponowane
-```
+- [ ] Globalne wyszukiwanie w headerze  
+- [ ] E2E smoke: koszyk + rabat + checkout + reorder  
+- [ ] Mock API (Route Handlers) zamiast localStorage  
+- [ ] Regeneracja batch Imagine po ulepszonych promptach (Mięsne/Warzywa/…)  
+- [ ] Eksport zamówienia PDF / e-mail  
+- [ ] Auth (Clerk / Auth0)  
+- [ ] VAT / cenniki wielopoziomowe  
 
 ---
 
 ## Kontekst developera
 
-Użytkownik uczy się od podstaw (doświadczenie VBA/Excel). Preferuje wyjaśnienia krok po kroku z analogiami do Excela. Komunikacja po polsku.  
-Praca z GrokWeb (plan/prompty) + Grok Build (implementacja).
+Użytkownik uczy się od podstaw (VBA/Excel). Preferuje analogie do arkuszy i wyjaśnienia krok po kroku. Komunikacja po polsku.

@@ -8,23 +8,23 @@ const TAG1_SCENES: Record<string, (kind: string) => string> = {
   Pasty: (k) =>
     `close-up of creamy ${k} fish paste spread in a clear glass jar with lid slightly open, rich texture visible`,
   Mrożonki: (k) =>
-    `frozen ${k} seafood blocks in professional vacuum retail packaging with light frost crystals`,
+    `premium frozen ${k} seafood in thick transparent vacuum bag, soft frost crystals on surface, ice-cold look, IQF pieces visible through plastic, commercial freezer aisle product, slight condensation highlights`,
   "Garmażeria mrożona": (k) =>
-    `frozen ready-to-cook ${k} dumplings or garmazeria dish in branded commercial freezer packaging`,
+    `frozen ready-to-cook ${k} dumplings or garmazeria dish in branded commercial freezer packaging, frost accents, appetizing window on the pack`,
   "Filety rybne": (k) =>
-    `premium frozen ${k} fish fillets, skinless portions, vacuum-sealed on white tray`,
+    `premium frozen ${k} fish fillets, skinless portions, vacuum-sealed on white tray with frost edge`,
   Panierowane: (k) =>
-    `golden breaded frozen ${k} fish portions in a retail carton, crispy coating visible`,
+    `golden breaded frozen ${k} fish portions in a retail carton, crispy coating visible through window`,
   "Ryba Wędzona": (k) =>
-    `artisan cold-smoked ${k} fish slices fanned on a slate board, golden smoke color`,
+    `artisan cold-smoked ${k} fish slices fanned on a slate board, golden smoke color, glossy oil sheen`,
   "Ryby pieczone": (k) =>
     `oven-roasted ${k} fish product in transparent retail packaging, appetizing glaze`,
   "Konserwy rybne": (k) =>
-    `classic metal tin can of ${k} fish preserve, lid open showing packed fish inside`,
+    `classic silver metal tin can of ${k} fish preserve, lid partially open revealing packed fish, rich oil or sauce glisten, European delicatessen can, micro scratches on metal for realism, top-down 45° view`,
   "Ryba w oleju": (k) =>
-    `open tin of ${k} fish fillets in golden oil, glistening pieces, European delicatessen style`,
+    `open tin of ${k} fish fillets in golden oil, glistening pieces, European delicatessen style, soft reflections on oil surface`,
   "Ryba w sosie": (k) =>
-    `open tin of ${k} fish in rich tomato sauce, saucy and appetizing Polish preserve style`,
+    `open tin of ${k} fish in rich tomato sauce, saucy and appetizing Polish preserve style, sauce texture clearly visible`,
   Śledzie: (k) =>
     `traditional Polish marinated ${k} herring pieces in a clear plastic tub or glass jar`,
   "Ryba faszerowana": (k) =>
@@ -44,11 +44,27 @@ const TAG1_SCENES: Record<string, (kind: string) => string> = {
   "Wątrobka rybna": (k) =>
     `canned ${k} fish liver pâté in a small tin or glass jar, gourmet style`,
   Mięsne: (k) =>
-    `sliced ${k} deli meat product in vacuum retail packaging, cold cuts style`,
+    `premium sliced ${k} deli cold cuts fanned in vacuum-sealed retail pack, pink-to-brown meat marbling, thin even slices, clear plastic window, Polish cold-cut style, appetizing but clean industrial packaging`,
   Warzywa: (k) =>
-    `frozen ${k} vegetables in a clear retail freezer bag, vibrant natural colors`,
+    `vibrant frozen ${k} vegetables in a clear retail freezer bag, natural saturated colors, light frost on pieces, no ice clumps, healthy frozen produce look, bright studio color accuracy`,
   Inne: (k) =>
     `wholesale food product featuring ${k} in clean modern retail packaging`,
+};
+
+/** Dodatkowe wskazówki e-commerce per trudniejszą kategorię Tag1. */
+const TAG1_PHOTO_EXTRAS: Record<string, string> = {
+  Mięsne:
+    "Cool deli counter lighting, slight specular highlights on meat fat, avoid raw blood look, keep packaging honest and appetizing for wholesale catalog.",
+  Warzywa:
+    "True-to-life vegetable colors under daylight-balanced softboxes (5600K feel), avoid plastic sheen overpowering produce, emphasize freshness of frozen IQF pieces.",
+  Mrożonki:
+    "Cold blue-white key light mixed with warm fill, visible frost without snow-storm, emphasize frozen texture and packaging transparency.",
+  "Konserwy rybne":
+    "Harder rim light on metal tin edges, soft fill inside the can, show food texture clearly, avoid unreadable labels, pure product hero.",
+  "Ryba w oleju":
+    "Catch light on oil surface, warm golden tones, open tin hero shot.",
+  "Ryba w sosie":
+    "Rich red sauce color accuracy, open tin three-quarter angle.",
 };
 
 /** Pełne mapowanie Tag2 → angielski opis do promptów Imagine. */
@@ -155,7 +171,9 @@ export function getTagComboSlug(tag1: string, tag2: string): string {
 
 /**
  * Prompt pod Grok Imagine — zbudowany z Tag1 (scena/opakowanie) + Tag2 (składnik).
- * Struktura: subject → material/kind → composition → lighting → quality → negatives.
+ *
+ * Struktura (jak kolumny w Excelu: Kategoria | Rodzaj | Scena | Światło | Jakość):
+ * subject → material/kind → composition → lighting → quality → negatives.
  */
 export function buildImaginePrompt(
   tag1: string,
@@ -166,6 +184,7 @@ export function buildImaginePrompt(
   const sceneBuilder = TAG1_SCENES[tag1];
   const category = formatCategoryLabel(tag1);
   const kindLabel = tag2 ? tag2 : "produkt spożywczy";
+  const photoExtra = TAG1_PHOTO_EXTRAS[tag1] ?? "";
 
   const scene = sceneBuilder
     ? sceneBuilder(kind)
@@ -181,14 +200,16 @@ export function buildImaginePrompt(
       : "";
 
   return [
-    `Ultra-realistic professional e-commerce product photo of ${scene}.`,
+    `Ultra-realistic professional e-commerce product photography of ${scene}.`,
     nameHint,
     tagHint,
-    `Hero product shot, centered 3/4 angle, clean seamless white or very light gray studio backdrop,`,
-    `soft dual softbox lighting, subtle natural shadow under product, shallow depth of field,`,
-    `tack-sharp focus on product, appetizing commercial food styling, high dynamic range,`,
-    `shot on 85mm lens look, 8k detail, suitable for wholesale grocery catalog thumbnail.`,
-    `Strictly no text, no brand logos, no nutrition labels, no watermarks, no people, no hands, no clutter.`,
+    photoExtra,
+    `Composition: single product hero, centered, slight 3/4 camera angle (about 30–40°), product filling ~70% of frame, generous negative space.`,
+    `Backdrop: seamless pure white or very light cool-gray infinity cyclorama, no props table clutter.`,
+    `Lighting: dual large softboxes key+fill, soft contact shadow under product, gentle rim light to separate edges, no harsh specular blowouts.`,
+    `Lens look: 85mm commercial food photography, f/5.6–f/8 depth of field, tack-sharp product edges, subtle background falloff.`,
+    `Quality: high dynamic range, accurate color, 8k detail, appetizing commercial styling suitable for wholesale grocery catalog thumbnail.`,
+    `Strictly no text, no brand logos, no nutrition labels, no barcodes, no watermarks, no people, no hands, no clutter, no fake store shelves.`,
   ]
     .filter(Boolean)
     .join(" ")

@@ -15,6 +15,8 @@ interface ExcelRow {
   Tag1: string;
   Tag2: string;
   Proponowany: string;
+  /** Powód proponowania z arkusza (np. „Wysoka marża”, „Bestseller”). */
+  PowodProponowania?: string;
   Jm: string;
   "Ilość OGÓŁEM": number;
   "Ilość W magazynie Dostępna": number;
@@ -73,6 +75,8 @@ function mapRowToProduct(row: ExcelRow, index: number): B2BProduct {
   const priceNet =
     Number(row["Cena z cennika Cennik bazowy 100 Netto"]) || 0;
   const recommended = isRecommended(row.Proponowany);
+  // Jak VLOOKUP/odczyt komórki: najpierw wartość z kolumny Excel, potem heurystyka
+  const excelReason = String(row.PowodProponowania ?? "").trim();
   const reason = resolveRecommendReason({
     priceNet,
     stock,
@@ -80,6 +84,7 @@ function mapRowToProduct(row: ExcelRow, index: number): B2BProduct {
     stockQtyTotal: Number(row["Ilość OGÓŁEM"]) || 0,
     deliveryDaysSpan: Number(row["Data dostawy Różnica dni"]) || 0,
     isRecommended: recommended,
+    excelReason: excelReason || null,
   });
 
   return {
@@ -92,7 +97,7 @@ function mapRowToProduct(row: ExcelRow, index: number): B2BProduct {
     producer: String(row.Producent || "").trim(),
     tag1,
     tag2,
-    isRecommended: recommended,
+    isRecommended: recommended || Boolean(reason),
     recommendReason: reason?.label ?? null,
     recommendReasonDetail: reason?.description ?? null,
     category,

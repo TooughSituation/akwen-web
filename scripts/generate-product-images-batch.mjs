@@ -107,45 +107,45 @@ const TAG1_SCENES = {
   Pasty: (k) =>
     `close-up of creamy ${k} fish paste spread in a clear glass jar with lid slightly open, rich texture visible`,
   Mrożonki: (k) =>
-    `frozen ${k} seafood blocks in professional vacuum retail packaging with light frost crystals`,
+    `premium frozen ${k} seafood in thick transparent vacuum bag, soft frost crystals, IQF pieces visible, commercial freezer product`,
   "Garmażeria mrożona": (k) =>
-    `frozen ready-to-cook ${k} dumplings or garmazeria dish in branded commercial freezer packaging`,
+    `frozen ready-to-cook ${k} dumplings in commercial freezer packaging with frost accents`,
   "Filety rybne": (k) =>
-    `premium frozen ${k} fish fillets, skinless portions, vacuum-sealed on white tray`,
+    `premium frozen ${k} fish fillets, vacuum-sealed on white tray with frost edge`,
   Panierowane: (k) =>
-    `golden breaded frozen ${k} fish portions in a retail carton, crispy coating visible`,
+    `golden breaded frozen ${k} fish portions in a retail carton`,
   "Ryba Wędzona": (k) =>
     `artisan cold-smoked ${k} fish slices fanned on a slate board, golden smoke color`,
   "Ryby pieczone": (k) =>
-    `oven-roasted ${k} fish product in transparent retail packaging, appetizing glaze`,
+    `oven-roasted ${k} fish product in transparent retail packaging`,
   "Konserwy rybne": (k) =>
-    `classic metal tin can of ${k} fish preserve, lid open showing packed fish inside`,
+    `classic silver metal tin can of ${k} fish preserve, lid partially open, rich oil glisten, top-down 45° view`,
   "Ryba w oleju": (k) =>
-    `open tin of ${k} fish fillets in golden oil, glistening pieces, European delicatessen style`,
+    `open tin of ${k} fish fillets in golden oil, glistening pieces`,
   "Ryba w sosie": (k) =>
-    `open tin of ${k} fish in rich tomato sauce, saucy and appetizing Polish preserve style`,
+    `open tin of ${k} fish in rich tomato sauce, Polish preserve style`,
   Śledzie: (k) =>
-    `traditional Polish marinated ${k} herring pieces in a clear plastic tub or glass jar`,
+    `traditional Polish marinated ${k} herring pieces in a clear plastic tub`,
   "Ryba faszerowana": (k) =>
-    `sliced stuffed ${k} fish terrine on a ceramic plate, festive Polish style`,
+    `sliced stuffed ${k} fish terrine on a ceramic plate`,
   "Owoce morza": (k) =>
     `premium frozen ${k} seafood in professional IQF retail bag packaging`,
   "Paluszki krabowe": () =>
-    `orange-white crab sticks surimi sticks in transparent retail packaging, clean cut ends`,
+    `orange-white crab sticks surimi in transparent retail packaging`,
   Kawiory: (k) =>
-    `luxury small glass jar of ${k} fish roe or caviar, pearls glistening under soft light`,
+    `luxury small glass jar of ${k} fish roe or caviar, pearls glistening`,
   Sałatki: (k) =>
-    `fresh ready-to-eat ${k} seafood salad in a clear plastic deli tub, colorful ingredients`,
+    `fresh ready-to-eat ${k} seafood salad in a clear plastic deli tub`,
   "Dania rybne": (k) =>
-    `ready meal with ${k} fish in commercial food tray packaging, microwave-ready style`,
+    `ready meal with ${k} fish in commercial food tray packaging`,
   "Farsz rybny": (k) =>
-    `finely ground ${k} fish mince (farsz) in vacuum retail packaging`,
+    `finely ground ${k} fish mince in vacuum retail packaging`,
   "Wątrobka rybna": (k) =>
-    `canned ${k} fish liver pâté in a small tin or glass jar, gourmet style`,
+    `canned ${k} fish liver pâté in a small tin or glass jar`,
   Mięsne: (k) =>
-    `sliced ${k} deli meat product in vacuum retail packaging, cold cuts style`,
+    `premium sliced ${k} deli cold cuts fanned in vacuum-sealed retail pack, meat marbling, clear plastic window, Polish cold-cut style`,
   Warzywa: (k) =>
-    `frozen ${k} vegetables in a clear retail freezer bag, vibrant natural colors`,
+    `vibrant frozen ${k} vegetables in a clear retail freezer bag, natural saturated colors, light frost, IQF pieces`,
   Inne: (k) =>
     `wholesale food product featuring ${k} in clean modern retail packaging`,
 };
@@ -163,12 +163,12 @@ function buildPrompt(tag1, tag2) {
       : "";
 
   return [
-    `Ultra-realistic professional e-commerce product photo of ${scene}.`,
+    `Ultra-realistic professional e-commerce product photography of ${scene}.`,
     tagHint,
-    `Hero product shot, centered 3/4 angle, clean seamless white or very light gray studio backdrop,`,
-    `soft dual softbox lighting, subtle natural shadow under product, shallow depth of field,`,
-    `tack-sharp focus on product, appetizing commercial food styling, high dynamic range,`,
-    `shot on 85mm lens look, 8k detail, suitable for wholesale grocery catalog thumbnail.`,
+    `Composition: single product hero, centered, slight 3/4 camera angle (about 30–40°), product filling ~70% of frame.`,
+    `Backdrop: seamless pure white or very light cool-gray infinity cyclorama.`,
+    `Lighting: dual large softboxes key+fill, soft contact shadow, gentle rim light, no harsh blowouts.`,
+    `Lens look: 85mm commercial food photography, f/5.6–f/8, tack-sharp edges, 8k detail.`,
     `Strictly no text, no brand logos, no nutrition labels, no watermarks, no people, no hands, no clutter.`,
   ]
     .filter(Boolean)

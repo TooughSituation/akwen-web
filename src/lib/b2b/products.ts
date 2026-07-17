@@ -17,6 +17,8 @@ interface ExcelRow {
   Proponowany: string;
   /** Powód proponowania z arkusza (np. „Wysoka marża”, „Bestseller”). */
   PowodProponowania?: string;
+  /** Opcjonalny opis handlowy z arkusza. */
+  Opis?: string;
   Jm: string;
   "Ilość OGÓŁEM": number;
   "Ilość W magazynie Dostępna": number;
@@ -24,6 +26,35 @@ interface ExcelRow {
   "Data dostawy Różnica dni": number;
   "Cena z cennika Cennik bazowy 100 Netto": number;
   Producent: string;
+}
+
+/**
+ * Opis do panelu szczegółów: kolumna Excel „Opis” albo sensowny mock.
+ * (Jak formuła IF w Excelu: jeśli pusto → zbuduj tekst z innych kolumn.)
+ * Powód proponowania zostaje w polu recommendReason* — nie dublujemy tu.
+ */
+function resolveProductDescription(input: {
+  excelDescription: string | null;
+  name: string;
+  producer: string;
+  tag1: string;
+  tag2: string;
+}): string {
+  if (input.excelDescription) return input.excelDescription;
+
+  const parts: string[] = [];
+  parts.push(
+    `${input.name} — pozycja z oferty hurtowej AKWEN, dostępna dla partnerów B2B.`
+  );
+  if (input.producer) {
+    parts.push(`Producent: ${input.producer}.`);
+  }
+  if (input.tag1 || input.tag2) {
+    const tags = [input.tag1, input.tag2].filter(Boolean).join(" · ");
+    parts.push(`Kategoria: ${tags}.`);
+  }
+  parts.push("Ceny netto, bez VAT. Stan magazynowy aktualizowany z cennika.");
+  return parts.join(" ");
 }
 
 function parseExcelRows(): ExcelRow[] {
@@ -87,6 +118,10 @@ function mapRowToProduct(row: ExcelRow, index: number): B2BProduct {
     excelReason: excelReason || null,
   });
 
+  const producer = String(row.Producent || "").trim();
+  const recommendReasonDetail = reason?.description ?? null;
+  const excelDescription = String(row.Opis ?? "").trim() || null;
+
   return {
     id: symbol,
     symbol,
@@ -94,12 +129,19 @@ function mapRowToProduct(row: ExcelRow, index: number): B2BProduct {
     unit: String(row.Jm || "szt"),
     stock,
     priceNet,
-    producer: String(row.Producent || "").trim(),
+    producer,
     tag1,
     tag2,
     isRecommended: recommended || Boolean(reason),
     recommendReason: reason?.label ?? null,
-    recommendReasonDetail: reason?.description ?? null,
+    recommendReasonDetail,
+    description: resolveProductDescription({
+      excelDescription,
+      name,
+      producer,
+      tag1,
+      tag2,
+    }),
     category,
     imageUrl: getProductImage(symbol, category.id, tag1, tag2),
   };

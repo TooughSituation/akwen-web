@@ -31,6 +31,11 @@ export interface B2BProduct {
   recommendReason: string | null;
   /** Rozszerzone wyjaśnienie powodu (tooltip / karta). */
   recommendReasonDetail: string | null;
+  /**
+   * Opis handlowy (kolumna Excel „Opis” albo mock z tagów/producenta).
+   * Używany w panelu szczegółów produktu.
+   */
+  description: string | null;
   category: ProductCategory;
   imageUrl: string;
 }

@@ -19,6 +19,7 @@ import { useCart } from "@/contexts/cart-context";
 import { useFavorites } from "@/contexts/favorites-context";
 import { usePriceDisplay } from "@/contexts/price-display-context";
 import { useProfile } from "@/contexts/profile-context";
+import { ProductDetailSheet } from "@/components/b2b/product-detail-sheet";
 import { ProductImage } from "@/components/b2b/product-image";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -86,7 +87,11 @@ export function ProductCard({ product, compact = false }: ProductCardProps) {
   );
   const primaryPromoBadge = CART_PROMOTIONS[0];
 
-  function handleAddToCart() {
+  const [detailsOpen, setDetailsOpen] = useState(false);
+
+  function handleAddToCart(event?: React.MouseEvent) {
+    event?.preventDefault();
+    event?.stopPropagation();
     addItem(product, 1);
     setJustAdded(true);
     window.setTimeout(() => setJustAdded(false), 1500);
@@ -96,6 +101,20 @@ export function ProductCard({ product, compact = false }: ProductCardProps) {
     event.preventDefault();
     event.stopPropagation();
     toggleFavorite(product.id);
+  }
+
+  /** Klik w kafelek (nie w przyciski) → panel szczegółów z prawej. */
+  function handleCardClick() {
+    if (compact) return;
+    setDetailsOpen(true);
+  }
+
+  function handleCardKeyDown(event: React.KeyboardEvent) {
+    if (compact) return;
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      setDetailsOpen(true);
+    }
   }
 
   return (
@@ -109,19 +128,25 @@ export function ProductCard({ product, compact = false }: ProductCardProps) {
       className="h-full"
     >
       <Card
+        role={compact ? undefined : "button"}
+        tabIndex={compact ? undefined : 0}
+        onClick={handleCardClick}
+        onKeyDown={handleCardKeyDown}
         className={cn(
           "group flex h-full flex-col overflow-hidden border-border/55 bg-card p-0 shadow-none",
           "transition-[box-shadow,border-color] duration-400",
           "hover:border-border hover:shadow-[0_12px_40px_-12px_rgba(0,31,63,0.12)]",
+          !compact && "cursor-pointer focus-visible:ring-2 focus-visible:ring-turquoise-500/40 focus-visible:outline-none",
           compact && "flex-row"
         )}
       >
+        {/* Zdjęcie: wysokość ~½ poprzedniej (4/5 → 8/5), proporcje object-cover bez rozciągania */}
         <div
           className={cn(
             "relative overflow-hidden bg-muted/25",
             compact
-              ? "aspect-square w-28 shrink-0 sm:w-32"
-              : "aspect-[4/5] w-full"
+              ? "aspect-square w-14 shrink-0 sm:w-16"
+              : "aspect-[8/5] w-full"
           )}
         >
           <ProductImage
@@ -314,6 +339,14 @@ export function ProductCard({ product, compact = false }: ProductCardProps) {
           </CardContent>
         </div>
       </Card>
+
+      {!compact && (
+        <ProductDetailSheet
+          product={product}
+          open={detailsOpen}
+          onOpenChange={setDetailsOpen}
+        />
+      )}
     </motion.div>
   );
 }

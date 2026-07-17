@@ -55,21 +55,35 @@ export default function ONasPage() {
 
           <div className="mt-10">
             <h3 className="text-lg font-semibold">Wyróżnienia i certyfikaty</h3>
-            <div className="mt-6 flex flex-wrap items-center gap-8">
-              {awards.map((award) => (
-                <div key={award.label} className="flex flex-col items-center gap-3">
-                  <Image
-                    src={award.image}
-                    alt={award.alt}
-                    width={award.image.includes("po-ryby") ? 220 : 140}
-                    height={90}
-                    className="h-auto max-h-20 w-auto object-contain"
-                  />
-                  <span className="max-w-[200px] text-center text-sm text-muted-foreground">
-                    {award.label}
-                  </span>
-                </div>
-              ))}
+            <div className="mt-6 flex flex-wrap items-start justify-start gap-8 sm:gap-10">
+              {awards.map((award) => {
+                const isOrzel = award.image.includes("orzeldystrybucji");
+                const isPoRyby = award.image.includes("po-ryby");
+                // Intrinsic sizes for Next/Image aspect ratio (orzel ~900×767)
+                const width = isOrzel ? 180 : isPoRyby ? 220 : 160;
+                const height = isOrzel ? 153 : 90;
+
+                return (
+                  <div
+                    key={award.label}
+                    className="flex w-[160px] flex-col items-center gap-3 sm:w-[180px]"
+                  >
+                    <div className="flex h-20 w-full items-center justify-center">
+                      <Image
+                        src={award.image}
+                        alt={award.alt}
+                        width={width}
+                        height={height}
+                        quality={90}
+                        className="max-h-20 w-auto max-w-full object-contain"
+                      />
+                    </div>
+                    <span className="max-w-[180px] text-center text-sm text-muted-foreground">
+                      {award.label}
+                    </span>
+                  </div>
+                );
+              })}
             </div>
           </div>
         </div>

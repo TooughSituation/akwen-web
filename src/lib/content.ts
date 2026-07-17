@@ -16,6 +16,7 @@ export const assets = {
   lithuanianProducts: "/images/oferta-litewskie.png",
   awards: {
     gazela: "/images/gazele-biznesu.png",
+    orzel: "/images/orzeldystrybucji.png",
     kpo: "/images/pcdr.png",
     poRyby: "/images/po-ryby.png",
   },
@@ -136,7 +137,7 @@ export const awards = [
   },
   {
     label: "Orzeł Dystrybucji FMCG 2014–2015 – Życie Handlowe",
-    image: assets.awards.gazela,
+    image: assets.awards.orzel,
     alt: "Orzeł Dystrybucji FMCG",
   },
   {

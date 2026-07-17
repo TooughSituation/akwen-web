@@ -37,6 +37,7 @@
 | **Ulubione** | ✅ | Serce na karcie, widok w katalogu, localStorage per user |
 | **Promocje** | ✅ | Progi 500 zł (−5%) i 800 zł (gratis), licznik „brakuje” live |
 | **Czat mock** | ✅ | Sheet z handlowcem, auto-odpowiedź 2–3 s, historia per user |
+| **Przewodnik** | ✅ | Tour po B2B (overlay), start z sidebara, localStorage tour-seen |
 | Etap 7+ | ⏳ | Prawdziwa baza, Resend SMTP, ERP… |
 
 ### Moduły B2B
@@ -243,6 +244,19 @@ scripts/
 | Pliki | `loyalty.ts`, `loyalty-context.tsx`, `loyalty-panel.tsx` |
 
 Analogia Excel: arkusz **Punkty** (ledger), **Nagrody** (katalog), **Wymiany** (redemptions).
+
+---
+
+## Przewodnik (product tour)
+
+| Element | Szczegóły |
+|---------|-----------|
+| Start | Sidebar → **Przewodnik** (+ auto-start przy 1. wizycie) |
+| UI | Custom overlay + spotlight (`tour-overlay.tsx`) |
+| Kroki | Dashboard, Katalog, Ulubione, Koszyk, Zamówienia, Moje dane, Lojalność, Czat |
+| Nawigacja | Poprzedni / Następny / Zakończ |
+| Storage | `akwen-b2b-tour-seen:{userId}` = `"1"` po zakończeniu |
+| Atrybuty | `data-tour="nav-*"` / `header-*` na elementach |
 
 ---
 

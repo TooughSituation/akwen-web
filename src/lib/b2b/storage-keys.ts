@@ -16,6 +16,8 @@ export const STORAGE_BASE = {
   favorites: "akwen-b2b-favorites",
   /** Historia czatu z handlowcem per firma. */
   chat: "akwen-b2b-chat",
+  /** Czy użytkownik ukończył / pominął przewodnik. */
+  tourSeen: "akwen-b2b-tour-seen",
 } as const;
 
 export function userScopedKey(base: string, userId: string | null | undefined): string {
@@ -49,4 +51,8 @@ export function favoritesStorageKey(userId: string | null | undefined): string {
 
 export function chatStorageKey(userId: string | null | undefined): string {
   return userScopedKey(STORAGE_BASE.chat, userId);
+}
+
+export function tourSeenStorageKey(userId: string | null | undefined): string {
+  return userScopedKey(STORAGE_BASE.tourSeen, userId);
 }

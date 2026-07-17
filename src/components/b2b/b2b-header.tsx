@@ -44,7 +44,8 @@ export function B2BHeader({ title, description }: B2BHeaderProps) {
 
             <Link
               href="/b2b/katalog?widok=ulubione"
-              className="hidden items-center gap-1.5 rounded-lg border border-border bg-muted/30 px-2.5 py-2 text-xs font-medium text-coral-600 transition-colors hover:bg-coral-500/10 sm:inline-flex"
+              data-tour="header-favorites"
+              className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-muted/30 px-2 py-2 text-xs font-medium text-coral-600 transition-colors hover:bg-coral-500/10 sm:px-2.5"
               title="Ulubione produkty"
             >
               <Heart
@@ -60,7 +61,8 @@ export function B2BHeader({ title, description }: B2BHeaderProps) {
 
             <Link
               href="/b2b/moje-dane"
-              className="hidden items-center gap-1.5 rounded-lg border border-border bg-muted/30 px-2.5 py-2 text-xs font-medium text-turquoise-700 transition-colors hover:bg-turquoise-500/10 sm:inline-flex dark:text-turquoise-400"
+              data-tour="header-loyalty"
+              className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-muted/30 px-2 py-2 text-xs font-medium text-turquoise-700 transition-colors hover:bg-turquoise-500/10 sm:px-2.5 dark:text-turquoise-400"
               title="Program lojalnościowy"
             >
               <Star className="size-3.5" />

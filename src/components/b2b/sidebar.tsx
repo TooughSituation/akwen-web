@@ -12,16 +12,44 @@ import {
   UserCircle,
   ExternalLink,
   LogOut,
+  BookOpen,
 } from "lucide-react";
 import { useCart } from "@/contexts/cart-context";
+import { useTour } from "@/contexts/tour-context";
 import { cn } from "@/lib/utils";
 
 export const navItems = [
-  { href: "/b2b", label: "Dashboard", icon: LayoutDashboard, exact: true },
-  { href: "/b2b/katalog", label: "Katalog", icon: Package },
-  { href: "/b2b/koszyk", label: "Koszyk", icon: ShoppingCart },
-  { href: "/b2b/zamowienia", label: "Moje zamówienia", icon: ClipboardList },
-  { href: "/b2b/moje-dane", label: "Moje dane", icon: UserCircle },
+  {
+    href: "/b2b",
+    label: "Dashboard",
+    icon: LayoutDashboard,
+    exact: true,
+    tourId: "nav-dashboard",
+  },
+  {
+    href: "/b2b/katalog",
+    label: "Katalog",
+    icon: Package,
+    tourId: "nav-katalog",
+  },
+  {
+    href: "/b2b/koszyk",
+    label: "Koszyk",
+    icon: ShoppingCart,
+    tourId: "nav-koszyk",
+  },
+  {
+    href: "/b2b/zamowienia",
+    label: "Moje zamówienia",
+    icon: ClipboardList,
+    tourId: "nav-zamowienia",
+  },
+  {
+    href: "/b2b/moje-dane",
+    label: "Moje dane",
+    icon: UserCircle,
+    tourId: "nav-moje-dane",
+  },
 ];
 
 interface B2BSidebarContentProps {
@@ -31,6 +59,7 @@ interface B2BSidebarContentProps {
 export function B2BSidebarContent({ onNavigate }: B2BSidebarContentProps) {
   const pathname = usePathname();
   const { totalItems, isHydrated } = useCart();
+  const { startTour, isActive: tourActive } = useTour();
 
   return (
     <>
@@ -61,6 +90,7 @@ export function B2BSidebarContent({ onNavigate }: B2BSidebarContentProps) {
               key={item.href}
               href={item.href}
               onClick={onNavigate}
+              data-tour={item.tourId}
               className={cn(
                 "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
                 isActive
@@ -78,6 +108,24 @@ export function B2BSidebarContent({ onNavigate }: B2BSidebarContentProps) {
             </Link>
           );
         })}
+
+        <button
+          type="button"
+          data-tour="nav-przewodnik"
+          disabled={tourActive}
+          onClick={() => {
+            onNavigate?.();
+            startTour();
+          }}
+          className={cn(
+            "flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
+            "text-ocean-100 hover:bg-white/10 hover:text-white",
+            tourActive && "opacity-50"
+          )}
+        >
+          <BookOpen className="size-4 shrink-0" />
+          <span className="flex-1 text-left">Przewodnik</span>
+        </button>
       </nav>
 
       <div className="space-y-1 border-t border-navy-800/50 p-4">

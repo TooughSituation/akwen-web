@@ -184,6 +184,7 @@ export function LiveChatHeaderButton() {
   return (
     <button
       type="button"
+      data-tour="header-chat"
       onClick={openChat}
       className="relative rounded-lg p-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
       aria-label="Czat z handlowcem"

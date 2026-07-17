@@ -183,11 +183,13 @@ scripts/
 
 ---
 
-## Checklist Etapu 2 (propozycja)
+## Checklist Etapu 2
 
-Priorytet do ustalenia z właścicielem — do implementacji w Grok Build:
-
-- [ ] **Rabat na kartach katalogu** — opcjonalnie toggle „Cena katalogowa / Twoja cena”  
+- [x] **Rabat na kartach katalogu** — toggle „Twoja cena (−X%) / Katalogowa”  
+  - Context: `price-display-context.tsx` (localStorage `akwen-b2b-price-mode`)  
+  - UI: `price-mode-toggle.tsx` na Dashboardzie i w Katalogu  
+  - Karty: `product-card.tsx` — cena po rabacie + przekreślona katalogowa (tryb „Twoja”)  
+  - Domyślnie: **Twoja cena**; preferencja zapamiętana w przeglądarce  
 - [ ] **Kolumna Powód w Excelu** — mapowanie zamiast heurystyki w `recommend.ts`  
 - [ ] **Globalne wyszukiwanie w headerze** — zamiast placeholdera  
 - [ ] **E2E smoke** — koszyk + rabat + checkout + reorder  
@@ -198,8 +200,8 @@ Priorytet do ustalenia z właścicielem — do implementacji w Grok Build:
 
 ### Gotowe prompty dla sesji Grok Build
 
-1. „Zaktualizuj PROJECT_SUMMARY.md o Etap 1 (commit 279080f) i checklistę Etapu 2.” ✅ (ten plik)  
-2. „Etap 2: rabat w katalogu na kartach produktów (opcjonalnie toggle cena katalogowa/Twoja cena).”  
+1. ~~PROJECT_SUMMARY Etap 1 + checklista~~ ✅  
+2. ~~Rabat na kartach + toggle~~ ✅  
 3. „Dodaj kolumnę Powód do Excelu i mapuj zamiast heurystyki w recommend.ts.”  
 4. „E2E smoke: koszyk + rabat + checkout + reorder.”  
 5. „Backend mock API (Route Handlers) zamiast localStorage dla zamówień.”  

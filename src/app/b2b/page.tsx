@@ -11,6 +11,7 @@ import { DashboardHeader } from "@/components/b2b/dashboard-header";
 import { CartCountBadge } from "@/components/b2b/cart-count-badge";
 import { OpenOrdersCountBadge } from "@/components/b2b/open-orders-count-badge";
 import { ProductCard } from "@/components/b2b/product-card";
+import { PriceModeToggle } from "@/components/b2b/price-mode-toggle";
 import { getProductCatalog, getRecommendedProducts } from "@/lib/b2b/products";
 import { RECOMMENDED_SECTION_HINT } from "@/lib/b2b/recommend";
 import { Button } from "@/components/ui/button";
@@ -118,7 +119,8 @@ export default function B2BDashboardPage() {
                 {RECOMMENDED_SECTION_HINT}
               </p>
             </div>
-            <div className="flex gap-2">
+            <div className="flex flex-wrap items-center gap-2">
+              <PriceModeToggle size="sm" />
               <Button
                 variant="outline"
                 size="sm"

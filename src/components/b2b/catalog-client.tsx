@@ -14,6 +14,7 @@ import type { B2BProduct, TagFilterData } from "@/lib/b2b/types";
 import { formatCategoryLabel, formatKindLabel } from "@/lib/b2b/labels";
 import { RECOMMENDED_SECTION_HINT } from "@/lib/b2b/recommend";
 import { ProductCard } from "@/components/b2b/product-card";
+import { PriceModeToggle } from "@/components/b2b/price-mode-toggle";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -417,7 +418,9 @@ export function CatalogClient({
             />
           </div>
 
-          <div className="flex shrink-0 items-center gap-2">
+          <div className="flex shrink-0 flex-wrap items-center gap-2">
+            <PriceModeToggle size="sm" />
+
             <button
               type="button"
               onClick={() => setMobileFiltersOpen((v) => !v)}

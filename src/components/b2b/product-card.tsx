@@ -4,8 +4,10 @@ import { useState } from "react";
 import { Check, Package, Sparkles } from "lucide-react";
 import type { B2BProduct } from "@/lib/b2b/types";
 import { formatCategoryLabel, formatKindLabel } from "@/lib/b2b/labels";
-import { formatPrice } from "@/lib/b2b/format";
+import { applyDiscount, formatPrice } from "@/lib/b2b/format";
 import { useCart } from "@/contexts/cart-context";
+import { usePriceDisplay } from "@/contexts/price-display-context";
+import { useProfile } from "@/contexts/profile-context";
 import { ProductImage } from "@/components/b2b/product-image";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -47,10 +49,17 @@ function StockBadge({ stock }: { stock: number }) {
 
 export function ProductCard({ product, compact = false }: ProductCardProps) {
   const { addItem } = useCart();
+  const { profile } = useProfile();
+  const { showYourPrice } = usePriceDisplay();
   const [justAdded, setJustAdded] = useState(false);
 
   const categoryLabel = formatCategoryLabel(product.tag1);
   const kindLabel = formatKindLabel(product.tag2);
+
+  const discountPercent = profile.discountPercent ?? 0;
+  const hasDiscount = discountPercent > 0;
+  const yourPrice = applyDiscount(product.priceNet, discountPercent);
+  const displayYourPrice = hasDiscount && showYourPrice;
 
   function handleAddToCart() {
     addItem(product, 1);
@@ -137,13 +146,44 @@ export function ProductCard({ product, compact = false }: ProductCardProps) {
         <CardContent className="mt-auto space-y-3 pb-4">
           <div className="flex items-end justify-between gap-2">
             <div>
-              <p className="text-xs text-muted-foreground">Cena hurtowa netto</p>
-              <p className="text-lg font-semibold text-navy-900 dark:text-white">
-                {formatPrice(product.priceNet)}
-                <span className="text-xs font-normal text-muted-foreground">
-                  /{product.unit}
-                </span>
+              <p className="text-xs text-muted-foreground">
+                {displayYourPrice
+                  ? "Twoja cena netto"
+                  : "Cena katalogowa netto"}
               </p>
+              {displayYourPrice ? (
+                <div>
+                  <p className="text-xs text-muted-foreground line-through">
+                    {formatPrice(product.priceNet)}
+                  </p>
+                  <p className="text-lg font-semibold text-turquoise-700 dark:text-turquoise-400">
+                    {formatPrice(yourPrice)}
+                    <span className="text-xs font-normal text-muted-foreground">
+                      /{product.unit}
+                    </span>
+                  </p>
+                  <p className="text-[10px] font-medium text-turquoise-700 dark:text-turquoise-400">
+                    Rabat −{discountPercent}%
+                  </p>
+                </div>
+              ) : (
+                <div>
+                  <p className="text-lg font-semibold text-navy-900 dark:text-white">
+                    {formatPrice(product.priceNet)}
+                    <span className="text-xs font-normal text-muted-foreground">
+                      /{product.unit}
+                    </span>
+                  </p>
+                  {hasDiscount && (
+                    <p className="text-[10px] text-muted-foreground">
+                      Z rabatem:{" "}
+                      <span className="font-medium text-turquoise-700 dark:text-turquoise-400">
+                        {formatPrice(yourPrice)}
+                      </span>
+                    </p>
+                  )}
+                </div>
+              )}
             </div>
             <StockBadge stock={product.stock} />
           </div>

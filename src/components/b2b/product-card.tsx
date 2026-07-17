@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Check, Package, Sparkles } from "lucide-react";
+import { Check, Heart, Package, Sparkles } from "lucide-react";
 import type { B2BProduct } from "@/lib/b2b/types";
 import { formatCategoryLabel, formatKindLabel } from "@/lib/b2b/labels";
 import {
@@ -10,6 +10,7 @@ import {
   formatPrice,
 } from "@/lib/b2b/format";
 import { useCart } from "@/contexts/cart-context";
+import { useFavorites } from "@/contexts/favorites-context";
 import { usePriceDisplay } from "@/contexts/price-display-context";
 import { useProfile } from "@/contexts/profile-context";
 import { ProductImage } from "@/components/b2b/product-image";
@@ -55,10 +56,12 @@ export function ProductCard({ product, compact = false }: ProductCardProps) {
   const { addItem } = useCart();
   const { profile } = useProfile();
   const { showYourPrice } = usePriceDisplay();
+  const { isFavorite, toggleFavorite } = useFavorites();
   const [justAdded, setJustAdded] = useState(false);
 
   const categoryLabel = formatCategoryLabel(product.tag1);
   const kindLabel = formatKindLabel(product.tag2);
+  const favorite = isFavorite(product.id);
 
   const discountPercent = profile.discountPercent ?? 0;
   const hasDiscount = discountPercent > 0;
@@ -74,6 +77,12 @@ export function ProductCard({ product, compact = false }: ProductCardProps) {
     addItem(product, 1);
     setJustAdded(true);
     window.setTimeout(() => setJustAdded(false), 1500);
+  }
+
+  function handleToggleFavorite(event: React.MouseEvent) {
+    event.preventDefault();
+    event.stopPropagation();
+    toggleFavorite(product.id);
   }
 
   return (
@@ -96,6 +105,33 @@ export function ProductCard({ product, compact = false }: ProductCardProps) {
           tag2={product.tag2}
           compact={compact}
         />
+        {/* Serce — jak checkbox „Ulubione” w Access */}
+        <button
+          type="button"
+          onClick={handleToggleFavorite}
+          className={cn(
+            "absolute top-2 right-2 z-10 flex size-8 items-center justify-center rounded-full",
+            "bg-white/90 shadow-sm backdrop-blur-sm transition-colors",
+            "hover:bg-white focus-visible:ring-2 focus-visible:ring-coral-500 focus-visible:outline-none",
+            favorite && "bg-coral-500/15"
+          )}
+          aria-label={
+            favorite
+              ? `Usuń z ulubionych: ${product.name}`
+              : `Dodaj do ulubionych: ${product.name}`
+          }
+          aria-pressed={favorite}
+          title={favorite ? "Usuń z ulubionych" : "Dodaj do ulubionych"}
+        >
+          <Heart
+            className={cn(
+              "size-4 transition-colors",
+              favorite
+                ? "fill-coral-500 text-coral-500"
+                : "text-navy-900/70"
+            )}
+          />
+        </button>
         <div className="absolute top-2 left-2 flex flex-wrap gap-1">
           {categoryLabel && (
             <Badge
@@ -206,29 +242,54 @@ export function ProductCard({ product, compact = false }: ProductCardProps) {
           </div>
 
           {!compact && (
-            <Button
-              size="sm"
-              className={cn(
-                "w-full",
-                justAdded
-                  ? "bg-green-600 hover:bg-green-600"
-                  : "bg-turquoise-500 hover:bg-turquoise-600"
-              )}
-              disabled={product.stock <= 0}
-              onClick={handleAddToCart}
-            >
-              {justAdded ? (
-                <>
-                  <Check className="size-4" />
-                  Dodano!
-                </>
-              ) : (
-                <>
-                  <Package className="size-4" />
-                  Dodaj do koszyka
-                </>
-              )}
-            </Button>
+            <div className="flex gap-2">
+              <Button
+                size="sm"
+                className={cn(
+                  "min-w-0 flex-1",
+                  justAdded
+                    ? "bg-green-600 hover:bg-green-600"
+                    : "bg-turquoise-500 hover:bg-turquoise-600"
+                )}
+                disabled={product.stock <= 0}
+                onClick={handleAddToCart}
+              >
+                {justAdded ? (
+                  <>
+                    <Check className="size-4" />
+                    Dodano!
+                  </>
+                ) : (
+                  <>
+                    <Package className="size-4" />
+                    Do koszyka
+                  </>
+                )}
+              </Button>
+              <Button
+                type="button"
+                size="sm"
+                variant="outline"
+                className={cn(
+                  "shrink-0",
+                  favorite &&
+                    "border-coral-500/40 bg-coral-500/10 text-coral-600 hover:bg-coral-500/15"
+                )}
+                onClick={handleToggleFavorite}
+                aria-pressed={favorite}
+                title={favorite ? "Usuń z ulubionych" : "Dodaj do ulubionych"}
+              >
+                <Heart
+                  className={cn(
+                    "size-4",
+                    favorite && "fill-coral-500 text-coral-500"
+                  )}
+                />
+                <span className="sr-only sm:not-sr-only sm:inline">
+                  {favorite ? "W ulubionych" : "Ulubione"}
+                </span>
+              </Button>
+            </div>
           )}
         </CardContent>
       </div>

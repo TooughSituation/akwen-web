@@ -5,6 +5,7 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import {
   ArrowUpDown,
   Check,
+  Heart,
   Link2,
   Search,
   SlidersHorizontal,
@@ -14,12 +15,13 @@ import type { B2BProduct, TagFilterData } from "@/lib/b2b/types";
 import { formatCategoryLabel, formatKindLabel } from "@/lib/b2b/labels";
 import { RECOMMENDED_SECTION_HINT } from "@/lib/b2b/recommend";
 import { matchesProductQuery } from "@/lib/b2b/search";
+import { useFavorites } from "@/contexts/favorites-context";
 import { ProductCard } from "@/components/b2b/product-card";
 import { PriceModeToggle } from "@/components/b2b/price-mode-toggle";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
-type CatalogView = "all" | "recommended";
+type CatalogView = "all" | "recommended" | "favorites";
 type SortOption =
   | "name-asc"
   | "name-desc"
@@ -101,6 +103,9 @@ export function buildCatalogSearchParams(filters: {
   if (filters.view === "recommended") {
     params.set("widok", "proponowane");
   }
+  if (filters.view === "favorites") {
+    params.set("widok", "ulubione");
+  }
   if (filters.search.trim()) {
     params.set("q", filters.search.trim());
   }
@@ -117,8 +122,13 @@ export function buildCatalogSearchParams(filters: {
 function readFiltersFromParams(searchParams: URLSearchParams) {
   const tag1 = searchParams.get("tag1")?.trim() || "all";
   const tag2 = searchParams.get("tag2")?.trim() || "all";
+  const widok = searchParams.get("widok");
   const view: CatalogView =
-    searchParams.get("widok") === "proponowane" ? "recommended" : "all";
+    widok === "proponowane"
+      ? "recommended"
+      : widok === "ulubione"
+        ? "favorites"
+        : "all";
   const search = searchParams.get("q")?.trim() || "";
   const inStockOnly =
     searchParams.get("stock") === "1" || searchParams.get("stock") === "true";
@@ -136,6 +146,8 @@ export function CatalogClient({
   const searchParams = useSearchParams();
   const router = useRouter();
   const pathname = usePathname();
+  const { favoriteIds, count: favoritesCount, isHydrated: favoritesHydrated } =
+    useFavorites();
 
   const initial = useMemo(
     () => readFiltersFromParams(searchParams),
@@ -151,6 +163,11 @@ export function CatalogClient({
   const [sort, setSort] = useState<SortOption>(initial.sort);
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
   const [linkCopied, setLinkCopied] = useState(false);
+
+  const favoriteIdSet = useMemo(
+    () => new Set(favoriteIds),
+    [favoriteIds]
+  );
 
   // Sync state when browser back/forward changes the URL
   useEffect(() => {
@@ -213,7 +230,9 @@ export function CatalogClient({
   const filteredProducts = useMemo(() => {
     const filtered = products.filter((product) => {
       const matchesView =
-        view === "all" || (view === "recommended" && product.isRecommended);
+        view === "all" ||
+        (view === "recommended" && product.isRecommended) ||
+        (view === "favorites" && favoriteIdSet.has(product.id));
       const matchesCategory =
         activeCategory === "all" || product.tag1 === activeCategory;
       const matchesKind = activeKind === "all" || product.tag2 === activeKind;
@@ -231,7 +250,16 @@ export function CatalogClient({
     });
 
     return sortProducts(filtered, sort);
-  }, [products, search, view, activeCategory, activeKind, inStockOnly, sort]);
+  }, [
+    products,
+    search,
+    view,
+    activeCategory,
+    activeKind,
+    inStockOnly,
+    sort,
+    favoriteIdSet,
+  ]);
 
   const categoryCounts = useMemo(() => {
     const counts: Record<string, number> = { all: products.length };
@@ -275,6 +303,8 @@ export function CatalogClient({
     search.trim() !== "" ||
     view !== "all" ||
     sort !== "name-asc";
+
+  const favoritesTabCount = favoritesHydrated ? favoritesCount : 0;
 
   const copyShareLink = useCallback(async () => {
     const params = buildCatalogSearchParams({
@@ -483,6 +513,13 @@ export function CatalogClient({
             count={recommendedCount}
             icon={<Sparkles className="size-3.5" />}
           />
+          <ViewTab
+            active={view === "favorites"}
+            onClick={() => setView("favorites")}
+            label="Ulubione"
+            count={favoritesTabCount}
+            icon={<Heart className="size-3.5" />}
+          />
           <Button
             type="button"
             variant="outline"
@@ -520,6 +557,22 @@ export function CatalogClient({
               </span>
               .
             </p>
+          </div>
+        )}
+
+        {view === "favorites" && (
+          <div className="rounded-lg border border-coral-500/20 bg-coral-500/5 px-4 py-3 text-sm text-muted-foreground">
+            <p>
+              <Heart className="mr-1.5 inline size-4 fill-coral-500 text-coral-500" />
+              Twoja lista ulubionych — zapisana na koncie (localStorage per
+              firma). Kliknij serce na karcie, aby dodać lub usunąć produkt.
+            </p>
+            {favoritesHydrated && favoritesCount === 0 && (
+              <p className="mt-1.5 text-xs">
+                Lista jest pusta. Przejdź do „Wszystkie” i oznacz produkty
+                sercem.
+              </p>
+            )}
           </div>
         )}
 

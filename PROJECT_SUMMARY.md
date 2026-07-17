@@ -34,6 +34,7 @@
 | **Etap 4** | ✅ | Auth.js (Credentials), `/b2b/login`, middleware, localStorage per user |
 | **Etap 5** | ✅ | Program lojalnościowy: punkty, nagrody, wymiana, historia |
 | **Etap 6** | ✅ | PDF zamówienia + mock e-mail potwierdzenia |
+| **Ulubione** | ✅ | Serce na karcie, widok w katalogu, localStorage per user |
 | Etap 7+ | ⏳ | Prawdziwa baza, Resend SMTP, ERP… |
 
 ### Moduły B2B
@@ -240,6 +241,20 @@ scripts/
 | Pliki | `loyalty.ts`, `loyalty-context.tsx`, `loyalty-panel.tsx` |
 
 Analogia Excel: arkusz **Punkty** (ledger), **Nagrody** (katalog), **Wymiany** (redemptions).
+
+---
+
+## Ulubione produkty
+
+| Element | Szczegóły |
+|---------|-----------|
+| Storage | `akwen-b2b-favorites:{userId}` — tablica ID produktów |
+| Context | `favorites-context.tsx` + `favorites.ts` |
+| UI karty | Serce (pusty/wypełniony) na zdjęciu + przycisk „Ulubione” |
+| Katalog | Zakładka **Ulubione** · URL `?widok=ulubione` |
+| Header | Licznik serc → katalog ulubionych |
+
+Analogia Excel: arkusz „Ulubione” z kolumną ProductId (jak lista zaznaczonych wierszy).
 
 ---
 

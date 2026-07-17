@@ -1,14 +1,16 @@
 "use client";
 
 import Link from "next/link";
-import { Bell, LogOut, Star } from "lucide-react";
+import { Bell, Heart, LogOut, Star } from "lucide-react";
 import { signOut } from "next-auth/react";
+import { useFavorites } from "@/contexts/favorites-context";
 import { useLoyalty } from "@/contexts/loyalty-context";
 import { useProfile } from "@/contexts/profile-context";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { CartHeaderLink } from "@/components/b2b/cart-header-link";
 import { GlobalSearch } from "@/components/b2b/global-search";
+import { cn } from "@/lib/utils";
 
 interface B2BHeaderProps {
   title: string;
@@ -18,6 +20,8 @@ interface B2BHeaderProps {
 export function B2BHeader({ title, description }: B2BHeaderProps) {
   const { customer } = useProfile();
   const { balance, isHydrated: loyaltyHydrated } = useLoyalty();
+  const { count: favoritesCount, isHydrated: favoritesHydrated } =
+    useFavorites();
 
   return (
     <header className="border-b border-border bg-card px-4 py-4 sm:px-6 sm:py-5">
@@ -36,6 +40,22 @@ export function B2BHeader({ title, description }: B2BHeaderProps) {
             <GlobalSearch className="hidden min-w-[220px] flex-1 md:block lg:min-w-[300px]" />
 
             <CartHeaderLink />
+
+            <Link
+              href="/b2b/katalog?widok=ulubione"
+              className="hidden items-center gap-1.5 rounded-lg border border-border bg-muted/30 px-2.5 py-2 text-xs font-medium text-coral-600 transition-colors hover:bg-coral-500/10 sm:inline-flex"
+              title="Ulubione produkty"
+            >
+              <Heart
+                className={cn(
+                  "size-3.5",
+                  favoritesHydrated &&
+                    favoritesCount > 0 &&
+                    "fill-coral-500 text-coral-500"
+                )}
+              />
+              {favoritesHydrated ? favoritesCount : "…"}
+            </Link>
 
             <Link
               href="/b2b/moje-dane"

@@ -33,7 +33,8 @@
 | **Etap 3** | ✅ | Globalne wyszukiwanie w headerze, mock API Route Handlers, E2E smoke |
 | **Etap 4** | ✅ | Auth.js (Credentials), `/b2b/login`, middleware, localStorage per user |
 | **Etap 5** | ✅ | Program lojalnościowy: punkty, nagrody, wymiana, historia |
-| Etap 6+ | ⏳ | Prawdziwa baza, Clerk produkcyjny, ERP… |
+| **Etap 6** | ✅ | PDF zamówienia + mock e-mail potwierdzenia |
+| Etap 7+ | ⏳ | Prawdziwa baza, Resend SMTP, ERP… |
 
 ### Moduły B2B
 
@@ -242,10 +243,24 @@ Analogia Excel: arkusz **Punkty** (ledger), **Nagrody** (katalog), **Wymiany** (
 
 ---
 
-## Checklist dalszych kroków (Etap 6+)
+## Etap 6 — PDF + mock e-mail
 
+| Element | Szczegóły |
+|---------|-----------|
+| PDF | `@react-pdf/renderer` — `OrderPdfDocument` w `order-pdf.tsx` |
+| Pobieranie | Przycisk **Pobierz PDF** na sukcesie zamówienia i w szczegółach |
+| Treść PDF | Nagłówek Akwen, klient, dostawa, pozycje, rabat, suma, punkty, numer |
+| E-mail | Mock `sendOrderConfirmationEmailMock` → `console.info` (DevTools) |
+| UI | Auto-mock po złożeniu + przycisk „Wyślij e-mail (mock)” |
+
+Analogia VBA: `DoCmd.OutputTo acOutputReport, , acFormatPDF` + `DoCmd.SendObject`.
+
+---
+
+## Checklist dalszych kroków (Etap 7+)
+
+- [ ] Prawdziwy e-mail (Resend / SMTP) zamiast console.log  
 - [ ] Regeneracja batch Imagine  
-- [ ] Eksport zamówienia PDF / e-mail  
 - [ ] Migracja na Clerk produkcyjny (opcjonalnie)  
 - [ ] Prawdziwa baza zamiast localStorage  
 - [ ] VAT / cenniki wielopoziomowe  

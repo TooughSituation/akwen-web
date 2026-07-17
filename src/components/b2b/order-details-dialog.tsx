@@ -2,8 +2,10 @@
 
 import { format } from "date-fns";
 import { pl } from "date-fns/locale";
+import { useProfile } from "@/contexts/profile-context";
 import { formatPrice } from "@/lib/b2b/format";
 import type { B2BOrder } from "@/lib/b2b/types";
+import { OrderPdfActions } from "@/components/b2b/order-pdf-actions";
 import { OrderStatusBadge } from "@/components/b2b/order-status-badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -30,6 +32,8 @@ export function OrderDetailsDialog({
   onReorder,
   isReordering = false,
 }: OrderDetailsDialogProps) {
+  const { profile } = useProfile();
+
   if (!order) return null;
 
   const deliveryDate = new Date(`${order.deliveryDate}T12:00:00`);
@@ -110,6 +114,14 @@ export function OrderDetailsDialog({
               ))}
             </ul>
           </div>
+        </div>
+
+        <div className="border-t border-border pt-3">
+          <OrderPdfActions
+            order={order}
+            customerEmail={profile.email}
+            contactPerson={profile.contactPerson}
+          />
         </div>
 
         <DialogFooter>

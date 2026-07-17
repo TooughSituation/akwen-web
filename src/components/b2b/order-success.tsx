@@ -1,12 +1,16 @@
 "use client";
 
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { format } from "date-fns";
 import { pl } from "date-fns/locale";
-import { CheckCircle2, Package } from "lucide-react";
+import { CheckCircle2, Mail, Package } from "lucide-react";
+import { useProfile } from "@/contexts/profile-context";
 import { getOrderStatusLabel } from "@/lib/b2b/orders";
 import { formatPrice } from "@/lib/b2b/format";
+import { sendOrderConfirmationEmailMock } from "@/lib/b2b/order-email";
 import type { B2BOrder } from "@/lib/b2b/types";
+import { OrderPdfActions } from "@/components/b2b/order-pdf-actions";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -24,7 +28,21 @@ interface OrderSuccessProps {
 }
 
 export function OrderSuccess({ order, onNewOrder }: OrderSuccessProps) {
+  const { profile } = useProfile();
   const deliveryDate = new Date(`${order.deliveryDate}T12:00:00`);
+  const [emailNote, setEmailNote] = useState<string | null>(null);
+  const autoEmailSent = useRef(false);
+
+  // Auto mock e-mail po złożeniu (jak Application.SendMail w AfterInsert)
+  useEffect(() => {
+    if (autoEmailSent.current) return;
+    autoEmailSent.current = true;
+    const result = sendOrderConfirmationEmailMock(order, {
+      to: profile.email,
+      contactPerson: profile.contactPerson,
+    });
+    setEmailNote(result.message);
+  }, [order, profile.email, profile.contactPerson]);
 
   return (
     <div className="space-y-6">
@@ -40,6 +58,17 @@ export function OrderSuccess({ order, onNewOrder }: OrderSuccessProps) {
           </span>
         </AlertDescription>
       </Alert>
+
+      {emailNote && (
+        <Alert className="border-border bg-muted/40">
+          <Mail className="text-turquoise-600" />
+          <AlertTitle className="text-sm">Potwierdzenie e-mail (mock)</AlertTitle>
+          <AlertDescription className="text-sm">
+            {emailNote} Otwórz konsolę przeglądarki (F12 → Console), aby zobaczyć
+            treść wiadomości.
+          </AlertDescription>
+        </Alert>
+      )}
 
       <Card className="border-border/60">
         <CardHeader>
@@ -123,6 +152,18 @@ export function OrderSuccess({ order, onNewOrder }: OrderSuccessProps) {
                 netto)
               </p>
             )}
+          </div>
+
+          <div className="space-y-2">
+            <p className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
+              Dokumenty i powiadomienia
+            </p>
+            <OrderPdfActions
+              order={order}
+              customerEmail={profile.email}
+              contactPerson={profile.contactPerson}
+              onEmailMock={(result) => setEmailNote(result.message)}
+            />
           </div>
 
           <div className="flex flex-col gap-2 sm:flex-row">

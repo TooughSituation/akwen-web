@@ -51,14 +51,24 @@ export function Header() {
       )}
     >
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-5 sm:h-[4.75rem] sm:px-8 lg:px-10">
-        <Link href="/" className="relative flex shrink-0 items-center">
+        <Link
+          href="/"
+          className="relative flex h-10 shrink-0 items-center sm:h-11"
+        >
+          {/*
+            Źródło 3× (logo-white-2x.png) + unoptimized — bez downscale Next,
+            żeby logo nie było rozmyte na retina. Wyświetlane ~40–44px wysokości.
+          */}
           <Image
-            src="/images/logo-white.png"
+            src="/images/logo-white-2x.png"
             alt="Akwen"
-            width={140}
-            height={48}
-            className="h-10 w-auto object-contain sm:h-11"
+            width={220}
+            height={40}
             priority
+            unoptimized
+            quality={100}
+            sizes="(max-width: 640px) 160px, 200px"
+            className="h-full w-auto max-w-[min(52vw,200px)] object-contain object-left [image-rendering:-webkit-optimize-contrast] [filter:contrast(1.08)_brightness(1.04)]"
           />
         </Link>
 
@@ -103,11 +113,13 @@ export function Header() {
               <SheetHeader>
                 <SheetTitle>
                   <Image
-                    src="/images/logo-white.png"
+                    src="/images/logo-white-2x.png"
                     alt="Akwen"
-                    width={120}
-                    height={40}
-                    className="h-9 w-auto"
+                    width={180}
+                    height={36}
+                    unoptimized
+                    quality={100}
+                    className="h-9 w-auto object-contain [image-rendering:-webkit-optimize-contrast] [filter:contrast(1.08)_brightness(1.04)]"
                   />
                 </SheetTitle>
               </SheetHeader>

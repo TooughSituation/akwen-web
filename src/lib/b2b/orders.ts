@@ -1,3 +1,4 @@
+import { applyDiscount, roundMoney } from "./format";
 import type {
   B2BOrder,
   CartItem,
@@ -7,6 +8,34 @@ import type {
 
 const STORAGE_KEY = "akwen-b2b-orders";
 
+function normalizeOrderItem(item: OrderItem): OrderItem {
+  const listPriceNet =
+    typeof item.listPriceNet === "number" && Number.isFinite(item.listPriceNet)
+      ? item.listPriceNet
+      : item.priceNet;
+
+  return {
+    ...item,
+    listPriceNet,
+    priceNet: item.priceNet,
+    lineTotal: item.lineTotal,
+  };
+}
+
+function normalizeOrder(order: B2BOrder): B2BOrder {
+  return {
+    ...order,
+    discountPercent:
+      typeof order.discountPercent === "number" &&
+      Number.isFinite(order.discountPercent)
+        ? order.discountPercent
+        : 0,
+    items: Array.isArray(order.items)
+      ? order.items.map(normalizeOrderItem)
+      : [],
+  };
+}
+
 function readOrders(): B2BOrder[] {
   if (typeof window === "undefined") return [];
 
@@ -14,7 +43,7 @@ function readOrders(): B2BOrder[] {
     const saved = localStorage.getItem(STORAGE_KEY);
     if (!saved) return [];
     const parsed = JSON.parse(saved) as B2BOrder[];
-    return Array.isArray(parsed) ? parsed : [];
+    return Array.isArray(parsed) ? parsed.map(normalizeOrder) : [];
   } catch {
     localStorage.removeItem(STORAGE_KEY);
     return [];
@@ -46,22 +75,37 @@ export function generateOrderNumber(existingOrders: B2BOrder[]): string {
   return `${prefix}${String(todayCount + 1).padStart(3, "0")}`;
 }
 
-function cartItemsToOrderItems(items: CartItem[]): OrderItem[] {
-  return items.map((item) => ({
-    productId: item.productId,
-    symbol: item.symbol,
-    name: item.name,
-    unit: item.unit,
-    priceNet: item.priceNet,
-    quantity: item.quantity,
-    lineTotal: item.priceNet * item.quantity,
-  }));
+function cartItemsToOrderItems(
+  items: CartItem[],
+  discountPercent: number
+): OrderItem[] {
+  return items.map((item) => {
+    const listPriceNet = item.priceNet;
+    const priceNet = applyDiscount(listPriceNet, discountPercent);
+    const lineTotal = roundMoney(priceNet * item.quantity);
+
+    return {
+      productId: item.productId,
+      symbol: item.symbol,
+      name: item.name,
+      unit: item.unit,
+      listPriceNet,
+      priceNet,
+      quantity: item.quantity,
+      lineTotal,
+    };
+  });
 }
 
 export function createOrder(input: CreateOrderInput): B2BOrder {
   const existingOrders = readOrders();
-  const orderItems = cartItemsToOrderItems(input.items);
-  const totalNet = orderItems.reduce((sum, item) => sum + item.lineTotal, 0);
+  const discountPercent = Number.isFinite(input.discountPercent)
+    ? Math.max(0, input.discountPercent)
+    : 0;
+  const orderItems = cartItemsToOrderItems(input.items, discountPercent);
+  const totalNet = roundMoney(
+    orderItems.reduce((sum, item) => sum + item.lineTotal, 0)
+  );
 
   return {
     id: crypto.randomUUID(),
@@ -71,6 +115,7 @@ export function createOrder(input: CreateOrderInput): B2BOrder {
     status: "new",
     items: orderItems,
     totalNet,
+    discountPercent,
     deliveryDate: input.deliveryDate,
     deliveryAddress: input.deliveryAddress,
     notes: input.notes.trim(),

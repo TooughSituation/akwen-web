@@ -4,10 +4,17 @@ import { useState } from "react";
 import Link from "next/link";
 import { Minus, Plus, ShoppingCart, Trash2 } from "lucide-react";
 import { useCart } from "@/contexts/cart-context";
+import { useProfile } from "@/contexts/profile-context";
 import { OrderForm } from "@/components/b2b/order-form";
 import { OrderSuccess } from "@/components/b2b/order-success";
-import { formatPrice } from "@/lib/b2b/format";
+import {
+  applyDiscount,
+  formatPrice,
+  sumCartNet,
+  sumDiscountSavings,
+} from "@/lib/b2b/format";
 import type { B2BOrder } from "@/lib/b2b/types";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -29,10 +36,17 @@ import {
 type CheckoutStep = "cart" | "form" | "success";
 
 export function CartCheckout() {
-  const { items, isHydrated, totalItems, totalNet, updateQuantity, removeItem, clearCart } =
+  const { items, isHydrated, totalItems, updateQuantity, removeItem, clearCart } =
     useCart();
+  const { profile } = useProfile();
   const [step, setStep] = useState<CheckoutStep>("cart");
   const [completedOrder, setCompletedOrder] = useState<B2BOrder | null>(null);
+
+  const discountPercent = profile.discountPercent ?? 0;
+  const hasDiscount = discountPercent > 0;
+  const totalListNet = sumCartNet(items, 0);
+  const totalNet = sumCartNet(items, discountPercent);
+  const savings = sumDiscountSavings(items, discountPercent);
 
   if (!isHydrated) {
     return (
@@ -99,6 +113,15 @@ export function CartCheckout() {
             <CardDescription>
               {items.length} {items.length === 1 ? "produkt" : "produkty"} ·{" "}
               {totalItems} {totalItems === 1 ? "sztuka" : "sztuk"} łącznie
+              {hasDiscount && (
+                <>
+                  {" "}
+                  · rabat klienta{" "}
+                  <span className="font-medium text-turquoise-700 dark:text-turquoise-400">
+                    −{discountPercent}%
+                  </span>
+                </>
+              )}
             </CardDescription>
           </div>
           <Button variant="outline" size="sm" onClick={clearCart}>
@@ -119,7 +142,8 @@ export function CartCheckout() {
             </TableHeader>
             <TableBody>
               {items.map((item) => {
-                const lineTotal = item.priceNet * item.quantity;
+                const unitPrice = applyDiscount(item.priceNet, discountPercent);
+                const lineTotal = unitPrice * item.quantity;
 
                 return (
                   <TableRow key={item.productId}>
@@ -135,7 +159,18 @@ export function CartCheckout() {
                       {item.symbol}
                     </TableCell>
                     <TableCell className="text-right">
-                      {formatPrice(item.priceNet)}
+                      {hasDiscount ? (
+                        <div className="flex flex-col items-end gap-0.5">
+                          <span className="text-xs text-muted-foreground line-through">
+                            {formatPrice(item.priceNet)}
+                          </span>
+                          <span className="font-medium text-turquoise-700 dark:text-turquoise-400">
+                            {formatPrice(unitPrice)}
+                          </span>
+                        </div>
+                      ) : (
+                        formatPrice(item.priceNet)
+                      )}
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center justify-center gap-1">
@@ -205,13 +240,33 @@ export function CartCheckout() {
       <Card className="border-turquoise-500/30 bg-turquoise-500/5">
         <CardContent className="flex flex-col gap-4 py-6 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <p className="text-sm text-muted-foreground">Wartość koszyka netto</p>
+            <div className="flex flex-wrap items-center gap-2">
+              <p className="text-sm text-muted-foreground">
+                Wartość koszyka netto
+              </p>
+              {hasDiscount && (
+                <Badge className="bg-turquoise-500/15 text-turquoise-700">
+                  Rabat −{discountPercent}%
+                </Badge>
+              )}
+            </div>
+            {hasDiscount && (
+              <p className="mt-1 text-sm text-muted-foreground line-through">
+                {formatPrice(totalListNet)}
+              </p>
+            )}
             <p className="text-3xl font-semibold text-navy-900 dark:text-white">
               {formatPrice(totalNet)}
             </p>
-            <p className="mt-1 text-xs text-muted-foreground">
-              Ceny hurtowe · bez VAT
-            </p>
+            {hasDiscount ? (
+              <p className="mt-1 text-xs text-turquoise-700 dark:text-turquoise-400">
+                Oszczędzasz {formatPrice(savings)} dzięki rabatowi z profilu
+              </p>
+            ) : (
+              <p className="mt-1 text-xs text-muted-foreground">
+                Ceny hurtowe · bez VAT
+              </p>
+            )}
           </div>
           <div className="flex flex-col gap-2 sm:flex-row">
             <Button variant="outline" render={<Link href="/b2b/katalog" />}>

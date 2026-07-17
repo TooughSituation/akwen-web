@@ -86,7 +86,14 @@ export function OrderSuccess({ order, onNewOrder }: OrderSuccessProps) {
           )}
 
           <div className="rounded-lg border border-border bg-muted/30 p-4">
-            <p className="mb-3 text-sm font-medium">Pozycje zamówienia</p>
+            <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+              <p className="text-sm font-medium">Pozycje zamówienia</p>
+              {order.discountPercent > 0 && (
+                <Badge className="bg-turquoise-500/15 text-turquoise-700">
+                  Rabat −{order.discountPercent}%
+                </Badge>
+              )}
+            </div>
             <ul className="space-y-2 text-sm">
               {order.items.map((item) => (
                 <li
@@ -103,7 +110,11 @@ export function OrderSuccess({ order, onNewOrder }: OrderSuccessProps) {
               ))}
             </ul>
             <div className="mt-4 flex justify-between border-t border-border pt-3 font-semibold">
-              <span>Razem netto</span>
+              <span>
+                {order.discountPercent > 0
+                  ? "Razem netto po rabacie"
+                  : "Razem netto"}
+              </span>
               <span>{formatPrice(order.totalNet)}</span>
             </div>
           </div>

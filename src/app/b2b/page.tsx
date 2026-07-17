@@ -12,6 +12,7 @@ import { CartCountBadge } from "@/components/b2b/cart-count-badge";
 import { OpenOrdersCountBadge } from "@/components/b2b/open-orders-count-badge";
 import { ProductCard } from "@/components/b2b/product-card";
 import { getProductCatalog, getRecommendedProducts } from "@/lib/b2b/products";
+import { RECOMMENDED_SECTION_HINT } from "@/lib/b2b/recommend";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -113,8 +114,8 @@ export default function B2BDashboardPage() {
                 Polecane dla Ciebie
               </h2>
               <p className="text-sm text-muted-foreground">
-                Wybrane przez zespół Akwen — {catalog.recommendedCount} pozycji
-                w aktualnym cenniku
+                {catalog.recommendedCount} pozycji w cenniku ·{" "}
+                {RECOMMENDED_SECTION_HINT}
               </p>
             </div>
             <div className="flex gap-2">

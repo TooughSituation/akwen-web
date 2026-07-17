@@ -1,11 +1,20 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-import { useSearchParams } from "next/navigation";
-import { ArrowUpDown, Search, SlidersHorizontal, Sparkles } from "lucide-react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import {
+  ArrowUpDown,
+  Check,
+  Link2,
+  Search,
+  SlidersHorizontal,
+  Sparkles,
+} from "lucide-react";
 import type { B2BProduct, TagFilterData } from "@/lib/b2b/types";
 import { formatCategoryLabel, formatKindLabel } from "@/lib/b2b/labels";
+import { RECOMMENDED_SECTION_HINT } from "@/lib/b2b/recommend";
 import { ProductCard } from "@/components/b2b/product-card";
+import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 type CatalogView = "all" | "recommended";
@@ -33,6 +42,12 @@ const SORT_LABELS: Record<SortOption, string> = {
   "stock-desc": "Stan magazynowy",
   "tag1-asc": "Kategoria A–Z",
 };
+
+const SORT_OPTIONS = Object.keys(SORT_LABELS) as SortOption[];
+
+function isSortOption(value: string | null): value is SortOption {
+  return value !== null && SORT_OPTIONS.includes(value as SortOption);
+}
 
 function sortProducts(products: B2BProduct[], sort: SortOption): B2BProduct[] {
   const sorted = [...products];
@@ -64,26 +79,115 @@ function sortProducts(products: B2BProduct[], sort: SortOption): B2BProduct[] {
   }
 }
 
+/** Buduje query string z filtrów katalogu (puste wartości pomijane). */
+export function buildCatalogSearchParams(filters: {
+  tag1: string;
+  tag2: string;
+  view: CatalogView;
+  search: string;
+  inStockOnly: boolean;
+  sort: SortOption;
+}): URLSearchParams {
+  const params = new URLSearchParams();
+
+  if (filters.tag1 && filters.tag1 !== "all") {
+    params.set("tag1", filters.tag1);
+  }
+  if (filters.tag2 && filters.tag2 !== "all") {
+    params.set("tag2", filters.tag2);
+  }
+  if (filters.view === "recommended") {
+    params.set("widok", "proponowane");
+  }
+  if (filters.search.trim()) {
+    params.set("q", filters.search.trim());
+  }
+  if (filters.inStockOnly) {
+    params.set("stock", "1");
+  }
+  if (filters.sort !== "name-asc") {
+    params.set("sort", filters.sort);
+  }
+
+  return params;
+}
+
+function readFiltersFromParams(searchParams: URLSearchParams) {
+  const tag1 = searchParams.get("tag1")?.trim() || "all";
+  const tag2 = searchParams.get("tag2")?.trim() || "all";
+  const view: CatalogView =
+    searchParams.get("widok") === "proponowane" ? "recommended" : "all";
+  const search = searchParams.get("q")?.trim() || "";
+  const inStockOnly =
+    searchParams.get("stock") === "1" || searchParams.get("stock") === "true";
+  const sortParam = searchParams.get("sort");
+  const sort: SortOption = isSortOption(sortParam) ? sortParam : "name-asc";
+
+  return { tag1, tag2, view, search, inStockOnly, sort };
+}
+
 export function CatalogClient({
   products,
   tags,
   recommendedCount,
 }: CatalogClientProps) {
   const searchParams = useSearchParams();
-  const [search, setSearch] = useState("");
-  const [view, setView] = useState<CatalogView>("all");
+  const router = useRouter();
+  const pathname = usePathname();
 
+  const initial = useMemo(
+    () => readFiltersFromParams(searchParams),
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- only hydrate from URL on first render
+    []
+  );
+
+  const [search, setSearch] = useState(initial.search);
+  const [view, setView] = useState<CatalogView>(initial.view);
+  const [activeCategory, setActiveCategory] = useState(initial.tag1);
+  const [activeKind, setActiveKind] = useState(initial.tag2);
+  const [inStockOnly, setInStockOnly] = useState(initial.inStockOnly);
+  const [sort, setSort] = useState<SortOption>(initial.sort);
+  const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
+  const [linkCopied, setLinkCopied] = useState(false);
+
+  // Sync state when browser back/forward changes the URL
   useEffect(() => {
-    if (searchParams.get("widok") === "proponowane") {
-      setView("recommended");
-    }
+    const next = readFiltersFromParams(searchParams);
+    setSearch(next.search);
+    setView(next.view);
+    setActiveCategory(next.tag1);
+    setActiveKind(next.tag2);
+    setInStockOnly(next.inStockOnly);
+    setSort(next.sort);
   }, [searchParams]);
 
-  const [activeCategory, setActiveCategory] = useState<string>("all");
-  const [activeKind, setActiveKind] = useState<string>("all");
-  const [inStockOnly, setInStockOnly] = useState(false);
-  const [sort, setSort] = useState<SortOption>("name-asc");
-  const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
+  // Write filters to URL (shareable links)
+  useEffect(() => {
+    const params = buildCatalogSearchParams({
+      tag1: activeCategory,
+      tag2: activeKind,
+      view,
+      search,
+      inStockOnly,
+      sort,
+    });
+    const nextQuery = params.toString();
+    const currentQuery = searchParams.toString();
+    if (nextQuery === currentQuery) return;
+
+    const href = nextQuery ? `${pathname}?${nextQuery}` : pathname;
+    router.replace(href, { scroll: false });
+  }, [
+    activeCategory,
+    activeKind,
+    view,
+    search,
+    inStockOnly,
+    sort,
+    pathname,
+    router,
+    searchParams,
+  ]);
 
   const availableKinds = useMemo(() => {
     if (activeCategory === "all") {
@@ -96,6 +200,14 @@ export function CatalogClient({
     return tags.tag2ByTag1[activeCategory] ?? [];
   }, [activeCategory, products, tags.tag2ByTag1]);
 
+  // If tag2 doesn't belong to selected tag1, clear it
+  useEffect(() => {
+    if (activeKind === "all") return;
+    if (!availableKinds.includes(activeKind)) {
+      setActiveKind("all");
+    }
+  }, [activeKind, availableKinds]);
+
   const filteredProducts = useMemo(() => {
     const query = search.trim().toLowerCase();
 
@@ -104,8 +216,7 @@ export function CatalogClient({
         view === "all" || (view === "recommended" && product.isRecommended);
       const matchesCategory =
         activeCategory === "all" || product.tag1 === activeCategory;
-      const matchesKind =
-        activeKind === "all" || product.tag2 === activeKind;
+      const matchesKind = activeKind === "all" || product.tag2 === activeKind;
       const matchesStock = !inStockOnly || product.stock > 0;
       const matchesSearch =
         !query ||
@@ -125,15 +236,7 @@ export function CatalogClient({
     });
 
     return sortProducts(filtered, sort);
-  }, [
-    products,
-    search,
-    view,
-    activeCategory,
-    activeKind,
-    inStockOnly,
-    sort,
-  ]);
+  }, [products, search, view, activeCategory, activeKind, inStockOnly, sort]);
 
   const categoryCounts = useMemo(() => {
     const counts: Record<string, number> = { all: products.length };
@@ -167,6 +270,7 @@ export function CatalogClient({
     setInStockOnly(false);
     setSearch("");
     setView("all");
+    setSort("name-asc");
   }
 
   const hasActiveFilters =
@@ -174,7 +278,41 @@ export function CatalogClient({
     activeKind !== "all" ||
     inStockOnly ||
     search.trim() !== "" ||
-    view !== "all";
+    view !== "all" ||
+    sort !== "name-asc";
+
+  const copyShareLink = useCallback(async () => {
+    const params = buildCatalogSearchParams({
+      tag1: activeCategory,
+      tag2: activeKind,
+      view,
+      search,
+      inStockOnly,
+      sort,
+    });
+    const query = params.toString();
+    const url =
+      typeof window !== "undefined"
+        ? `${window.location.origin}${pathname}${query ? `?${query}` : ""}`
+        : `${pathname}${query ? `?${query}` : ""}`;
+
+    try {
+      await navigator.clipboard.writeText(url);
+      setLinkCopied(true);
+      window.setTimeout(() => setLinkCopied(false), 2000);
+    } catch {
+      // Fallback for restricted clipboard
+      window.prompt("Skopiuj link do katalogu:", url);
+    }
+  }, [
+    activeCategory,
+    activeKind,
+    view,
+    search,
+    inStockOnly,
+    sort,
+    pathname,
+  ]);
 
   const filterPanel = (
     <div className="space-y-4">
@@ -297,13 +435,34 @@ export function CatalogClient({
                 className="appearance-none rounded-lg border border-border bg-card py-2.5 pr-8 pl-10 text-sm outline-none transition-colors focus:border-turquoise-500 focus:ring-2 focus:ring-turquoise-500/20"
                 aria-label="Sortowanie produktów"
               >
-                {(Object.keys(SORT_LABELS) as SortOption[]).map((key) => (
+                {SORT_OPTIONS.map((key) => (
                   <option key={key} value={key}>
                     {SORT_LABELS[key]}
                   </option>
                 ))}
               </select>
             </div>
+
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              className="hidden h-[42px] sm:inline-flex"
+              onClick={copyShareLink}
+              title="Kopiuj link z aktualnymi filtrami"
+            >
+              {linkCopied ? (
+                <>
+                  <Check className="size-4 text-green-600" />
+                  Skopiowano
+                </>
+              ) : (
+                <>
+                  <Link2 className="size-4" />
+                  Udostępnij
+                </>
+              )}
+            </Button>
           </div>
         </div>
 
@@ -327,14 +486,44 @@ export function CatalogClient({
             count={recommendedCount}
             icon={<Sparkles className="size-3.5" />}
           />
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            className="sm:hidden"
+            onClick={copyShareLink}
+          >
+            {linkCopied ? (
+              <>
+                <Check className="size-4 text-green-600" />
+                Skopiowano
+              </>
+            ) : (
+              <>
+                <Link2 className="size-4" />
+                Udostępnij link
+              </>
+            )}
+          </Button>
         </div>
 
         {view === "recommended" && (
-          <p className="rounded-lg border border-turquoise-500/20 bg-turquoise-500/5 px-4 py-3 text-sm text-muted-foreground">
-            <Sparkles className="mr-1.5 inline size-4 text-turquoise-600" />
-            Nasze rekomendacje dla Twojego asortymentu — produkty
-            wybrane przez zespół Akwen.
-          </p>
+          <div className="rounded-lg border border-turquoise-500/20 bg-turquoise-500/5 px-4 py-3 text-sm text-muted-foreground">
+            <p>
+              <Sparkles className="mr-1.5 inline size-4 text-turquoise-600" />
+              {RECOMMENDED_SECTION_HINT}
+            </p>
+            <p className="mt-1.5 text-xs">
+              Na każdej karcie widać powód, np.{" "}
+              <span className="font-medium text-foreground">Wysoka marża</span>,{" "}
+              <span className="font-medium text-foreground">Świeża partia</span>,{" "}
+              <span className="font-medium text-foreground">Duży stan</span> lub{" "}
+              <span className="font-medium text-foreground">
+                Wybór handlowca
+              </span>
+              .
+            </p>
+          </div>
         )}
 
         <p className="text-sm text-muted-foreground">

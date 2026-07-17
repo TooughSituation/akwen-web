@@ -61,11 +61,18 @@ export function OrderDetailsDialog({
             </div>
             <div>
               <p className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
-                Wartość netto
+                {order.discountPercent > 0
+                  ? "Wartość netto po rabacie"
+                  : "Wartość netto"}
               </p>
               <p className="mt-1 text-sm font-semibold">
                 {formatPrice(order.totalNet)}
               </p>
+              {order.discountPercent > 0 && (
+                <p className="mt-0.5 text-xs text-turquoise-700 dark:text-turquoise-400">
+                  Rabat −{order.discountPercent}%
+                </p>
+              )}
             </div>
           </div>
 

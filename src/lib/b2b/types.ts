@@ -24,6 +24,13 @@ export interface B2BProduct {
   tag1: string;
   tag2: string;
   isRecommended: boolean;
+  /**
+   * Krótki powód proponowania (np. „Wysoka marża”).
+   * null dla produktów spoza oferty polecanej.
+   */
+  recommendReason: string | null;
+  /** Rozszerzone wyjaśnienie powodu (tooltip / karta). */
+  recommendReasonDetail: string | null;
   category: ProductCategory;
   imageUrl: string;
 }
@@ -75,6 +82,9 @@ export interface OrderItem {
   symbol: string;
   name: string;
   unit: string;
+  /** Cena katalogowa (przed rabatem). */
+  listPriceNet: number;
+  /** Cena jednostkowa netto po rabacie klienta. */
   priceNet: number;
   quantity: number;
   lineTotal: number;
@@ -87,7 +97,10 @@ export interface B2BOrder {
   companyName: string;
   status: OrderStatus;
   items: OrderItem[];
+  /** Suma netto po rabacie. */
   totalNet: number;
+  /** Rabat procentowy zastosowany przy składaniu zamówienia. */
+  discountPercent: number;
   deliveryDate: string;
   deliveryAddress: string;
   notes: string;
@@ -98,6 +111,8 @@ export interface CreateOrderInput {
   items: CartItem[];
   customerId: string;
   companyName: string;
+  /** Rabat % z profilu klienta — stosowany do cen przy tworzeniu zamówienia. */
+  discountPercent: number;
   deliveryDate: string;
   deliveryAddress: string;
   notes: string;

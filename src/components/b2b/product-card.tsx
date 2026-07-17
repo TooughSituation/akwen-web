@@ -101,6 +101,15 @@ export function ProductCard({ product, compact = false }: ProductCardProps) {
               Polecane
             </Badge>
           )}
+          {product.recommendReason && (
+            <Badge
+              variant="secondary"
+              className="bg-white/90 text-[10px] text-navy-900 shadow-sm backdrop-blur-sm"
+              title={product.recommendReasonDetail ?? product.recommendReason}
+            >
+              {product.recommendReason}
+            </Badge>
+          )}
         </div>
       </div>
 
@@ -118,6 +127,11 @@ export function ProductCard({ product, compact = false }: ProductCardProps) {
             Symbol: {product.symbol}
             {product.producer ? ` · ${product.producer}` : ""}
           </CardDescription>
+          {product.isRecommended && product.recommendReasonDetail && !compact && (
+            <p className="mt-1.5 text-xs leading-snug text-turquoise-700 dark:text-turquoise-400">
+              {product.recommendReasonDetail}
+            </p>
+          )}
         </CardHeader>
 
         <CardContent className="mt-auto space-y-3 pb-4">

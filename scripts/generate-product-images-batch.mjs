@@ -3,6 +3,8 @@
  * Użyj wygenerowanych promptów z Grok Imagine, zapisz pliki jako:
  *   public/images/products/{slug}.jpg
  * Następnie uruchom: node scripts/sync-image-manifest.mjs
+ *
+ * Prompty budowane z Tag1 (scena/opakowanie) + Tag2 (składnik) — spójne z src/lib/b2b/image-prompts.ts
  */
 import fs from "fs";
 import path from "path";
@@ -23,38 +25,162 @@ function slugify(tag1, tag2) {
 }
 
 const KIND_EN = {
-  Łosoś: "salmon", Dorsz: "cod", Makrela: "mackerel", Śledź: "herring",
-  Tuńczyk: "tuna", Krewetki: "shrimp", Paprykarz: "fish spread",
-  Miruna: "blue whiting", Mintaj: "pollock", Szprot: "sprat",
+  Łosoś: "Atlantic salmon",
+  Dorsz: "cod",
+  Makrela: "mackerel",
+  Śledź: "herring",
+  Śledz: "herring",
+  Tuńczyk: "tuna",
+  Krewetki: "shrimp",
+  Kawior: "caviar roe",
+  Paprykarz: "paprika fish spread",
+  Miruna: "hoki blue whiting",
+  Mintaj: "Alaska pollock",
+  Pstrąg: "trout",
+  Halibut: "halibut",
+  Karp: "carp",
+  Sandacz: "zander pike-perch",
+  Kalmar: "squid",
+  Kałamarnica: "squid calamari",
+  Krab: "crab",
+  Anchois: "anchovy",
+  Sardynki: "sardines",
+  Szprot: "sprat",
+  Surimi: "surimi",
+  Jesiotr: "sturgeon",
+  Zębacz: "wolffish",
+  Srebrzyk: "silver smelt",
+  Tilapia: "tilapia",
+  Panga: "pangasius",
+  Morszczuk: "hake",
+  Nototenia: "notothenia",
+  Błękitek: "blue whiting",
+  Karmazyn: "redfish",
+  Limanda: "yellowfin sole",
+  Miętus: "burbot",
+  Okoń: "perch",
+  Pałasz: "escolar oilfish",
+  Sajra: "saury",
+  Trewal: "butterfish",
+  Byczki: "goby fish",
+  Szczupak: "pike",
+  "Mix ryb": "mixed fish",
+  "Paluszki rybne": "fish sticks",
+  Burgery: "fish burgers",
+  Awokado: "avocado",
+  Brzoskwinia: "peach",
+  Grzyby: "mushrooms",
+  Jajeczne: "egg",
+  Pomidory: "tomato",
+  Zioła: "herbs",
+  Tzatziki: "tzatziki",
+  Ciecierzyca: "chickpea",
+  Fasola: "beans",
+  Groszek: "peas",
+  Kapusta: "cabbage",
+  Kukurudza: "corn",
+  "Mix warzyw": "mixed vegetables",
+  Brukselka: "Brussels sprouts",
+  "Fasolka szparagowa": "green beans",
+  Kalafior: "cauliflower",
+  Marchew: "carrot",
+  Szpinak: "spinach",
+  Oliwki: "olives",
+  Papryczki: "peppers",
+  Kurczak: "chicken",
+  Indyk: "turkey",
+  Wieprzowina: "pork",
+  Wołowina: "beef",
+  Pierogi: "pierogi dumplings",
+  Pyzy: "potato dumplings",
+  Kopytka: "potato gnocchi",
+  Kluski: "noodles",
+  Kartacze: "potato kartacze dumplings",
+  Chinkali: "khinkali dumplings",
+  Olej: "cooking oil",
+  Oliwa: "olive oil",
+  Ryż: "rice",
+  Zupy: "soup base",
 };
 
 const TAG1_SCENES = {
-  Pasty: (k) => `appetizing fish paste with ${k} in a glass jar`,
-  Mrożonki: (k) => `frozen ${k} product in professional retail packaging`,
-  "Filety rybne": (k) => `frozen ${k} fish fillets in vacuum-sealed packaging`,
-  "Konserwy rybne": (k) => `canned ${k} fish in a metal tin can`,
-  "Ryba w oleju": (k) => `canned ${k} fish in oil in a tin can`,
-  "Ryba w sosie": (k) => `canned ${k} fish in sauce in a tin can`,
-  Śledzie: (k) => `marinated herring ${k} in a jar`,
-  "Ryba Wędzona": (k) => `premium smoked ${k} fish, sliced appetizingly`,
-  Sałatki: (k) => `ready-to-eat ${k} fish salad in a plastic tub`,
-  "Owoce morza": (k) => `frozen ${k} seafood in retail packaging`,
-  Panierowane: (k) => `breaded frozen ${k} fish in a box`,
-  Warzywa: (k) => `frozen vegetable product in retail bag`,
+  Pasty: (k) =>
+    `close-up of creamy ${k} fish paste spread in a clear glass jar with lid slightly open, rich texture visible`,
+  Mrożonki: (k) =>
+    `frozen ${k} seafood blocks in professional vacuum retail packaging with light frost crystals`,
+  "Garmażeria mrożona": (k) =>
+    `frozen ready-to-cook ${k} dumplings or garmazeria dish in branded commercial freezer packaging`,
+  "Filety rybne": (k) =>
+    `premium frozen ${k} fish fillets, skinless portions, vacuum-sealed on white tray`,
+  Panierowane: (k) =>
+    `golden breaded frozen ${k} fish portions in a retail carton, crispy coating visible`,
+  "Ryba Wędzona": (k) =>
+    `artisan cold-smoked ${k} fish slices fanned on a slate board, golden smoke color`,
+  "Ryby pieczone": (k) =>
+    `oven-roasted ${k} fish product in transparent retail packaging, appetizing glaze`,
+  "Konserwy rybne": (k) =>
+    `classic metal tin can of ${k} fish preserve, lid open showing packed fish inside`,
+  "Ryba w oleju": (k) =>
+    `open tin of ${k} fish fillets in golden oil, glistening pieces, European delicatessen style`,
+  "Ryba w sosie": (k) =>
+    `open tin of ${k} fish in rich tomato sauce, saucy and appetizing Polish preserve style`,
+  Śledzie: (k) =>
+    `traditional Polish marinated ${k} herring pieces in a clear plastic tub or glass jar`,
+  "Ryba faszerowana": (k) =>
+    `sliced stuffed ${k} fish terrine on a ceramic plate, festive Polish style`,
+  "Owoce morza": (k) =>
+    `premium frozen ${k} seafood in professional IQF retail bag packaging`,
+  "Paluszki krabowe": () =>
+    `orange-white crab sticks surimi sticks in transparent retail packaging, clean cut ends`,
+  Kawiory: (k) =>
+    `luxury small glass jar of ${k} fish roe or caviar, pearls glistening under soft light`,
+  Sałatki: (k) =>
+    `fresh ready-to-eat ${k} seafood salad in a clear plastic deli tub, colorful ingredients`,
+  "Dania rybne": (k) =>
+    `ready meal with ${k} fish in commercial food tray packaging, microwave-ready style`,
+  "Farsz rybny": (k) =>
+    `finely ground ${k} fish mince (farsz) in vacuum retail packaging`,
+  "Wątrobka rybna": (k) =>
+    `canned ${k} fish liver pâté in a small tin or glass jar, gourmet style`,
+  Mięsne: (k) =>
+    `sliced ${k} deli meat product in vacuum retail packaging, cold cuts style`,
+  Warzywa: (k) =>
+    `frozen ${k} vegetables in a clear retail freezer bag, vibrant natural colors`,
+  Inne: (k) =>
+    `wholesale food product featuring ${k} in clean modern retail packaging`,
 };
 
 function buildPrompt(tag1, tag2) {
-  const kind = KIND_EN[tag2] ?? tag2.toLowerCase();
-  const scene = (TAG1_SCENES[tag1] ?? ((k) => `Polish ${tag1} product with ${k}`))(kind);
-  return (
-    `Professional e-commerce product photography of ${scene}. ` +
-    `Centered on clean bright white studio background, soft lighting, sharp focus, ` +
-    `appetizing commercial styling, no text, no watermark, no people.`
-  );
+  const kind = KIND_EN[tag2] ?? (tag2 ? tag2.toLowerCase() : "seafood");
+  const sceneBuilder = TAG1_SCENES[tag1];
+  const scene = sceneBuilder
+    ? sceneBuilder(kind)
+    : `Polish wholesale ${tag1 || "seafood"} product featuring ${kind}`;
+
+  const tagHint =
+    tag1 || tag2
+      ? ` Category tags: ${[tag1, tag2].filter(Boolean).join(" / ")}.`
+      : "";
+
+  return [
+    `Ultra-realistic professional e-commerce product photo of ${scene}.`,
+    tagHint,
+    `Hero product shot, centered 3/4 angle, clean seamless white or very light gray studio backdrop,`,
+    `soft dual softbox lighting, subtle natural shadow under product, shallow depth of field,`,
+    `tack-sharp focus on product, appetizing commercial food styling, high dynamic range,`,
+    `shot on 85mm lens look, 8k detail, suitable for wholesale grocery catalog thumbnail.`,
+    `Strictly no text, no brand logos, no nutrition labels, no watermarks, no people, no hands, no clutter.`,
+  ]
+    .filter(Boolean)
+    .join(" ")
+    .replace(/\s+/g, " ")
+    .trim();
 }
 
 const wb = XLSX.readFile(path.join(root, "public/data/produkty.xlsx"));
-const rows = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], { defval: "" });
+const rows = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], {
+  defval: "",
+});
 const combos = new Map();
 for (const row of rows) {
   const tag1 = String(row.Tag1 || "").trim();
@@ -67,7 +193,9 @@ for (const row of rows) {
 const productsDir = path.join(root, "public/images/products");
 const existing = new Set(
   fs.existsSync(productsDir)
-    ? fs.readdirSync(productsDir).map((f) => f.replace(/\.(jpg|png|webp)$/i, ""))
+    ? fs
+        .readdirSync(productsDir)
+        .map((f) => f.replace(/\.(jpg|png|webp)$/i, ""))
     : []
 );
 
@@ -87,7 +215,10 @@ const batch = missing.map(([key, count]) => {
 });
 
 const outPath = path.join(root, "public/data/image-generation-batch.json");
-fs.writeFileSync(outPath, JSON.stringify({ generatedAt: new Date().toISOString(), batch }, null, 2));
+fs.writeFileSync(
+  outPath,
+  JSON.stringify({ generatedAt: new Date().toISOString(), batch }, null, 2)
+);
 console.log(`Saved ${batch.length} prompts to ${outPath}`);
 batch.forEach((item, i) => {
   console.log(`\n[${i + 1}] ${item.slug} (${item.count} produktów)`);

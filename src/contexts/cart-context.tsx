@@ -162,12 +162,20 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const reorderFromOrder = useCallback(
     (order: B2BOrder) => {
       order.items.forEach((item) => {
+        // Koszyk trzyma ceny katalogowe — rabat z profilu nakładany jest przy wyświetlaniu
+        // i przy składaniu zamówienia. Przy reorder bierzemy listPriceNet (fallback: priceNet).
+        const listPrice =
+          typeof item.listPriceNet === "number" &&
+          Number.isFinite(item.listPriceNet)
+            ? item.listPriceNet
+            : item.priceNet;
+
         addCartItem({
           productId: item.productId,
           symbol: item.symbol,
           name: item.name,
           unit: item.unit,
-          priceNet: item.priceNet,
+          priceNet: listPrice,
           stock: Math.max(item.quantity, 9999),
           quantity: item.quantity,
         });

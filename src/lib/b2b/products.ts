@@ -6,6 +6,7 @@ import path from "path";
 import * as XLSX from "xlsx";
 import { categorizeProduct, getCategoryList } from "./categories";
 import { getProductImage } from "./images";
+import { resolveRecommendReason } from "./recommend";
 import type { B2BProduct, ProductCatalog, TagFilterData } from "./types";
 
 interface ExcelRow {
@@ -15,7 +16,10 @@ interface ExcelRow {
   Tag2: string;
   Proponowany: string;
   Jm: string;
+  "Ilość OGÓŁEM": number;
   "Ilość W magazynie Dostępna": number;
+  "Wartość ogółem": number;
+  "Data dostawy Różnica dni": number;
   "Cena z cennika Cennik bazowy 100 Netto": number;
   Producent: string;
 }
@@ -65,18 +69,32 @@ function mapRowToProduct(row: ExcelRow, index: number): B2BProduct {
   const tag1 = String(row.Tag1 || "").trim();
   const tag2 = String(row.Tag2 || "").trim();
   const category = categorizeProduct(name);
+  const stock = Number(row["Ilość W magazynie Dostępna"]) || 0;
+  const priceNet =
+    Number(row["Cena z cennika Cennik bazowy 100 Netto"]) || 0;
+  const recommended = isRecommended(row.Proponowany);
+  const reason = resolveRecommendReason({
+    priceNet,
+    stock,
+    stockValueTotal: Number(row["Wartość ogółem"]) || 0,
+    stockQtyTotal: Number(row["Ilość OGÓŁEM"]) || 0,
+    deliveryDaysSpan: Number(row["Data dostawy Różnica dni"]) || 0,
+    isRecommended: recommended,
+  });
 
   return {
     id: symbol,
     symbol,
     name,
     unit: String(row.Jm || "szt"),
-    stock: Number(row["Ilość W magazynie Dostępna"]) || 0,
-    priceNet: Number(row["Cena z cennika Cennik bazowy 100 Netto"]) || 0,
+    stock,
+    priceNet,
     producer: String(row.Producent || "").trim(),
     tag1,
     tag2,
-    isRecommended: isRecommended(row.Proponowany),
+    isRecommended: recommended,
+    recommendReason: reason?.label ?? null,
+    recommendReasonDetail: reason?.description ?? null,
     category,
     imageUrl: getProductImage(symbol, category.id, tag1, tag2),
   };

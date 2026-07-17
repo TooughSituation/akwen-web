@@ -6,10 +6,16 @@ import { pl } from "date-fns/locale";
 import { CalendarIcon } from "lucide-react";
 import { useCart } from "@/contexts/cart-context";
 import { useProfile } from "@/contexts/profile-context";
-import { formatPrice } from "@/lib/b2b/format";
+import {
+  applyDiscount,
+  formatPrice,
+  sumCartNet,
+  sumDiscountSavings,
+} from "@/lib/b2b/format";
 import { createOrder, saveOrder } from "@/lib/b2b/orders";
 import type { B2BOrder } from "@/lib/b2b/types";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import {
@@ -35,9 +41,14 @@ interface OrderFormProps {
 }
 
 export function OrderForm({ onSuccess, onCancel }: OrderFormProps) {
-  const { items, totalItems, totalNet, clearCart } = useCart();
+  const { items, totalItems, clearCart } = useCart();
   const { profile } = useProfile();
   const deliveryAddresses = profile.deliveryAddresses;
+  const discountPercent = profile.discountPercent ?? 0;
+  const hasDiscount = discountPercent > 0;
+  const totalListNet = sumCartNet(items, 0);
+  const totalNet = sumCartNet(items, discountPercent);
+  const savings = sumDiscountSavings(items, discountPercent);
   const [deliveryDate, setDeliveryDate] = useState<Date | undefined>();
   const [calendarOpen, setCalendarOpen] = useState(false);
   const [addressMode, setAddressMode] = useState<"saved" | "custom">("saved");
@@ -79,6 +90,7 @@ export function OrderForm({ onSuccess, onCancel }: OrderFormProps) {
         items,
         customerId: profile.id,
         companyName: profile.companyName,
+        discountPercent,
         deliveryDate: format(deliveryDate, "yyyy-MM-dd"),
         deliveryAddress,
         notes,
@@ -224,31 +236,64 @@ export function OrderForm({ onSuccess, onCancel }: OrderFormProps) {
 
       <Card className="border-turquoise-500/30 bg-turquoise-500/5">
         <CardHeader>
-          <CardTitle>Podsumowanie zamówienia</CardTitle>
-          <CardDescription>
-            {items.length} {items.length === 1 ? "produkt" : "produkty"} ·{" "}
-            {totalItems} {totalItems === 1 ? "sztuka" : "sztuk"}
-          </CardDescription>
+          <div className="flex flex-wrap items-start justify-between gap-2">
+            <div>
+              <CardTitle>Podsumowanie zamówienia</CardTitle>
+              <CardDescription>
+                {items.length} {items.length === 1 ? "produkt" : "produkty"} ·{" "}
+                {totalItems} {totalItems === 1 ? "sztuka" : "sztuk"}
+              </CardDescription>
+            </div>
+            {hasDiscount && (
+              <Badge className="bg-turquoise-500/15 text-turquoise-700">
+                Rabat −{discountPercent}%
+              </Badge>
+            )}
+          </div>
         </CardHeader>
         <CardContent className="space-y-4">
           <ul className="space-y-2 text-sm">
-            {items.map((item) => (
-              <li
-                key={item.productId}
-                className="flex justify-between gap-4 border-b border-border/50 pb-2 last:border-0"
-              >
-                <span className="line-clamp-1 text-muted-foreground">
-                  {item.name} × {item.quantity}
-                </span>
-                <span className="shrink-0 font-medium">
-                  {formatPrice(item.priceNet * item.quantity)}
-                </span>
-              </li>
-            ))}
+            {items.map((item) => {
+              const unitPrice = applyDiscount(item.priceNet, discountPercent);
+              const lineTotal = unitPrice * item.quantity;
+
+              return (
+                <li
+                  key={item.productId}
+                  className="flex justify-between gap-4 border-b border-border/50 pb-2 last:border-0"
+                >
+                  <span className="line-clamp-1 text-muted-foreground">
+                    {item.name} × {item.quantity}
+                  </span>
+                  <span className="shrink-0 text-right font-medium">
+                    {hasDiscount && (
+                      <span className="mr-2 text-xs font-normal text-muted-foreground line-through">
+                        {formatPrice(item.priceNet * item.quantity)}
+                      </span>
+                    )}
+                    {formatPrice(lineTotal)}
+                  </span>
+                </li>
+              );
+            })}
           </ul>
+          {hasDiscount && (
+            <div className="flex justify-between text-sm text-muted-foreground">
+              <span>Wartość katalogowa</span>
+              <span className="line-through">{formatPrice(totalListNet)}</span>
+            </div>
+          )}
+          {hasDiscount && (
+            <div className="flex justify-between text-sm text-turquoise-700 dark:text-turquoise-400">
+              <span>Oszczędność (rabat −{discountPercent}%)</span>
+              <span>−{formatPrice(savings)}</span>
+            </div>
+          )}
           <div className="flex items-end justify-between border-t border-border pt-4">
             <div>
-              <p className="text-sm text-muted-foreground">Wartość netto</p>
+              <p className="text-sm text-muted-foreground">
+                {hasDiscount ? "Wartość netto po rabacie" : "Wartość netto"}
+              </p>
               <p className="text-2xl font-semibold text-navy-900 dark:text-white">
                 {formatPrice(totalNet)}
               </p>

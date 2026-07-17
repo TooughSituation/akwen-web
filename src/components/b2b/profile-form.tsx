@@ -244,6 +244,25 @@ export function ProfileForm() {
                 onChange={(e) => updateField("email", e.target.value)}
               />
             </div>
+            <div className="space-y-2 sm:col-span-2">
+              <Label htmlFor="discountPercent">Rabat handlowy</Label>
+              <div className="flex flex-wrap items-center gap-3">
+                <Input
+                  id="discountPercent"
+                  value={`${formData.discountPercent}%`}
+                  readOnly
+                  className="max-w-[120px] bg-muted/50"
+                  aria-describedby="discount-help"
+                />
+                <Badge className="bg-turquoise-500/15 text-turquoise-700">
+                  −{formData.discountPercent}% w koszyku i zamówieniach
+                </Badge>
+              </div>
+              <p id="discount-help" className="text-xs text-muted-foreground">
+                Rabat ustalany przez handlowca Akwen. Automatycznie obniża ceny
+                netto w koszyku i przy składaniu zamówienia.
+              </p>
+            </div>
           </CardContent>
         </Card>
 

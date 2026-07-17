@@ -12,6 +12,7 @@ import { CartCountBadge } from "@/components/b2b/cart-count-badge";
 import { OpenOrdersCountBadge } from "@/components/b2b/open-orders-count-badge";
 import { ProductCard } from "@/components/b2b/product-card";
 import { PriceModeToggle } from "@/components/b2b/price-mode-toggle";
+import { MotionCard, MotionFade } from "@/components/motion-fade";
 import { getProductCatalog, getRecommendedProducts } from "@/lib/b2b/products";
 import { RECOMMENDED_SECTION_HINT } from "@/lib/b2b/recommend";
 import { Button } from "@/components/ui/button";
@@ -26,7 +27,6 @@ import {
 export default function B2BDashboardPage() {
   const catalog = getProductCatalog();
   const recommended = getRecommendedProducts(6);
-
   const inStockCount = catalog.products.filter((p) => p.stock > 0).length;
 
   const stats = [
@@ -81,40 +81,46 @@ export default function B2BDashboardPage() {
     <>
       <DashboardHeader />
 
-      <div className="space-y-12 p-5 sm:space-y-14 sm:p-8 lg:p-10">
+      <div className="b2b-page">
         <div className="grid gap-5 sm:grid-cols-2 sm:gap-6 xl:grid-cols-4">
-          {stats.map((stat) => {
+          {stats.map((stat, i) => {
             const Icon = stat.icon;
             return (
-              <Card key={stat.label} className="border-border/60">
-                <CardHeader className="flex flex-row items-center justify-between pb-2">
-                  <CardDescription>{stat.label}</CardDescription>
-                  <Icon className="size-4 text-turquoise-600" />
-                </CardHeader>
-                <CardContent>
-                  <p className="text-3xl font-semibold text-navy-900 dark:text-white">
-                    {stat.value === "cart" ? (
-                      <CartCountBadge />
-                    ) : stat.value === "orders" ? (
-                      <OpenOrdersCountBadge />
-                    ) : (
-                      stat.value
-                    )}
-                  </p>
-                  <p className="mt-1 text-xs text-muted-foreground">{stat.hint}</p>
-                </CardContent>
-              </Card>
+              <MotionFade key={stat.label} delay={0.04 * i}>
+                <Card className="b2b-card h-full border-border/55 hover:shadow-md hover:shadow-navy-900/[0.04]">
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+                    <CardDescription className="text-xs font-medium tracking-wide uppercase">
+                      {stat.label}
+                    </CardDescription>
+                    <Icon className="size-4 text-turquoise-600/80" />
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-3xl font-semibold tracking-tight text-navy-900 dark:text-white">
+                      {stat.value === "cart" ? (
+                        <CartCountBadge />
+                      ) : stat.value === "orders" ? (
+                        <OpenOrdersCountBadge />
+                      ) : (
+                        stat.value
+                      )}
+                    </p>
+                    <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
+                      {stat.hint}
+                    </p>
+                  </CardContent>
+                </Card>
+              </MotionFade>
             );
           })}
         </div>
 
-        <div>
-          <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <div>
-              <h2 className="font-heading text-xl font-semibold">
+        <section className="space-y-6 sm:space-y-8">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+            <div className="max-w-2xl space-y-2">
+              <h2 className="font-heading text-xl font-semibold tracking-tight sm:text-2xl">
                 Polecane dla Ciebie
               </h2>
-              <p className="text-sm text-muted-foreground">
+              <p className="text-sm leading-relaxed text-muted-foreground">
                 {catalog.recommendedCount} pozycji w cenniku ·{" "}
                 {RECOMMENDED_SECTION_HINT}
               </p>
@@ -124,6 +130,7 @@ export default function B2BDashboardPage() {
               <Button
                 variant="outline"
                 size="sm"
+                className="rounded-full"
                 render={<Link href="/b2b/katalog?widok=proponowane" />}
               >
                 Wszystkie proponowane
@@ -132,42 +139,50 @@ export default function B2BDashboardPage() {
               <Button
                 variant="outline"
                 size="sm"
+                className="rounded-full"
                 render={<Link href="/b2b/katalog" />}
               >
                 Cały katalog
               </Button>
             </div>
           </div>
-          <div className="grid gap-5 sm:grid-cols-2 sm:gap-6 xl:grid-cols-3 xl:gap-8">
+
+          <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3 xl:gap-8">
             {recommended.map((product) => (
               <ProductCard key={product.id} product={product} />
             ))}
           </div>
-        </div>
+        </section>
 
-        <div>
-          <h2 className="mb-4 font-heading text-xl font-semibold">
+        <section className="space-y-6">
+          <h2 className="font-heading text-xl font-semibold tracking-tight sm:text-2xl">
             Szybkie akcje
           </h2>
-          <div className="grid gap-4 sm:grid-cols-3">
-            {quickActions.map((action) => {
+          <div className="grid gap-5 sm:grid-cols-3 sm:gap-6">
+            {quickActions.map((action, i) => {
               const Icon = action.icon;
               return (
-                <Link key={action.title} href={action.href}>
-                  <Card className="h-full border-border/60 transition-shadow hover:shadow-md">
-                    <CardHeader>
-                      <Icon className="size-6 text-turquoise-600" />
-                      <CardTitle className="mt-2 text-base">
-                        {action.title}
-                      </CardTitle>
-                      <CardDescription>{action.description}</CardDescription>
-                    </CardHeader>
-                  </Card>
-                </Link>
+                <MotionCard key={action.title} delay={0.05 * i}>
+                  <Link href={action.href} className="block h-full">
+                    <Card className="b2b-card h-full border-border/55 hover:border-turquoise-500/20 hover:shadow-md hover:shadow-navy-900/[0.05]">
+                      <CardHeader className="space-y-3 p-6 sm:p-7">
+                        <div className="flex size-11 items-center justify-center rounded-full bg-turquoise-500/10">
+                          <Icon className="size-5 text-turquoise-600" />
+                        </div>
+                        <CardTitle className="text-base font-semibold tracking-tight">
+                          {action.title}
+                        </CardTitle>
+                        <CardDescription className="text-sm leading-relaxed">
+                          {action.description}
+                        </CardDescription>
+                      </CardHeader>
+                    </Card>
+                  </Link>
+                </MotionCard>
               );
             })}
           </div>
-        </div>
+        </section>
       </div>
     </>
   );

@@ -16,7 +16,20 @@ export default function B2BCatalogPage() {
       <div className="p-5 sm:p-8 lg:p-10">
         <Suspense
           fallback={
-            <p className="text-sm text-muted-foreground">Ładowanie katalogu…</p>
+            <div className="space-y-6">
+              <div className="h-12 animate-pulse rounded-xl bg-muted/50" />
+              <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
+                {Array.from({ length: 6 }).map((_, i) => (
+                  <div
+                    key={i}
+                    className="aspect-[4/5] animate-pulse rounded-2xl bg-muted/40"
+                  />
+                ))}
+              </div>
+              <p className="text-center text-sm text-muted-foreground">
+                Ładowanie katalogu…
+              </p>
+            </div>
           }
         >
           <CatalogClient

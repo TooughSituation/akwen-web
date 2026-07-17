@@ -51,11 +51,13 @@ export function CartCheckout() {
 
   if (!isHydrated) {
     return (
-      <Card className="border-border/60">
-        <CardContent className="py-12 text-center text-sm text-muted-foreground">
+      <div className="space-y-4">
+        <div className="h-48 animate-pulse rounded-2xl bg-muted/50" />
+        <div className="h-28 animate-pulse rounded-2xl bg-muted/40" />
+        <p className="text-center text-sm text-muted-foreground">
           Ładowanie koszyka…
-        </CardContent>
-      </Card>
+        </p>
+      </div>
     );
   }
 

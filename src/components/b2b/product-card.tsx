@@ -100,25 +100,28 @@ export function ProductCard({ product, compact = false }: ProductCardProps) {
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 12 }}
+      layout
+      initial={{ opacity: 0, y: 14 }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-20px" }}
+      viewport={{ once: true, margin: "-24px" }}
       transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
-      whileHover={compact ? undefined : { y: -3 }}
+      whileHover={compact ? undefined : { y: -4 }}
       className="h-full"
     >
       <Card
         className={cn(
-          "group h-full overflow-hidden border-border/50 bg-card p-0 shadow-none transition-shadow duration-500 hover:shadow-xl hover:shadow-navy-900/[0.06]",
+          "group flex h-full flex-col overflow-hidden border-border/55 bg-card p-0 shadow-none",
+          "transition-[box-shadow,border-color] duration-400",
+          "hover:border-border hover:shadow-[0_12px_40px_-12px_rgba(0,31,63,0.12)]",
           compact && "flex-row"
         )}
       >
         <div
           className={cn(
-            "relative overflow-hidden bg-muted/30",
+            "relative overflow-hidden bg-muted/25",
             compact
               ? "aspect-square w-28 shrink-0 sm:w-32"
-              : "aspect-[4/5] w-full sm:aspect-[5/6]"
+              : "aspect-[4/5] w-full"
           )}
         >
           <ProductImage
@@ -185,34 +188,46 @@ export function ProductCard({ product, compact = false }: ProductCardProps) {
         </div>
 
         <div className="flex flex-1 flex-col">
-          <CardHeader className={cn("space-y-1.5 px-5 pt-5 pb-2", compact && "px-3 py-3")}>
+          <CardHeader
+            className={cn(
+              "min-h-[4.5rem] space-y-1.5 px-5 pt-5 pb-2",
+              compact && "min-h-0 px-3 py-3"
+            )}
+          >
             <CardTitle
               className={cn(
-                "line-clamp-2 font-semibold tracking-tight",
-                compact ? "text-sm leading-snug" : "text-[0.95rem] leading-snug sm:text-base"
+                "line-clamp-2 font-semibold tracking-tight text-navy-900 dark:text-foreground",
+                compact
+                  ? "text-sm leading-snug"
+                  : "text-[0.95rem] leading-[1.35] sm:text-base"
               )}
             >
               {product.name}
             </CardTitle>
             {!compact && (
-              <CardDescription className="line-clamp-1 text-[11px] tracking-wide">
+              <CardDescription className="line-clamp-1 text-[11px] leading-relaxed tracking-wide text-muted-foreground">
                 {product.symbol}
                 {kindLabel ? ` · ${kindLabel}` : ""}
               </CardDescription>
             )}
             {!compact && nextPromo && !nextPromo.unlocked && (
-              <p className="text-[11px] font-medium text-coral-600/90 dark:text-coral-400">
+              <p className="text-[11px] font-medium leading-snug text-coral-600/90 dark:text-coral-400">
                 Brakuje {formatPrice(nextPromo.remaining)} do promocji
               </p>
             )}
           </CardHeader>
 
-          <CardContent className={cn("mt-auto space-y-4 px-5 pb-5", compact && "px-3 pb-3")}>
-            <div className="flex items-end justify-between gap-2">
+          <CardContent
+            className={cn(
+              "mt-auto space-y-4 px-5 pt-1 pb-5",
+              compact && "space-y-2 px-3 pb-3"
+            )}
+          >
+            <div className="flex min-h-[3.25rem] items-end justify-between gap-2">
               <div>
                 {showDiscounted ? (
                   <div className="space-y-0.5">
-                    <p className="text-xs text-muted-foreground line-through decoration-muted-foreground/50">
+                    <p className="text-xs text-muted-foreground line-through decoration-muted-foreground/45">
                       {formatPrice(product.priceNet)}
                     </p>
                     <p className="text-xl font-semibold tracking-tight text-turquoise-600 dark:text-turquoise-400">
@@ -236,7 +251,7 @@ export function ProductCard({ product, compact = false }: ProductCardProps) {
                       </span>
                     </p>
                     {hasDiscount && savingsLabel && (
-                      <p className="text-[11px] text-muted-foreground">
+                      <p className="text-[11px] leading-relaxed text-muted-foreground">
                         Z rabatem:{" "}
                         <span className="font-medium text-turquoise-600">
                           {formatPrice(yourPrice)}
@@ -250,14 +265,14 @@ export function ProductCard({ product, compact = false }: ProductCardProps) {
             </div>
 
             {!compact && (
-              <div className="flex gap-2">
+              <div className="flex gap-2.5">
                 <Button
                   size="sm"
                   className={cn(
-                    "h-10 min-w-0 flex-1 rounded-full",
+                    "h-10 min-w-0 flex-1 rounded-full font-medium",
                     justAdded
                       ? "bg-green-600/90 hover:bg-green-600"
-                      : "bg-turquoise-500/95 hover:bg-turquoise-600"
+                      : "bg-[#0077B6] hover:bg-turquoise-600"
                   )}
                   disabled={product.stock <= 0}
                   onClick={handleAddToCart}

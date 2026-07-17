@@ -155,7 +155,7 @@ export function B2BSidebarContent({ onNavigate }: B2BSidebarContentProps) {
 
 export function B2BSidebar() {
   return (
-    <aside className="hidden w-64 shrink-0 flex-col border-r border-navy-800/50 bg-navy-900 text-white lg:flex">
+    <aside className="hidden w-64 shrink-0 flex-col border-r border-white/10 bg-[#001F3F] text-white lg:flex">
       <B2BSidebarContent />
     </aside>
   );

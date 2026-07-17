@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { AnimatePresence, motion } from "framer-motion";
 import {
   ArrowUpDown,
   Check,
@@ -602,29 +603,45 @@ export function CatalogClient({
           )}
         </p>
 
-        {filteredProducts.length === 0 ? (
-          <div className="rounded-xl border border-dashed border-border bg-muted/30 px-6 py-16 text-center">
-            <p className="font-medium text-foreground">Brak wyników</p>
-            <p className="mt-1 text-sm text-muted-foreground">
-              Zmień filtry lub wpisz inną frazę wyszukiwania.
-            </p>
-            {hasActiveFilters && (
-              <button
-                type="button"
-                onClick={clearFilters}
-                className="mt-4 text-sm font-medium text-turquoise-600 hover:underline"
-              >
-                Wyczyść wszystkie filtry
-              </button>
-            )}
-          </div>
-        ) : (
-          <div className="grid gap-5 sm:grid-cols-2 sm:gap-6 xl:grid-cols-3 xl:gap-8">
-            {filteredProducts.map((product) => (
-              <ProductCard key={product.id} product={product} />
-            ))}
-          </div>
-        )}
+        <AnimatePresence mode="wait">
+          {filteredProducts.length === 0 ? (
+            <motion.div
+              key={`empty-${view}`}
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -6 }}
+              transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
+              className="rounded-2xl border border-dashed border-border bg-muted/25 px-6 py-20 text-center"
+            >
+              <p className="font-medium text-foreground">Brak wyników</p>
+              <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                Zmień filtry lub wpisz inną frazę wyszukiwania.
+              </p>
+              {hasActiveFilters && (
+                <button
+                  type="button"
+                  onClick={clearFilters}
+                  className="mt-5 text-sm font-medium text-turquoise-600 hover:underline"
+                >
+                  Wyczyść wszystkie filtry
+                </button>
+              )}
+            </motion.div>
+          ) : (
+            <motion.div
+              key={`grid-${view}-${activeCategory}-${activeKind}-${search}`}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -6 }}
+              transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
+              className="grid gap-6 sm:grid-cols-2 sm:gap-7 xl:grid-cols-3 xl:gap-8"
+            >
+              {filteredProducts.map((product) => (
+                <ProductCard key={product.id} product={product} />
+              ))}
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </div>
   );

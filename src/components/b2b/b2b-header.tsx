@@ -25,15 +25,15 @@ export function B2BHeader({ title, description }: B2BHeaderProps) {
     useFavorites();
 
   return (
-    <header className="border-b border-border/70 bg-card/80 px-5 py-6 backdrop-blur-sm sm:px-8 sm:py-8 lg:px-10">
-      <div className="flex flex-col gap-5">
-        <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
+    <header className="border-b border-border/60 bg-card/90 px-5 py-6 backdrop-blur-md sm:px-8 sm:py-8 lg:px-10">
+      <div className="flex flex-col gap-5 sm:gap-6">
+        <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between lg:gap-8">
           <div className="min-w-0">
-            <h1 className="font-heading text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
+            <h1 className="font-heading text-2xl font-semibold tracking-tight text-navy-900 sm:text-3xl dark:text-foreground">
               {title}
             </h1>
             {description && (
-              <p className="mt-2 max-w-xl text-sm leading-relaxed text-muted-foreground">
+              <p className="mt-2.5 max-w-xl text-sm leading-[1.7] text-muted-foreground">
                 {description}
               </p>
             )}

@@ -12,30 +12,34 @@
   --font-heading: var(--font-heading);
   --font-display: var(--font-display);
 
-  /* Paleta marki — złagodzone nasycenie (quiet luxury 2026) */
-  --color-navy-50: #eef1f4;
-  --color-navy-100: #d4dce4;
-  --color-navy-200: #a8b8c8;
-  --color-navy-700: #1a3a5c;
-  --color-navy-800: #0f2a45;
-  --color-navy-900: #0a1f33;
-  --color-navy-950: #061525;
+  /*
+   * Paleta marki Akwen (brief):
+   * Granat #001F3F · Teal #0077B6 · Koral #FF6B35
+   * Skale złagodzone pod Quiet Luxury — pełne hex jako kotwice.
+   */
+  --color-navy-50: #eef2f6;
+  --color-navy-100: #d5dee8;
+  --color-navy-200: #a9b9cc;
+  --color-navy-700: #0a2d52;
+  --color-navy-800: #002952;
+  --color-navy-900: #001f3f;
+  --color-navy-950: #001428;
 
-  --color-turquoise-300: #6baecf;
-  --color-turquoise-400: #4a9bc4;
-  --color-turquoise-500: #2a86b0;
-  --color-turquoise-600: #1f6d91;
+  --color-turquoise-300: #5aafd4;
+  --color-turquoise-400: #3399c9;
+  --color-turquoise-500: #0077b6;
+  --color-turquoise-600: #006399;
 
-  --color-coral-400: #e8926e;
-  --color-coral-500: #d97a55;
-  --color-coral-600: #c06545;
+  --color-coral-400: #ff8a5c;
+  --color-coral-500: #ff6b35;
+  --color-coral-600: #e55a28;
 
-  --color-ocean-50: #f4f8fa;
-  --color-ocean-100: #e4eef4;
-  --color-ocean-200: #c5dce8;
-  --color-ocean-800: #1a5570;
-  --color-ocean-900: #144256;
-  --color-ocean-950: #0e3040;
+  --color-ocean-50: #f3f8fb;
+  --color-ocean-100: #e0eef6;
+  --color-ocean-200: #b8d7e8;
+  --color-ocean-800: #004d73;
+  --color-ocean-900: #003d5c;
+  --color-ocean-950: #002d44;
 
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
@@ -76,24 +80,25 @@
 }
 
 :root {
-  --background: #f7f6f4;
-  --foreground: #0a1f33;
+  /* Dużo bieli + neutralne szarości, granat jako tekst */
+  --background: #fafbfc;
+  --foreground: #001f3f;
   --card: #ffffff;
-  --card-foreground: #0a1f33;
+  --card-foreground: #001f3f;
   --popover: #ffffff;
-  --popover-foreground: #0a1f33;
-  --primary: #0a1f33;
+  --popover-foreground: #001f3f;
+  --primary: #001f3f;
   --primary-foreground: #ffffff;
-  --secondary: #eef4f7;
-  --secondary-foreground: #0a1f33;
-  --muted: #f0eeeb;
-  --muted-foreground: #5c6b78;
-  --accent: #2a86b0;
+  --secondary: #eef5f9;
+  --secondary-foreground: #001f3f;
+  --muted: #f3f5f7;
+  --muted-foreground: #5a6b7a;
+  --accent: #0077b6;
   --accent-foreground: #ffffff;
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: #e4e0da;
-  --input: #e4e0da;
-  --ring: #2a86b0;
+  --destructive: oklch(0.55 0.18 27);
+  --border: #e2e8ef;
+  --input: #e2e8ef;
+  --ring: #0077b6;
   --radius: 0.875rem;
   --sidebar: oklch(0.985 0 0);
   --sidebar-foreground: oklch(0.145 0 0);
@@ -113,22 +118,22 @@
 .dark {
   --background: #001428;
   --foreground: #f0f7fb;
-  --card: #001F3F;
+  --card: #001f3f;
   --card-foreground: #f0f7fb;
-  --popover: #001F3F;
+  --popover: #001f3f;
   --popover-foreground: #f0f7fb;
-  --primary: #0077B6;
+  --primary: #3399c9;
   --primary-foreground: #001428;
   --secondary: #002952;
   --secondary-foreground: #f0f7fb;
   --muted: #002952;
-  --muted-foreground: #9aafc0;
-  --accent: #0077B6;
+  --muted-foreground: #b3c5d4;
+  --accent: #0077b6;
   --accent-foreground: #ffffff;
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
+  --destructive: oklch(0.65 0.16 22);
+  --border: oklch(1 0 0 / 12%);
   --input: oklch(1 0 0 / 15%);
-  --ring: #0077B6;
+  --ring: #3399c9;
   --sidebar: oklch(0.205 0 0);
   --sidebar-foreground: oklch(0.985 0 0);
   --sidebar-primary: oklch(0.488 0.243 264.376);
@@ -152,9 +157,10 @@
     @apply font-sans scroll-smooth;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
   }
   body {
-    @apply bg-background text-foreground text-base leading-relaxed tracking-[-0.01em];
+    @apply bg-background text-foreground text-base leading-[1.7] tracking-[-0.011em];
   }
   h1,
   h2,
@@ -163,38 +169,51 @@
   h5,
   h6 {
     font-family: var(--font-heading), var(--font-display), ui-serif, serif;
-    @apply tracking-tight text-balance;
+    @apply tracking-tight text-balance font-semibold;
   }
   h1 {
-    @apply text-4xl leading-[1.12] font-semibold sm:text-5xl lg:text-6xl;
+    @apply text-4xl leading-[1.1] sm:text-5xl lg:text-6xl;
   }
   h2 {
-    @apply text-3xl leading-[1.2] font-semibold sm:text-4xl;
+    @apply text-3xl leading-[1.18] sm:text-4xl;
   }
   h3 {
-    @apply text-xl leading-snug font-semibold sm:text-2xl;
+    @apply text-xl leading-snug sm:text-2xl;
   }
   p {
-    @apply leading-[1.7];
+    @apply leading-[1.75];
   }
 }
 
 @layer utilities {
   .maritime-gradient {
-    background: linear-gradient(135deg, #0a1f33 0%, #0f2a45 50%, #144256 100%);
+    background: linear-gradient(
+      145deg,
+      #001f3f 0%,
+      #002952 48%,
+      #003d5c 100%
+    );
   }
 
   .font-display {
     font-family: var(--font-display), var(--font-sans), ui-sans-serif, sans-serif;
   }
 
-  /* Sekcje z dużym white space */
   .section-pad {
     @apply px-5 py-24 sm:px-8 sm:py-28 lg:px-10 lg:py-32;
   }
 
   .content-width {
     @apply mx-auto max-w-6xl;
+  }
+
+  /* Jednolite karty B2B */
+  .b2b-page {
+    @apply space-y-10 p-5 sm:space-y-12 sm:p-8 lg:space-y-14 lg:p-10;
+  }
+
+  .b2b-card {
+    @apply rounded-2xl border border-border/60 bg-card shadow-none transition-shadow duration-300;
   }
 }
 

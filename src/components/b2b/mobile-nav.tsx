@@ -15,7 +15,7 @@ export function B2BMobileNav() {
   const [open, setOpen] = useState(false);
 
   return (
-    <div className="flex items-center border-b border-navy-800/50 bg-navy-900 px-4 py-3 text-white lg:hidden">
+    <div className="flex items-center border-b border-white/10 bg-[#001F3F] px-4 py-3.5 text-white lg:hidden">
       <Sheet open={open} onOpenChange={setOpen}>
         <SheetTrigger
           render={

@@ -9,6 +9,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
+import { useSession } from "next-auth/react";
 import {
   PROFILE_UPDATED_EVENT,
   getDefaultProfile,
@@ -16,12 +17,14 @@ import {
   profileToCustomer,
   saveProfile as persistProfile,
 } from "@/lib/b2b/profile";
+import { profileStorageKey } from "@/lib/b2b/storage-keys";
 import type { B2BCustomer, B2BProfile } from "@/lib/b2b/types";
 
 interface ProfileContextValue {
   profile: B2BProfile;
   customer: B2BCustomer;
   isHydrated: boolean;
+  userId: string | null;
   saveProfile: (profile: B2BProfile) => void;
   refreshProfile: () => void;
 }
@@ -29,20 +32,24 @@ interface ProfileContextValue {
 const ProfileContext = createContext<ProfileContextValue | null>(null);
 
 export function ProfileProvider({ children }: { children: ReactNode }) {
+  const { data: session, status } = useSession();
+  const userId = session?.user?.id ?? null;
   const [profile, setProfile] = useState<B2BProfile>(getDefaultProfile());
   const [isHydrated, setIsHydrated] = useState(false);
 
   const refreshProfile = useCallback(() => {
-    setProfile(getProfile());
-  }, []);
+    setProfile(getProfile(userId));
+  }, [userId]);
 
   useEffect(() => {
+    if (status === "loading") return;
     refreshProfile();
     setIsHydrated(true);
 
     const onProfileUpdated = () => refreshProfile();
     const onStorage = (event: StorageEvent) => {
-      if (event.key === "akwen-b2b-profile") {
+      if (!userId) return;
+      if (event.key === profileStorageKey(userId)) {
         refreshProfile();
       }
     };
@@ -54,12 +61,15 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
       window.removeEventListener(PROFILE_UPDATED_EVENT, onProfileUpdated);
       window.removeEventListener("storage", onStorage);
     };
-  }, [refreshProfile]);
+  }, [refreshProfile, status, userId]);
 
-  const saveProfile = useCallback((nextProfile: B2BProfile) => {
-    persistProfile(nextProfile);
-    setProfile(nextProfile);
-  }, []);
+  const saveProfile = useCallback(
+    (nextProfile: B2BProfile) => {
+      persistProfile(nextProfile, userId);
+      setProfile(nextProfile);
+    },
+    [userId]
+  );
 
   const customer = useMemo(() => profileToCustomer(profile), [profile]);
 
@@ -68,10 +78,11 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
       profile,
       customer,
       isHydrated,
+      userId,
       saveProfile,
       refreshProfile,
     }),
-    [profile, customer, isHydrated, saveProfile, refreshProfile]
+    [profile, customer, isHydrated, userId, saveProfile, refreshProfile]
   );
 
   return (

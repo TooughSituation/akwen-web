@@ -43,7 +43,7 @@ interface OrderFormProps {
 
 export function OrderForm({ onSuccess, onCancel }: OrderFormProps) {
   const { items, totalItems, clearCart } = useCart();
-  const { profile } = useProfile();
+  const { profile, userId } = useProfile();
   const deliveryAddresses = profile.deliveryAddresses;
   const discountPercent = profile.discountPercent ?? 0;
   const hasDiscount = discountPercent > 0;
@@ -104,9 +104,9 @@ export function OrderForm({ onSuccess, onCancel }: OrderFormProps) {
           order = await apiCreateOrder(payload);
         } catch {
           // Fallback offline / błąd API: stara ścieżka lokalna
-          order = createOrder(payload, getOrders());
+          order = createOrder(payload, getOrders(userId));
         }
-        saveOrder(order);
+        saveOrder(order, userId);
         clearCart();
         onSuccess(order);
       } catch {

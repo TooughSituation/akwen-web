@@ -1,30 +1,29 @@
-import { MOCK_CUSTOMER, SAVED_DELIVERY_ADDRESSES } from "./auth";
+import { getDemoProfileForUser } from "./seed-users";
+import { profileStorageKey, STORAGE_BASE } from "./storage-keys";
 import type { B2BCustomer, B2BProfile, DeliveryAddress } from "./types";
 
-export const PROFILE_STORAGE_KEY = "akwen-b2b-profile";
+export const PROFILE_STORAGE_KEY = STORAGE_BASE.profile;
 export const PROFILE_UPDATED_EVENT = "akwen-profile-updated";
 
-export function getDefaultProfile(): B2BProfile {
+/** Domyślny profil — preferuj seed użytkownika, inaczej pierwszy demo. */
+export function getDefaultProfile(userId?: string | null): B2BProfile {
+  if (userId) {
+    const seeded = getDemoProfileForUser(userId);
+    if (seeded) return seeded;
+  }
+  const fallback = getDemoProfileForUser("cust-001");
+  if (fallback) return fallback;
+
   return {
-    id: MOCK_CUSTOMER.id,
-    companyName: MOCK_CUSTOMER.companyName,
-    nip: MOCK_CUSTOMER.nip,
+    id: "cust-001",
+    companyName: "Sklep Rybny Morska Fala",
+    nip: "542-123-45-67",
     regon: "",
-    contactPerson: MOCK_CUSTOMER.contactPerson,
-    email: MOCK_CUSTOMER.email,
-    phone: MOCK_CUSTOMER.phone,
-    discountPercent: MOCK_CUSTOMER.discountPercent,
-    deliveryAddresses: SAVED_DELIVERY_ADDRESSES.map((address, index) => ({
-      id: `addr-default-${index}`,
-      label:
-        index === 0
-          ? "Siedziba"
-          : index === 1
-            ? "Magazyn chłodniczy"
-            : "Punkt odbioru",
-      address,
-      isDefault: index === 0,
-    })),
+    contactPerson: "Jan Kowalski",
+    email: "jan@morskafala.pl",
+    phone: "+48 600 123 456",
+    discountPercent: 5,
+    deliveryAddresses: [],
   };
 }
 
@@ -45,37 +44,43 @@ export function profileToCustomer(profile: B2BProfile): B2BCustomer {
   };
 }
 
-export function getProfile(): B2BProfile {
+export function getProfile(userId?: string | null): B2BProfile {
   if (typeof window === "undefined") {
-    return getDefaultProfile();
+    return getDefaultProfile(userId);
   }
 
+  const key = profileStorageKey(userId);
+
   try {
-    const saved = localStorage.getItem(PROFILE_STORAGE_KEY);
-    if (!saved) return getDefaultProfile();
+    const saved = localStorage.getItem(key);
+    if (!saved) return getDefaultProfile(userId);
 
     const parsed = JSON.parse(saved) as B2BProfile;
     if (!parsed?.companyName || !Array.isArray(parsed.deliveryAddresses)) {
-      return getDefaultProfile();
+      return getDefaultProfile(userId);
     }
 
     return {
-      ...getDefaultProfile(),
+      ...getDefaultProfile(userId),
       ...parsed,
       deliveryAddresses: parsed.deliveryAddresses.filter(
         (item) => item.id && item.address?.trim()
       ),
     };
   } catch {
-    localStorage.removeItem(PROFILE_STORAGE_KEY);
-    return getDefaultProfile();
+    localStorage.removeItem(key);
+    return getDefaultProfile(userId);
   }
 }
 
-export function saveProfile(profile: B2BProfile): void {
+export function saveProfile(
+  profile: B2BProfile,
+  userId?: string | null
+): void {
   if (typeof window === "undefined") return;
 
-  localStorage.setItem(PROFILE_STORAGE_KEY, JSON.stringify(profile));
+  const key = profileStorageKey(userId ?? profile.id);
+  localStorage.setItem(key, JSON.stringify(profile));
   window.dispatchEvent(new Event(PROFILE_UPDATED_EVENT));
 }
 

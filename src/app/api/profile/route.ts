@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { auth } from "@/auth";
 import {
   ensureSingleDefaultAddress,
   getDefaultProfile,
@@ -23,14 +24,19 @@ function isValidProfile(value: unknown): value is B2BProfile {
 }
 
 export async function GET() {
-  const profile = getDefaultProfile();
+  const session = await auth();
+  const userId = session?.user?.id;
+  const profile = getDefaultProfile(userId);
   return NextResponse.json({
     profile,
     meta: {
-      source: "mock-default",
-      storageKey: "akwen-b2b-profile",
+      source: userId ? "seed-user" : "mock-default",
+      userId: userId ?? null,
+      storageKey: userId
+        ? `akwen-b2b-profile:${userId}`
+        : "akwen-b2b-profile",
       note:
-        "Domyślny profil serwera. Zapisany profil użytkownika jest w localStorage przeglądarki.",
+        "Profil seed dla zalogowanego konta. Edycje w localStorage per userId.",
     },
   });
 }

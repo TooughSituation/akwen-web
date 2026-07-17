@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { signOut } from "next-auth/react";
 import {
   LayoutDashboard,
   Package,
@@ -10,6 +11,7 @@ import {
   ClipboardList,
   UserCircle,
   ExternalLink,
+  LogOut,
 } from "lucide-react";
 import { useCart } from "@/contexts/cart-context";
 import { cn } from "@/lib/utils";
@@ -78,7 +80,7 @@ export function B2BSidebarContent({ onNavigate }: B2BSidebarContentProps) {
         })}
       </nav>
 
-      <div className="border-t border-navy-800/50 p-4">
+      <div className="space-y-1 border-t border-navy-800/50 p-4">
         <Link
           href="/"
           onClick={onNavigate}
@@ -87,6 +89,17 @@ export function B2BSidebarContent({ onNavigate }: B2BSidebarContentProps) {
           <ExternalLink className="size-4" />
           Strona publiczna
         </Link>
+        <button
+          type="button"
+          onClick={() => {
+            onNavigate?.();
+            void signOut({ callbackUrl: "/b2b/login" });
+          }}
+          className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-ocean-200 transition-colors hover:bg-white/10 hover:text-white"
+        >
+          <LogOut className="size-4" />
+          Wyloguj
+        </button>
       </div>
     </>
   );

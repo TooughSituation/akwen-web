@@ -9,9 +9,9 @@ import {
   useState,
   type ReactNode,
 } from "react";
+import { useSession } from "next-auth/react";
 import type { B2BOrder, B2BProduct, CartItem } from "@/lib/b2b/types";
-
-const STORAGE_KEY = "akwen-b2b-cart";
+import { cartStorageKey } from "@/lib/b2b/storage-keys";
 
 interface CartContextValue {
   items: CartItem[];
@@ -45,36 +45,47 @@ function clampQuantity(quantity: number, stock: number): number {
   return Math.max(1, Math.min(quantity, stock));
 }
 
+function loadCart(userId: string | undefined): CartItem[] {
+  if (typeof window === "undefined" || !userId) return [];
+  try {
+    const saved = localStorage.getItem(cartStorageKey(userId));
+    if (!saved) return [];
+    const parsed = JSON.parse(saved) as CartItem[];
+    if (!Array.isArray(parsed)) return [];
+    return parsed
+      .filter((item) => item.productId && item.quantity > 0)
+      .map((item) => ({
+        ...item,
+        quantity: clampQuantity(item.quantity, item.stock),
+      }));
+  } catch {
+    localStorage.removeItem(cartStorageKey(userId));
+    return [];
+  }
+}
+
 export function CartProvider({ children }: { children: ReactNode }) {
+  const { data: session, status } = useSession();
+  const userId = session?.user?.id;
   const [items, setItems] = useState<CartItem[]>([]);
   const [isHydrated, setIsHydrated] = useState(false);
 
+  // Przeładuj koszyk przy zmianie użytkownika (jak otwarcie innego pliku Excel)
   useEffect(() => {
-    try {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) {
-        const parsed = JSON.parse(saved) as CartItem[];
-        if (Array.isArray(parsed)) {
-          setItems(
-            parsed
-              .filter((item) => item.productId && item.quantity > 0)
-              .map((item) => ({
-                ...item,
-                quantity: clampQuantity(item.quantity, item.stock),
-              }))
-          );
-        }
-      }
-    } catch {
-      localStorage.removeItem(STORAGE_KEY);
+    if (status === "loading") return;
+    if (!userId) {
+      setItems([]);
+      setIsHydrated(true);
+      return;
     }
+    setItems(loadCart(userId));
     setIsHydrated(true);
-  }, []);
+  }, [userId, status]);
 
   useEffect(() => {
-    if (!isHydrated) return;
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
-  }, [items, isHydrated]);
+    if (!isHydrated || !userId) return;
+    localStorage.setItem(cartStorageKey(userId), JSON.stringify(items));
+  }, [items, isHydrated, userId]);
 
   const addItem = useCallback((product: B2BProduct, quantity = 1) => {
     if (product.stock <= 0) return;
@@ -162,8 +173,6 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const reorderFromOrder = useCallback(
     (order: B2BOrder) => {
       order.items.forEach((item) => {
-        // Koszyk trzyma ceny katalogowe — rabat z profilu nakładany jest przy wyświetlaniu
-        // i przy składaniu zamówienia. Przy reorder bierzemy listPriceNet (fallback: priceNet).
         const listPrice =
           typeof item.listPriceNet === "number" &&
           Number.isFinite(item.listPriceNet)

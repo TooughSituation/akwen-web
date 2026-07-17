@@ -1,8 +1,10 @@
 "use client";
 
-import { Bell } from "lucide-react";
+import { Bell, LogOut } from "lucide-react";
+import { signOut } from "next-auth/react";
 import { useProfile } from "@/contexts/profile-context";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { CartHeaderLink } from "@/components/b2b/cart-header-link";
 import { GlobalSearch } from "@/components/b2b/global-search";
 
@@ -27,8 +29,8 @@ export function B2BHeader({ title, description }: B2BHeaderProps) {
             )}
           </div>
 
-          <div className="flex items-center gap-3 sm:gap-4">
-            <GlobalSearch className="hidden min-w-[240px] flex-1 md:block lg:min-w-[320px]" />
+          <div className="flex items-center gap-2 sm:gap-3">
+            <GlobalSearch className="hidden min-w-[220px] flex-1 md:block lg:min-w-[300px]" />
 
             <CartHeaderLink />
 
@@ -40,12 +42,12 @@ export function B2BHeader({ title, description }: B2BHeaderProps) {
               <Bell className="size-5" />
             </button>
 
-            <div className="flex items-center gap-3 rounded-lg border border-border bg-muted/30 px-3 py-2">
+            <div className="flex items-center gap-2 rounded-lg border border-border bg-muted/30 px-2 py-1.5 sm:gap-3 sm:px-3 sm:py-2">
               <div className="flex size-9 items-center justify-center rounded-full bg-turquoise-500 text-sm font-semibold text-white">
                 {customer.companyName.charAt(0)}
               </div>
               <div className="hidden sm:block">
-                <p className="text-sm font-medium text-foreground">
+                <p className="max-w-[140px] truncate text-sm font-medium text-foreground lg:max-w-[180px]">
                   {customer.companyName}
                 </p>
                 <p className="text-xs text-muted-foreground">
@@ -59,10 +61,23 @@ export function B2BHeader({ title, description }: B2BHeaderProps) {
                 -{customer.discountPercent}%
               </Badge>
             </div>
+
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              className="shrink-0"
+              onClick={() =>
+                signOut({ callbackUrl: "/b2b/login" })
+              }
+              title="Wyloguj"
+            >
+              <LogOut className="size-4" />
+              <span className="hidden sm:inline">Wyloguj</span>
+            </Button>
           </div>
         </div>
 
-        {/* Mobile: pełna szerokość pod tytułem — jak pasek filtrów w arkuszu */}
         <GlobalSearch fullWidth className="block w-full md:hidden" />
       </div>
     </header>

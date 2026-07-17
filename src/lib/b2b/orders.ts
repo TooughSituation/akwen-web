@@ -1,4 +1,5 @@
 import { applyDiscount, roundMoney } from "./format";
+import { ordersStorageKey, STORAGE_BASE } from "./storage-keys";
 import type {
   B2BOrder,
   CartItem,
@@ -6,7 +7,7 @@ import type {
   OrderItem,
 } from "./types";
 
-const STORAGE_KEY = "akwen-b2b-orders";
+export const ORDERS_STORAGE_KEY = STORAGE_BASE.orders;
 
 function normalizeOrderItem(item: OrderItem): OrderItem {
   const listPriceNet =
@@ -36,28 +37,34 @@ function normalizeOrder(order: B2BOrder): B2BOrder {
   };
 }
 
-function readOrders(): B2BOrder[] {
+function readOrders(userId?: string | null): B2BOrder[] {
   if (typeof window === "undefined") return [];
 
+  const key = ordersStorageKey(userId);
+
   try {
-    const saved = localStorage.getItem(STORAGE_KEY);
+    const saved = localStorage.getItem(key);
     if (!saved) return [];
     const parsed = JSON.parse(saved) as B2BOrder[];
     return Array.isArray(parsed) ? parsed.map(normalizeOrder) : [];
   } catch {
-    localStorage.removeItem(STORAGE_KEY);
+    localStorage.removeItem(key);
     return [];
   }
 }
 
-export function getOrders(): B2BOrder[] {
-  return readOrders();
+export function getOrders(userId?: string | null): B2BOrder[] {
+  return readOrders(userId);
 }
 
-export function saveOrder(order: B2BOrder): void {
-  const orders = readOrders();
+export function saveOrder(order: B2BOrder, userId?: string | null): void {
+  const scope = userId ?? order.customerId;
+  const orders = readOrders(scope);
   orders.unshift(order);
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(orders));
+  localStorage.setItem(ordersStorageKey(scope), JSON.stringify(orders));
+  if (typeof window !== "undefined") {
+    window.dispatchEvent(new Event("akwen-orders-updated"));
+  }
 }
 
 export function generateOrderNumber(existingOrders: B2BOrder[]): string {
@@ -98,9 +105,7 @@ function cartItemsToOrderItems(
 }
 
 /**
- * Buduje zamówienie (czysta logika — działa w przeglądarce i w Route Handlerze).
- * Analogia VBA: funkcja CreateOrder(dane) As Order — bez SideEffect na arkusz.
- * Zapis do „arkusza” = saveOrder / localStorage po stronie klienta.
+ * Buduje zamówienie (czysta logika — przeglądarka i Route Handler).
  */
 export function createOrder(
   input: CreateOrderInput,
@@ -108,7 +113,7 @@ export function createOrder(
 ): B2BOrder {
   const knownOrders =
     existingOrders ??
-    (typeof window !== "undefined" ? readOrders() : []);
+    (typeof window !== "undefined" ? readOrders(input.customerId) : []);
   const discountPercent = Number.isFinite(input.discountPercent)
     ? Math.max(0, input.discountPercent)
     : 0;

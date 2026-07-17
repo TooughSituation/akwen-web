@@ -1,8 +1,8 @@
 # Projekt: akwen-web — Portal B2B (Akwen)
 
 > Ostatnia aktualizacja: 17.07.2026  
-> Etap 1–2: rabat, proponowane, filtry, karty, Excel Powód  
-> Etap 3: globalne wyszukiwanie, mock API, E2E smoke  
+> Etapy 1–3: rabat, proponowane, search, mock API, smoke  
+> **Etap 4: Auth.js — logowanie B2B, middleware, dane per użytkownik**  
 > Kontekst dla GrokWeb / Grok Build
 
 ## Linki
@@ -31,7 +31,8 @@
 | **Etap 1** | ✅ | Rabat w koszyku, proponowane z powodami, shareable filtry, zdjęcia |
 | **Etap 2** | ✅ | Kolumna Excel PowodProponowania, rabat na kartach, prompty Imagine |
 | **Etap 3** | ✅ | Globalne wyszukiwanie w headerze, mock API Route Handlers, E2E smoke |
-| Etap 4+ | ⏳ | Auth, prawdziwa baza, ERP… |
+| **Etap 4** | ✅ | Auth.js (Credentials), `/b2b/login`, middleware, localStorage per user |
+| Etap 5+ | ⏳ | Prawdziwa baza, Clerk produkcyjny, ERP… |
 
 ### Moduły B2B
 
@@ -166,6 +167,35 @@ scripts/
 
 ---
 
+## Etap 4 — autoryzacja (Auth.js)
+
+**Dlaczego Auth.js, nie Clerk:** kilka kont demo z różnymi rabatami/firmami bez dashboardu zewnętrznego.
+
+| Element | Ścieżka / plik |
+|---------|----------------|
+| Logowanie | `/b2b/login` |
+| Middleware | `src/middleware.ts` — chroni `/b2b/*` (oprócz login) |
+| Konfiguracja | `src/auth.ts` + `src/app/api/auth/[...nextauth]/route.ts` |
+| Konta demo | `src/lib/b2b/seed-users.ts` (hasło: `demo123`) |
+| Storage per user | `akwen-b2b-cart:{userId}`, `…-profile:{userId}`, `…-orders:{userId}` |
+| Env | `AUTH_SECRET` (wymagane na Vercel) |
+
+### Konta testowe
+
+| E-mail | Hasło | Firma | Rabat |
+|--------|-------|-------|-------|
+| jan@morskafala.pl | demo123 | Sklep Rybny Morska Fala | 5% |
+| anna@gastrocentrum.pl | demo123 | Gastro Centrum | 8% |
+| piotr@superfish.pl | demo123 | SuperFish Hurt | 3% |
+| ewa@baltyckismak.pl | demo123 | Bałtycki Smak | 10% |
+
+### Analogia VBA
+- Logowanie = Form_Logowanie sprawdzające tabelę Użytkownicy  
+- Middleware = Form_Open z `If Not LoggedIn Then Cancel`  
+- Per-user localStorage = osobny skoroszyt na firmę  
+
+---
+
 ## Etap 3 — szczegóły
 
 ### 1) Globalne wyszukiwanie (header)
@@ -196,12 +226,13 @@ scripts/
 
 ---
 
-## Checklist dalszych kroków (Etap 4+)
+## Checklist dalszych kroków (Etap 5+)
 
-- [ ] Regeneracja batch Imagine po ulepszonych promptach  
+- [ ] Ustaw `AUTH_SECRET` w Vercel Project Settings (jeśli brak)  
+- [ ] Regeneracja batch Imagine  
 - [ ] Eksport zamówienia PDF / e-mail  
-- [ ] Auth (Clerk / Auth0)  
-- [ ] Prawdziwa baza zamiast localStorage dla zamówień  
+- [ ] Migracja na Clerk produkcyjny (opcjonalnie)  
+- [ ] Prawdziwa baza zamiast localStorage  
 - [ ] VAT / cenniki wielopoziomowe  
 
 ---

@@ -1,21 +1,18 @@
+/**
+ * Kompatybilność wsteczna — mock klienta = pierwsze konto demo.
+ * Nowe logowanie: Auth.js + seed-users.ts
+ */
+import { DEMO_B2B_USERS } from "./seed-users";
 import type { B2BCustomer } from "./types";
+import { profileToCustomer } from "./profile";
 
-export const MOCK_CUSTOMER: B2BCustomer = {
-  id: "cust-001",
-  companyName: "Sklep Rybny Morska Fala",
-  nip: "542-123-45-67",
-  contactPerson: "Jan Kowalski",
-  email: "jan.kowalski@morskafala.pl",
-  phone: "+48 600 123 456",
-  address: "ul. Rybacka 12, 15-001 Białystok",
-  discountPercent: 5,
-};
+const first = DEMO_B2B_USERS[0];
 
-export const SAVED_DELIVERY_ADDRESSES = [
-  MOCK_CUSTOMER.address,
-  "Magazyn chłodniczy, ul. Ełcka 88, 15-001 Białystok",
-  "Punkt odbioru — hala targowa, ul. Baranowicka 117, Białystok",
-] as const;
+export const MOCK_CUSTOMER: B2BCustomer = profileToCustomer(first.profile);
+
+export const SAVED_DELIVERY_ADDRESSES = first.profile.deliveryAddresses.map(
+  (a) => a.address
+) as readonly string[];
 
 export function getMockCustomer(): B2BCustomer {
   return MOCK_CUSTOMER;

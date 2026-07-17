@@ -9,16 +9,15 @@ import {
   useState,
   type ReactNode,
 } from "react";
+import { useSession } from "next-auth/react";
+import { priceModeStorageKey } from "@/lib/b2b/storage-keys";
 
 export type PriceDisplayMode = "yours" | "list";
-
-const STORAGE_KEY = "akwen-b2b-price-mode";
 
 interface PriceDisplayContextValue {
   mode: PriceDisplayMode;
   setMode: (mode: PriceDisplayMode) => void;
   isHydrated: boolean;
-  /** true = pokazuj ceny po rabacie klienta */
   showYourPrice: boolean;
 }
 
@@ -26,10 +25,10 @@ const PriceDisplayContext = createContext<PriceDisplayContextValue | null>(
   null
 );
 
-function readStoredMode(): PriceDisplayMode {
-  if (typeof window === "undefined") return "yours";
+function readStoredMode(userId: string | undefined): PriceDisplayMode {
+  if (typeof window === "undefined" || !userId) return "yours";
   try {
-    const saved = localStorage.getItem(STORAGE_KEY);
+    const saved = localStorage.getItem(priceModeStorageKey(userId));
     if (saved === "list" || saved === "yours") return saved;
   } catch {
     // ignore
@@ -38,22 +37,29 @@ function readStoredMode(): PriceDisplayMode {
 }
 
 export function PriceDisplayProvider({ children }: { children: ReactNode }) {
+  const { data: session, status } = useSession();
+  const userId = session?.user?.id;
   const [mode, setModeState] = useState<PriceDisplayMode>("yours");
   const [isHydrated, setIsHydrated] = useState(false);
 
   useEffect(() => {
-    setModeState(readStoredMode());
+    if (status === "loading") return;
+    setModeState(readStoredMode(userId));
     setIsHydrated(true);
-  }, []);
+  }, [userId, status]);
 
-  const setMode = useCallback((next: PriceDisplayMode) => {
-    setModeState(next);
-    try {
-      localStorage.setItem(STORAGE_KEY, next);
-    } catch {
-      // ignore
-    }
-  }, []);
+  const setMode = useCallback(
+    (next: PriceDisplayMode) => {
+      setModeState(next);
+      if (!userId) return;
+      try {
+        localStorage.setItem(priceModeStorageKey(userId), next);
+      } catch {
+        // ignore
+      }
+    },
+    [userId]
+  );
 
   const value = useMemo(
     () => ({

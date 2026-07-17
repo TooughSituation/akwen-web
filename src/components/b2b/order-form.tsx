@@ -15,9 +15,13 @@ import {
 import { apiCreateOrder } from "@/lib/b2b/api-client";
 import { calculatePointsFromNet } from "@/lib/b2b/loyalty";
 import { createOrder, getOrders, saveOrder } from "@/lib/b2b/orders";
+import {
+  getPaymentArrearsMessage,
+  hasPaymentArrears,
+} from "@/lib/b2b/profile";
 import { getNextPromotionProgress } from "@/lib/b2b/promotions";
 import type { B2BOrder } from "@/lib/b2b/types";
-import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
@@ -54,6 +58,8 @@ export function OrderForm({ onSuccess, onCancel }: OrderFormProps) {
   const savings = sumDiscountSavings(items, discountPercent);
   const estimatedPoints = calculatePointsFromNet(totalNet);
   const promoProgress = getNextPromotionProgress(totalNet);
+  const orderBlocked = hasPaymentArrears(profile);
+  const arrearsMessage = getPaymentArrearsMessage(profile);
   const [deliveryDate, setDeliveryDate] = useState<Date | undefined>();
   const [calendarOpen, setCalendarOpen] = useState(false);
   const [addressMode, setAddressMode] = useState<"saved" | "custom">("saved");
@@ -71,6 +77,12 @@ export function OrderForm({ onSuccess, onCancel }: OrderFormProps) {
   function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
     setError(null);
+
+    // Podwójna blokada (gdy ktoś wejdzie w formularz mimo koszyka)
+    if (orderBlocked) {
+      setError(arrearsMessage ?? "Zamówienia zablokowane z powodu zaległości.");
+      return;
+    }
 
     if (!deliveryDate) {
       setError("Wybierz datę dostawy.");
@@ -133,6 +145,13 @@ export function OrderForm({ onSuccess, onCancel }: OrderFormProps) {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-5">
+          {orderBlocked && arrearsMessage && (
+            <Alert variant="destructive">
+              <AlertTitle>Zamówienia zablokowane</AlertTitle>
+              <AlertDescription>{arrearsMessage}</AlertDescription>
+            </Alert>
+          )}
+
           {error && (
             <Alert variant="destructive">
               <AlertDescription>{error}</AlertDescription>
@@ -346,7 +365,7 @@ export function OrderForm({ onSuccess, onCancel }: OrderFormProps) {
               <Button
                 type="submit"
                 className="bg-turquoise-500 hover:bg-turquoise-600"
-                disabled={isSubmitting}
+                disabled={isSubmitting || orderBlocked}
               >
                 {isSubmitting ? "Składanie…" : "Potwierdź zamówienie"}
               </Button>

@@ -84,7 +84,8 @@ export const DEMO_B2B_USERS: DemoB2BUser[] = [
     id: "cust-003",
     email: "piotr@superfish.pl",
     password: "demo123",
-    label: "Hurt rybny · rabat 3%",
+    // Demo blokady: zaległości → nie da się złożyć zamówienia w koszyku
+    label: "Hurt rybny · rabat 3% · ZALEGŁOŚCI (demo)",
     profile: {
       id: "cust-003",
       companyName: "SuperFish Hurt Sp. j.",
@@ -102,6 +103,11 @@ export const DEMO_B2B_USERS: DemoB2BUser[] = [
           isDefault: true,
         },
       ],
+      paymentArrears: {
+        hasArrears: true,
+        amountNet: 2450.5,
+        note: "Przeterminowana FV/2025/03-118 (mock)",
+      },
     },
   },
   {

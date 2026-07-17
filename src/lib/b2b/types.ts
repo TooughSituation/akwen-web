@@ -103,10 +103,23 @@ export interface B2BOrder {
   discountPercent: number;
   /** Punkty lojalnościowe naliczone za to zamówienie (1 pkt / 10 zł netto). */
   loyaltyPointsEarned?: number;
+  /** Data dostawy w formacie YYYY-MM-DD (jak data w komórce Excela). */
   deliveryDate: string;
   deliveryAddress: string;
   notes: string;
   createdAt: string;
+  /** Opcjonalnie: kiedy ostatnio zmieniono datę/adres/uwagi lub anulowano. */
+  updatedAt?: string;
+}
+
+/**
+ * Pola, które klient może zmienić w zamówieniu (status „new”, min. 24h do dostawy).
+ * Pozycje koszyka nie są edytowalne w MVP — tylko logistyka.
+ */
+export interface UpdateOrderInput {
+  deliveryDate: string;
+  deliveryAddress: string;
+  notes: string;
 }
 
 /** Typ nagrody w katalogu lojalnościowym. */
@@ -173,6 +186,18 @@ export interface DeliveryAddress {
   isDefault?: boolean;
 }
 
+/**
+ * Mock zaległości płatniczych (jak flaga w arkuszu „Rozrachunki”).
+ * hasArrears = true → blokada „Złóż zamówienie” w koszyku.
+ */
+export interface PaymentArrears {
+  hasArrears: boolean;
+  /** Kwota zaległości netto (PLN) — tylko do komunikatu. */
+  amountNet: number;
+  /** Np. numer faktury / opis (mock). */
+  note?: string;
+}
+
 export interface B2BProfile {
   id: string;
   companyName: string;
@@ -183,4 +208,6 @@ export interface B2BProfile {
   phone: string;
   discountPercent: number;
   deliveryAddresses: DeliveryAddress[];
+  /** Opcjonalny mock zaległości — brak pola = brak blokady. */
+  paymentArrears?: PaymentArrears;
 }

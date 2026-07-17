@@ -1,9 +1,35 @@
+import { formatPrice } from "./format";
 import { getDemoProfileForUser } from "./seed-users";
 import { profileStorageKey, STORAGE_BASE } from "./storage-keys";
 import type { B2BCustomer, B2BProfile, DeliveryAddress } from "./types";
 
 export const PROFILE_STORAGE_KEY = STORAGE_BASE.profile;
 export const PROFILE_UPDATED_EVENT = "akwen-profile-updated";
+
+/**
+ * Czy profil ma aktywną blokadę z powodu zaległości (mock).
+ * Analogia VBA: If Range("Zaleglosci") = True Then Exit Sub
+ */
+export function hasPaymentArrears(profile: B2BProfile): boolean {
+  return Boolean(profile.paymentArrears?.hasArrears);
+}
+
+/**
+ * Komunikat do UI koszyka (Alert). null = brak blokady.
+ */
+export function getPaymentArrearsMessage(profile: B2BProfile): string | null {
+  if (!hasPaymentArrears(profile)) return null;
+
+  const amount = profile.paymentArrears?.amountNet ?? 0;
+  const note = profile.paymentArrears?.note?.trim();
+  const amountPart =
+    Number.isFinite(amount) && amount > 0
+      ? ` Zaległość: ${formatPrice(amount)} netto.`
+      : "";
+  const notePart = note ? ` (${note})` : "";
+
+  return `Składanie zamówień jest zablokowane z powodu zaległości płatniczych.${amountPart}${notePart} Skontaktuj się z działem handlowym AKWEN.`;
+}
 
 /** Domyślny profil — preferuj seed użytkownika, inaczej pierwszy demo. */
 export function getDefaultProfile(userId?: string | null): B2BProfile {

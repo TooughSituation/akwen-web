@@ -14,7 +14,12 @@ import {
   sumCartNet,
   sumDiscountSavings,
 } from "@/lib/b2b/format";
+import {
+  getPaymentArrearsMessage,
+  hasPaymentArrears,
+} from "@/lib/b2b/profile";
 import type { B2BOrder } from "@/lib/b2b/types";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -48,6 +53,9 @@ export function CartCheckout() {
   const totalListNet = sumCartNet(items, 0);
   const totalNet = sumCartNet(items, discountPercent);
   const savings = sumDiscountSavings(items, discountPercent);
+  // Blokada jak w VBA: If Zaleglosci Then Exit Sub
+  const orderBlocked = hasPaymentArrears(profile);
+  const arrearsMessage = getPaymentArrearsMessage(profile);
 
   if (!isHydrated) {
     return (
@@ -247,6 +255,13 @@ export function CartCheckout() {
         </CardContent>
       </Card>
 
+      {orderBlocked && arrearsMessage && (
+        <Alert variant="destructive">
+          <AlertTitle>Zamówienia zablokowane</AlertTitle>
+          <AlertDescription>{arrearsMessage}</AlertDescription>
+        </Alert>
+      )}
+
       <Card className="border-turquoise-500/30 bg-turquoise-500/5">
         <CardContent className="flex flex-col gap-4 py-6 sm:flex-row sm:items-center sm:justify-between">
           <div>
@@ -285,6 +300,12 @@ export function CartCheckout() {
             <Button
               className="bg-turquoise-500 hover:bg-turquoise-600"
               onClick={() => setStep("form")}
+              disabled={orderBlocked}
+              title={
+                orderBlocked
+                  ? "Złóż zamówienie niedostępne — masz zaległości płatnicze"
+                  : undefined
+              }
             >
               Złóż zamówienie
             </Button>

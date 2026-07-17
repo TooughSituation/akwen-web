@@ -6,9 +6,16 @@ import type {
   CartItem,
   CreateOrderInput,
   OrderItem,
+  UpdateOrderInput,
 } from "./types";
 
 export const ORDERS_STORAGE_KEY = STORAGE_BASE.orders;
+
+/**
+ * Minimalny czas do daty dostawy (w godzinach), żeby jeszcze edytować/anulować.
+ * Jak reguła biznesowa w Excelu: „zmiany tylko gdy DataDostawy − Teraz >= 24h”.
+ */
+export const ORDER_MODIFY_MIN_HOURS = 24;
 
 function normalizeOrderItem(item: OrderItem): OrderItem {
   const listPriceNet =
@@ -68,6 +75,191 @@ export function saveOrder(order: B2BOrder, userId?: string | null): void {
   if (typeof window !== "undefined") {
     window.dispatchEvent(new Event("akwen-orders-updated"));
   }
+}
+
+/**
+ * Nadpisuje listę zamówień w localStorage (jak Range.Value = tablica).
+ * Nie nalicza punktów — używane przy edycji / anulacji.
+ */
+function writeOrders(orders: B2BOrder[], userId?: string | null): void {
+  if (typeof window === "undefined") return;
+  localStorage.setItem(ordersStorageKey(userId), JSON.stringify(orders));
+  window.dispatchEvent(new Event("akwen-orders-updated"));
+}
+
+/**
+ * Ile godzin zostało do początku dnia dostawy (lokalnie).
+ * deliveryDate = „YYYY-MM-DD” → traktujemy jak 00:00 tego dnia.
+ *
+ * Analogia VBA:
+ *   hours = DateDiff("h", Now, CDate(deliveryDate))
+ */
+export function hoursUntilDelivery(
+  deliveryDateYmd: string,
+  now: Date = new Date()
+): number {
+  const deliveryStart = new Date(`${deliveryDateYmd}T00:00:00`);
+  if (Number.isNaN(deliveryStart.getTime())) return Number.NEGATIVE_INFINITY;
+  return (deliveryStart.getTime() - now.getTime()) / (1000 * 60 * 60);
+}
+
+/**
+ * Czy status pozwala na edycję/anulację w UI (tylko „new”).
+ * Jak filtr: If Status = "new" Then pokaż przyciski.
+ */
+export function isOrderStatusModifiable(order: B2BOrder): boolean {
+  return order.status === "new";
+}
+
+/**
+ * Czy mieścimy się w oknie czasowym (min. 24h przed dniem dostawy).
+ */
+export function isWithinModificationWindow(
+  order: B2BOrder,
+  now: Date = new Date()
+): boolean {
+  return hoursUntilDelivery(order.deliveryDate, now) >= ORDER_MODIFY_MIN_HOURS;
+}
+
+export type OrderModifyBlockReason =
+  | "not_new"
+  | "too_late"
+  | "invalid_date";
+
+export interface OrderModifyCheck {
+  allowed: boolean;
+  reason?: OrderModifyBlockReason;
+  /** Tekst po polsku do Alert / title przycisku. */
+  message?: string;
+}
+
+/**
+ * Pełna reguła: status „new” + min. 24h do dostawy.
+ * Używaj przed zapisem edycji / anulacji (walidacja jak w makrze).
+ */
+export function canModifyOrder(
+  order: B2BOrder,
+  now: Date = new Date()
+): OrderModifyCheck {
+  if (!isOrderStatusModifiable(order)) {
+    return {
+      allowed: false,
+      reason: "not_new",
+      message:
+        "Edycja i anulacja są dostępne tylko dla zamówień ze statusem „Nowe”.",
+    };
+  }
+
+  const hours = hoursUntilDelivery(order.deliveryDate, now);
+  if (!Number.isFinite(hours)) {
+    return {
+      allowed: false,
+      reason: "invalid_date",
+      message: "Nieprawidłowa data dostawy zamówienia.",
+    };
+  }
+
+  if (hours < ORDER_MODIFY_MIN_HOURS) {
+    return {
+      allowed: false,
+      reason: "too_late",
+      message: `Zmiany możliwe do ${ORDER_MODIFY_MIN_HOURS} h przed datą dostawy. Termin już minął lub jest za blisko.`,
+    };
+  }
+
+  return { allowed: true };
+}
+
+/**
+ * Aktualizuje datę dostawy, adres i uwagi istniejącego zamówienia.
+ * Zapis do localStorage (arkusz „Zamówienia” — Update wiersza).
+ */
+export function updateOrder(
+  orderId: string,
+  fields: UpdateOrderInput,
+  userId?: string | null
+): B2BOrder {
+  if (typeof window === "undefined") {
+    throw new Error("Edycja zamówienia działa tylko w przeglądarce.");
+  }
+
+  const orders = readOrders(userId);
+  const index = orders.findIndex((o) => o.id === orderId);
+  if (index < 0) {
+    throw new Error("Nie znaleziono zamówienia.");
+  }
+
+  const current = orders[index];
+  const check = canModifyOrder(current);
+  if (!check.allowed) {
+    throw new Error(check.message ?? "Nie można edytować tego zamówienia.");
+  }
+
+  const deliveryDate = fields.deliveryDate?.trim() ?? "";
+  const deliveryAddress = fields.deliveryAddress?.trim() ?? "";
+  const notes = (fields.notes ?? "").trim();
+
+  if (!deliveryDate) {
+    throw new Error("Wybierz datę dostawy.");
+  }
+  if (!deliveryAddress) {
+    throw new Error("Podaj adres dostawy.");
+  }
+
+  // Nowa data też musi zachować regułę 24h (nie da się „przesunąć” na jutro)
+  if (hoursUntilDelivery(deliveryDate) < ORDER_MODIFY_MIN_HOURS) {
+    throw new Error(
+      `Nowa data dostawy musi być co najmniej ${ORDER_MODIFY_MIN_HOURS} h od teraz.`
+    );
+  }
+
+  const updated: B2BOrder = {
+    ...current,
+    deliveryDate,
+    deliveryAddress,
+    notes,
+    updatedAt: new Date().toISOString(),
+  };
+
+  const next = [...orders];
+  next[index] = updated;
+  writeOrders(next, userId);
+  return updated;
+}
+
+/**
+ * Anuluje zamówienie (status → cancelled). Wymaga potwierdzenia w UI.
+ */
+export function cancelOrder(
+  orderId: string,
+  userId?: string | null
+): B2BOrder {
+  if (typeof window === "undefined") {
+    throw new Error("Anulacja zamówienia działa tylko w przeglądarce.");
+  }
+
+  const orders = readOrders(userId);
+  const index = orders.findIndex((o) => o.id === orderId);
+  if (index < 0) {
+    throw new Error("Nie znaleziono zamówienia.");
+  }
+
+  const current = orders[index];
+  const check = canModifyOrder(current);
+  if (!check.allowed) {
+    throw new Error(check.message ?? "Nie można anulować tego zamówienia.");
+  }
+
+  const updated: B2BOrder = {
+    ...current,
+    status: "cancelled",
+    updatedAt: new Date().toISOString(),
+  };
+
+  const next = [...orders];
+  next[index] = updated;
+  writeOrders(next, userId);
+  return updated;
 }
 
 export function generateOrderNumber(existingOrders: B2BOrder[]): string {

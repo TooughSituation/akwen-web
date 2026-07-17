@@ -5,13 +5,19 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { format } from "date-fns";
 import { pl } from "date-fns/locale";
-import { ClipboardList, RotateCcw } from "lucide-react";
+import { ClipboardList, Pencil, RotateCcw, XCircle } from "lucide-react";
 import { useCart } from "@/contexts/cart-context";
 import { useOrders } from "@/hooks/use-orders";
-import { countOrderItems } from "@/lib/b2b/orders";
+import {
+  canModifyOrder,
+  countOrderItems,
+  isOrderStatusModifiable,
+} from "@/lib/b2b/orders";
 import { formatPrice } from "@/lib/b2b/format";
 import type { B2BOrder } from "@/lib/b2b/types";
+import { OrderCancelDialog } from "@/components/b2b/order-cancel-dialog";
 import { OrderDetailsDialog } from "@/components/b2b/order-details-dialog";
+import { OrderEditDialog } from "@/components/b2b/order-edit-dialog";
 import { OrderStatusBadge } from "@/components/b2b/order-status-badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -32,15 +38,31 @@ import {
 
 export function OrdersList() {
   const router = useRouter();
-  const { orders, isHydrated } = useOrders();
+  const { orders, isHydrated, userId, refresh } = useOrders();
   const { reorderFromOrder } = useCart();
   const [selectedOrder, setSelectedOrder] = useState<B2BOrder | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [editOrder, setEditOrder] = useState<B2BOrder | null>(null);
+  const [editOpen, setEditOpen] = useState(false);
+  const [cancelOrderTarget, setCancelOrderTarget] = useState<B2BOrder | null>(
+    null
+  );
+  const [cancelOpen, setCancelOpen] = useState(false);
   const [reorderingId, setReorderingId] = useState<string | null>(null);
 
   function openDetails(order: B2BOrder) {
     setSelectedOrder(order);
     setDialogOpen(true);
+  }
+
+  function openEdit(order: B2BOrder) {
+    setEditOrder(order);
+    setEditOpen(true);
+  }
+
+  function openCancel(order: B2BOrder) {
+    setCancelOrderTarget(order);
+    setCancelOpen(true);
   }
 
   function handleReorder(order: B2BOrder, goToCart = false) {
@@ -115,6 +137,9 @@ export function OrdersList() {
               {orders.map((order) => {
                 const itemCount = countOrderItems(order);
                 const createdAt = new Date(order.createdAt);
+                // Przyciski Edytuj/Anuluj tylko dla statusu „new”
+                const showModify = isOrderStatusModifiable(order);
+                const modifyGate = canModifyOrder(order);
 
                 return (
                   <TableRow
@@ -139,7 +164,7 @@ export function OrdersList() {
                     </TableCell>
                     <TableCell className="text-right">
                       <div
-                        className="flex justify-end gap-1"
+                        className="flex flex-wrap justify-end gap-1"
                         onClick={(e) => e.stopPropagation()}
                       >
                         <Button
@@ -149,6 +174,39 @@ export function OrdersList() {
                         >
                           Szczegóły
                         </Button>
+                        {showModify && (
+                          <>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => openEdit(order)}
+                              disabled={!modifyGate.allowed}
+                              title={
+                                modifyGate.allowed
+                                  ? "Edytuj datę, adres lub uwagi"
+                                  : modifyGate.message
+                              }
+                            >
+                              <Pencil className="size-3.5" />
+                              Edytuj
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => openCancel(order)}
+                              disabled={!modifyGate.allowed}
+                              title={
+                                modifyGate.allowed
+                                  ? "Anuluj zamówienie"
+                                  : modifyGate.message
+                              }
+                              className="text-destructive hover:bg-destructive/10 hover:text-destructive"
+                            >
+                              <XCircle className="size-3.5" />
+                              Anuluj
+                            </Button>
+                          </>
+                        )}
                         <Button
                           variant="ghost"
                           size="sm"
@@ -175,6 +233,27 @@ export function OrdersList() {
         onOpenChange={setDialogOpen}
         onReorder={(order) => handleReorder(order, true)}
         isReordering={reorderingId === selectedOrder?.id}
+      />
+
+      <OrderEditDialog
+        order={editOrder}
+        open={editOpen}
+        onOpenChange={setEditOpen}
+        onSaved={(updated) => {
+          setSelectedOrder(updated);
+          refresh();
+        }}
+      />
+
+      <OrderCancelDialog
+        order={cancelOrderTarget}
+        open={cancelOpen}
+        onOpenChange={setCancelOpen}
+        userId={userId}
+        onCancelled={(updated) => {
+          setSelectedOrder(updated);
+          refresh();
+        }}
       />
     </>
   );

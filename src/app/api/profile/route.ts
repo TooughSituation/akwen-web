@@ -85,6 +85,8 @@ export async function PUT(request: NextRequest) {
           ? body.discountPercent
           : getDefaultProfile().discountPercent,
       deliveryAddresses: ensureSingleDefaultAddress(body.deliveryAddresses),
+      // Zachowaj mock zaległości z body (nie gub przy walidacji API)
+      paymentArrears: body.paymentArrears,
     };
 
     return NextResponse.json({

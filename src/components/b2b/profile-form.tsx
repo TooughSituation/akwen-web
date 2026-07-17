@@ -7,9 +7,11 @@ import { apiValidateProfile } from "@/lib/b2b/api-client";
 import {
   createDeliveryAddress,
   ensureSingleDefaultAddress,
+  getPaymentArrearsMessage,
+  hasPaymentArrears,
 } from "@/lib/b2b/profile";
 import type { B2BProfile, DeliveryAddress } from "@/lib/b2b/types";
-import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -198,6 +200,15 @@ export function ProfileForm() {
         {error && (
           <Alert variant="destructive">
             <AlertDescription>{error}</AlertDescription>
+          </Alert>
+        )}
+
+        {hasPaymentArrears(formData) && getPaymentArrearsMessage(formData) && (
+          <Alert variant="destructive">
+            <AlertTitle>Zaległości płatnicze (mock)</AlertTitle>
+            <AlertDescription>
+              {getPaymentArrearsMessage(formData)}
+            </AlertDescription>
           </Alert>
         )}
 

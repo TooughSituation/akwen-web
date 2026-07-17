@@ -140,13 +140,13 @@ export function ProductCard({ product, compact = false }: ProductCardProps) {
           compact && "flex-row"
         )}
       >
-        {/* Zdjęcie: wysokość ~½ poprzedniej (4/5 → 8/5), proporcje object-cover bez rozciągania */}
+        {/* Zdjęcie: kolejne −50% wysokości (8/5 → 16/5), object-cover bez rozciągania */}
         <div
           className={cn(
             "relative overflow-hidden bg-muted/25",
             compact
-              ? "aspect-square w-14 shrink-0 sm:w-16"
-              : "aspect-[8/5] w-full"
+              ? "aspect-square w-7 shrink-0 sm:w-8"
+              : "aspect-[16/5] w-full"
           )}
         >
           <ProductImage

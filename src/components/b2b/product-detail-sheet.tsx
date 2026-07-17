@@ -97,13 +97,13 @@ export function ProductDetailSheet({
       <SheetContent
         side="right"
         className={cn(
-          // ~1/3 szerokości na desktopie; pełna szerokość na mobile
-          "w-full gap-0 overflow-y-auto p-0 sm:max-w-none sm:w-1/2 lg:w-1/3",
+          // Było ~1/3; −30% → ~23% na desktopie (mobile: pełna szerokość)
+          "w-full gap-0 overflow-y-auto p-0 sm:max-w-none sm:w-[35%] lg:w-[23%]",
           "data-[side=right]:sm:max-w-none"
         )}
       >
-        {/* Duże zdjęcie */}
-        <div className="relative aspect-[4/3] w-full shrink-0 overflow-hidden bg-muted/30">
+        {/* Zdjęcie w panelu: −50% wysokości względem poprzedniego 4/3 */}
+        <div className="relative aspect-[8/3] w-full shrink-0 overflow-hidden bg-muted/30">
           <ProductImage
             imageUrl={product.imageUrl}
             name={product.name}

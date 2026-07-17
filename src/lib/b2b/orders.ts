@@ -97,8 +97,18 @@ function cartItemsToOrderItems(
   });
 }
 
-export function createOrder(input: CreateOrderInput): B2BOrder {
-  const existingOrders = readOrders();
+/**
+ * Buduje zamówienie (czysta logika — działa w przeglądarce i w Route Handlerze).
+ * Analogia VBA: funkcja CreateOrder(dane) As Order — bez SideEffect na arkusz.
+ * Zapis do „arkusza” = saveOrder / localStorage po stronie klienta.
+ */
+export function createOrder(
+  input: CreateOrderInput,
+  existingOrders?: B2BOrder[]
+): B2BOrder {
+  const knownOrders =
+    existingOrders ??
+    (typeof window !== "undefined" ? readOrders() : []);
   const discountPercent = Number.isFinite(input.discountPercent)
     ? Math.max(0, input.discountPercent)
     : 0;
@@ -109,7 +119,7 @@ export function createOrder(input: CreateOrderInput): B2BOrder {
 
   return {
     id: crypto.randomUUID(),
-    orderNumber: generateOrderNumber(existingOrders),
+    orderNumber: generateOrderNumber(knownOrders),
     customerId: input.customerId,
     companyName: input.companyName,
     status: "new",

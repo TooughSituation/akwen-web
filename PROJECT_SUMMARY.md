@@ -1,7 +1,8 @@
 # Projekt: akwen-web — Portal B2B (Akwen)
 
 > Ostatnia aktualizacja: 17.07.2026  
-> Etap 1: `279080f` · Etap 2.1: `faa73b7` · Etap 2 (Powód + karty + prompty): ten push  
+> Etap 1–2: rabat, proponowane, filtry, karty, Excel Powód  
+> Etap 3: globalne wyszukiwanie, mock API, E2E smoke  
 > Kontekst dla GrokWeb / Grok Build
 
 ## Linki
@@ -28,18 +29,20 @@
 |------|--------|------|
 | MVP B2B | ✅ | Katalog, koszyk, zamówienia, profil, dashboard |
 | **Etap 1** | ✅ | Rabat w koszyku, proponowane z powodami, shareable filtry, zdjęcia |
-| **Etap 2** | ✅ | Kolumna Excel PowodProponowania, rabat na kartach (katalogowa + po rabacie + oszczędność), lepsze prompty Imagine |
-| Etap 3+ | ⏳ | Auth, API, E2E, ERP… |
+| **Etap 2** | ✅ | Kolumna Excel PowodProponowania, rabat na kartach, prompty Imagine |
+| **Etap 3** | ✅ | Globalne wyszukiwanie w headerze, mock API Route Handlers, E2E smoke |
+| Etap 4+ | ⏳ | Auth, prawdziwa baza, ERP… |
 
 ### Moduły B2B
 
 | Moduł | Ścieżka | Stan |
 |-------|---------|------|
-| Dashboard | `/b2b` | Polecane + toggle ceny + badge powodów |
-| Katalog | `/b2b/katalog` | 517 produktów, filtry URL, rabat na kartach |
-| Koszyk | `/b2b/koszyk` | Rabat % z profilu |
+| Dashboard | `/b2b` | Polecane + toggle + **global search w headerze** |
+| Katalog | `/b2b/katalog` | Filtry URL + `?q=` z headera |
+| Koszyk | `/b2b/koszyk` | Rabat %; createOrder przez `/api/orders` |
 | Zamówienia | `/b2b/zamowienia` | Reorder bez double discount |
-| Moje dane | `/b2b/moje-dane` | Profil + adresy + rabat read-only |
+| Moje dane | `/b2b/moje-dane` | Profil; walidacja PUT `/api/profile` |
+| Smoke | `/b2b/smoke` | Automatyczny smoke API + checklista |
 
 Strona publiczna: `/`, `/o-nas`, `/oferta`, `/produkty`, `/kontakt`, `/dotacje`
 
@@ -163,14 +166,42 @@ scripts/
 
 ---
 
-## Checklist dalszych kroków (Etap 3+)
+## Etap 3 — szczegóły
 
-- [ ] Globalne wyszukiwanie w headerze  
-- [ ] E2E smoke: koszyk + rabat + checkout + reorder  
-- [ ] Mock API (Route Handlers) zamiast localStorage  
-- [ ] Regeneracja batch Imagine po ulepszonych promptach (Mięsne/Warzywa/…)  
+### 1) Globalne wyszukiwanie (header)
+
+- Komponent: `src/components/b2b/global-search.tsx`
+- Szuka po: nazwa, symbol, producent, Tag1, Tag2 (+ etykiety)
+- Logika: `src/lib/b2b/search.ts` (`matchesProductQuery`)
+- Podpowiedzi z `GET /api/products?q=&compact=1`
+- Enter → `/b2b/katalog?q=…` (shareable)
+- Desktop w pasku headera; mobile pod tytułem strony
+
+### 2) Mock API (Route Handlers)
+
+| Endpoint | Metody | Rola |
+|----------|--------|------|
+| `/api/products` | GET | Katalog z Excel (q, tag1, tag2, limit, compact) |
+| `/api/orders` | GET, POST | POST buduje zamówienie + rabat; lista = localStorage u klienta |
+| `/api/profile` | GET, PUT | Walidacja profilu; zapis trwały = localStorage |
+
+- Klient: `src/lib/b2b/api-client.ts`
+- Kompatybilność: order-form i profile-form wołają API, potem `saveOrder` / `saveProfile`
+- Fallback offline: lokalny `createOrder` / zapis bez API
+
+### 3) E2E smoke
+
+- UI: `/b2b/smoke` — przycisk **Uruchom smoke**
+- Docs: `docs/E2E_SMOKE.md` — checklista ręczna + curl
+
+---
+
+## Checklist dalszych kroków (Etap 4+)
+
+- [ ] Regeneracja batch Imagine po ulepszonych promptach  
 - [ ] Eksport zamówienia PDF / e-mail  
 - [ ] Auth (Clerk / Auth0)  
+- [ ] Prawdziwa baza zamiast localStorage dla zamówień  
 - [ ] VAT / cenniki wielopoziomowe  
 
 ---

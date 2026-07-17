@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { MapPin, Pencil, Plus, Trash2 } from "lucide-react";
 import { useProfile } from "@/contexts/profile-context";
+import { apiValidateProfile } from "@/lib/b2b/api-client";
 import {
   createDeliveryAddress,
   ensureSingleDefaultAddress,
@@ -143,7 +144,7 @@ export function ProfileForm() {
       return;
     }
 
-    saveProfile({
+    const draft: B2BProfile = {
       ...formData,
       companyName: formData.companyName.trim(),
       nip: formData.nip.trim(),
@@ -152,10 +153,25 @@ export function ProfileForm() {
       email: formData.email.trim(),
       phone: formData.phone.trim(),
       deliveryAddresses: ensureSingleDefaultAddress(formData.deliveryAddresses),
-    });
+    };
 
-    setSavedMessage(true);
-    window.setTimeout(() => setSavedMessage(false), 3000);
+    // Walidacja przez mock API, potem zapis localStorage (kompatybilność)
+    void (async () => {
+      try {
+        let next = draft;
+        try {
+          next = await apiValidateProfile(draft);
+        } catch {
+          // Offline / błąd API — zapis lokalny i tak działa
+        }
+        saveProfile(next);
+        setFormData(next);
+        setSavedMessage(true);
+        window.setTimeout(() => setSavedMessage(false), 3000);
+      } catch {
+        setError("Nie udało się zapisać profilu.");
+      }
+    })();
   }
 
   if (!isHydrated) {

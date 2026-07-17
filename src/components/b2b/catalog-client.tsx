@@ -13,6 +13,7 @@ import {
 import type { B2BProduct, TagFilterData } from "@/lib/b2b/types";
 import { formatCategoryLabel, formatKindLabel } from "@/lib/b2b/labels";
 import { RECOMMENDED_SECTION_HINT } from "@/lib/b2b/recommend";
+import { matchesProductQuery } from "@/lib/b2b/search";
 import { ProductCard } from "@/components/b2b/product-card";
 import { PriceModeToggle } from "@/components/b2b/price-mode-toggle";
 import { Button } from "@/components/ui/button";
@@ -210,8 +211,6 @@ export function CatalogClient({
   }, [activeKind, availableKinds]);
 
   const filteredProducts = useMemo(() => {
-    const query = search.trim().toLowerCase();
-
     const filtered = products.filter((product) => {
       const matchesView =
         view === "all" || (view === "recommended" && product.isRecommended);
@@ -219,13 +218,8 @@ export function CatalogClient({
         activeCategory === "all" || product.tag1 === activeCategory;
       const matchesKind = activeKind === "all" || product.tag2 === activeKind;
       const matchesStock = !inStockOnly || product.stock > 0;
-      const matchesSearch =
-        !query ||
-        product.name.toLowerCase().includes(query) ||
-        product.symbol.toLowerCase().includes(query) ||
-        product.producer.toLowerCase().includes(query) ||
-        formatCategoryLabel(product.tag1).toLowerCase().includes(query) ||
-        formatKindLabel(product.tag2).toLowerCase().includes(query);
+      // Ta sama logika co globalne wyszukiwanie w headerze
+      const matchesSearch = matchesProductQuery(product, search);
 
       return (
         matchesView &&

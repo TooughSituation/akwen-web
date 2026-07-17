@@ -12,7 +12,8 @@ import {
   sumCartNet,
   sumDiscountSavings,
 } from "@/lib/b2b/format";
-import { createOrder, saveOrder } from "@/lib/b2b/orders";
+import { apiCreateOrder } from "@/lib/b2b/api-client";
+import { createOrder, getOrders, saveOrder } from "@/lib/b2b/orders";
 import type { B2BOrder } from "@/lib/b2b/types";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
@@ -85,24 +86,34 @@ export function OrderForm({ onSuccess, onCancel }: OrderFormProps) {
 
     setIsSubmitting(true);
 
-    try {
-      const order = createOrder({
-        items,
-        customerId: profile.id,
-        companyName: profile.companyName,
-        discountPercent,
-        deliveryDate: format(deliveryDate, "yyyy-MM-dd"),
-        deliveryAddress,
-        notes,
-      });
+    const payload = {
+      items,
+      customerId: profile.id,
+      companyName: profile.companyName,
+      discountPercent,
+      deliveryDate: format(deliveryDate, "yyyy-MM-dd"),
+      deliveryAddress,
+      notes,
+    };
 
-      saveOrder(order);
-      clearCart();
-      onSuccess(order);
-    } catch {
-      setError("Nie udało się złożyć zamówienia. Spróbuj ponownie.");
-      setIsSubmitting(false);
-    }
+    // Mock API (Route Handler) → zapis lokalny (localStorage) — jak makro → arkusz
+    void (async () => {
+      try {
+        let order: B2BOrder;
+        try {
+          order = await apiCreateOrder(payload);
+        } catch {
+          // Fallback offline / błąd API: stara ścieżka lokalna
+          order = createOrder(payload, getOrders());
+        }
+        saveOrder(order);
+        clearCart();
+        onSuccess(order);
+      } catch {
+        setError("Nie udało się złożyć zamówienia. Spróbuj ponownie.");
+        setIsSubmitting(false);
+      }
+    })();
   }
 
   const today = new Date();

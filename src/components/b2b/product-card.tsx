@@ -1,14 +1,19 @@
 "use client";
 
-import { useState } from "react";
-import { Check, Heart, Package, Sparkles } from "lucide-react";
+import { useMemo, useState } from "react";
+import { Check, Heart, Package, Sparkles, Tag } from "lucide-react";
 import type { B2BProduct } from "@/lib/b2b/types";
 import { formatCategoryLabel, formatKindLabel } from "@/lib/b2b/labels";
 import {
   applyDiscount,
   formatDiscountSavingsLabel,
   formatPrice,
+  sumCartNet,
 } from "@/lib/b2b/format";
+import {
+  CART_PROMOTIONS,
+  getNextPromotionProgress,
+} from "@/lib/b2b/promotions";
 import { useCart } from "@/contexts/cart-context";
 import { useFavorites } from "@/contexts/favorites-context";
 import { usePriceDisplay } from "@/contexts/price-display-context";
@@ -53,7 +58,7 @@ function StockBadge({ stock }: { stock: number }) {
 }
 
 export function ProductCard({ product, compact = false }: ProductCardProps) {
-  const { addItem } = useCart();
+  const { addItem, items } = useCart();
   const { profile } = useProfile();
   const { showYourPrice } = usePriceDisplay();
   const { isFavorite, toggleFavorite } = useFavorites();
@@ -72,6 +77,19 @@ export function ProductCard({ product, compact = false }: ProductCardProps) {
   );
   // Domyślnie: Twoja cena (katalogowa + rabat + oszczędność). Toggle „Katalogowa” = sam cennik.
   const showDiscounted = hasDiscount && showYourPrice;
+
+  // Suma koszyka netto (po rabacie) → „brakuje do promocji” na żywo
+  const cartNet = useMemo(
+    () => sumCartNet(items, discountPercent),
+    [items, discountPercent]
+  );
+  const nextPromo = useMemo(
+    () => getNextPromotionProgress(cartNet),
+    [cartNet]
+  );
+  // Badge: najniższy próg (pierwsza promocja w tabeli) + ewentualnie gratis
+  const primaryPromoBadge = CART_PROMOTIONS[0];
+  const secondaryPromoBadge = CART_PROMOTIONS[1];
 
   function handleAddToCart() {
     addItem(product, 1);
@@ -164,6 +182,23 @@ export function ProductCard({ product, compact = false }: ProductCardProps) {
               {product.recommendReason}
             </Badge>
           )}
+          {primaryPromoBadge && (
+            <Badge
+              className="bg-coral-500/90 text-[10px] text-white backdrop-blur-sm"
+              title={primaryPromoBadge.title}
+            >
+              <Tag className="mr-0.5 size-2.5" />
+              {primaryPromoBadge.badgeLabel}
+            </Badge>
+          )}
+          {secondaryPromoBadge && !compact && (
+            <Badge
+              className="bg-navy-900/75 text-[10px] text-white backdrop-blur-sm"
+              title={secondaryPromoBadge.title}
+            >
+              {secondaryPromoBadge.badgeLabel}
+            </Badge>
+          )}
         </div>
       </div>
 
@@ -188,6 +223,24 @@ export function ProductCard({ product, compact = false }: ProductCardProps) {
                 {product.recommendReasonDetail}
               </p>
             )}
+          {!compact && nextPromo && (
+            <p
+              className={cn(
+                "mt-1.5 text-xs font-medium leading-snug",
+                nextPromo.unlocked
+                  ? "text-turquoise-700 dark:text-turquoise-400"
+                  : "text-coral-600 dark:text-coral-400"
+              )}
+            >
+              {nextPromo.unlocked
+                ? `✓ ${nextPromo.promotion.badgeLabel}`
+                : `Brakuje Ci ${formatPrice(nextPromo.remaining)} do ${
+                    nextPromo.promotion.rewardType === "cart_discount_percent"
+                      ? `rabatu −${nextPromo.promotion.discountPercent}%`
+                      : "gratisu"
+                  }`}
+            </p>
+          )}
         </CardHeader>
 
         <CardContent className="mt-auto space-y-3 pb-4">

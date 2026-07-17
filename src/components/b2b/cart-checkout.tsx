@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Minus, Plus, ShoppingCart, Trash2 } from "lucide-react";
 import { useCart } from "@/contexts/cart-context";
 import { useProfile } from "@/contexts/profile-context";
+import { CartPromotionsBanner } from "@/components/b2b/cart-promotions-banner";
 import { OrderForm } from "@/components/b2b/order-form";
 import { OrderSuccess } from "@/components/b2b/order-success";
 import {
@@ -234,6 +235,13 @@ export function CartCheckout() {
               })}
             </TableBody>
           </Table>
+        </CardContent>
+      </Card>
+
+      {/* Licznik promocji — żywo przy zmianie ilości (jak AutoCalc w Excelu) */}
+      <Card className="border-border/60">
+        <CardContent className="py-5">
+          <CartPromotionsBanner cartNet={totalNet} />
         </CardContent>
       </Card>
 

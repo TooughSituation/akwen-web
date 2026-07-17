@@ -15,6 +15,7 @@ import {
 import { apiCreateOrder } from "@/lib/b2b/api-client";
 import { calculatePointsFromNet } from "@/lib/b2b/loyalty";
 import { createOrder, getOrders, saveOrder } from "@/lib/b2b/orders";
+import { getNextPromotionProgress } from "@/lib/b2b/promotions";
 import type { B2BOrder } from "@/lib/b2b/types";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
@@ -52,6 +53,7 @@ export function OrderForm({ onSuccess, onCancel }: OrderFormProps) {
   const totalNet = sumCartNet(items, discountPercent);
   const savings = sumDiscountSavings(items, discountPercent);
   const estimatedPoints = calculatePointsFromNet(totalNet);
+  const promoProgress = getNextPromotionProgress(totalNet);
   const [deliveryDate, setDeliveryDate] = useState<Date | undefined>();
   const [calendarOpen, setCalendarOpen] = useState(false);
   const [addressMode, setAddressMode] = useState<"saved" | "custom">("saved");
@@ -306,6 +308,26 @@ export function OrderForm({ onSuccess, onCancel }: OrderFormProps) {
             <div className="flex justify-between text-sm text-turquoise-700 dark:text-turquoise-400">
               <span>Punkty lojalnościowe (po złożeniu)</span>
               <span>+{estimatedPoints} pkt</span>
+            </div>
+          )}
+          {promoProgress && (
+            <div
+              className={
+                promoProgress.unlocked
+                  ? "flex justify-between text-sm text-turquoise-700 dark:text-turquoise-400"
+                  : "flex justify-between text-sm text-coral-600 dark:text-coral-400"
+              }
+            >
+              <span>
+                {promoProgress.unlocked
+                  ? "Promocja koszykowa"
+                  : "Do najbliższej promocji"}
+              </span>
+              <span className="text-right">
+                {promoProgress.unlocked
+                  ? promoProgress.promotion.badgeLabel
+                  : `brakuje ${formatPrice(promoProgress.remaining)}`}
+              </span>
             </div>
           )}
           <div className="flex items-end justify-between border-t border-border pt-4">

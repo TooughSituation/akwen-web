@@ -18,8 +18,8 @@ export function SectionHeading({
       {label && (
         <p
           className={cn(
-            "font-display mb-4 text-xs font-medium tracking-[0.22em] uppercase sm:text-sm",
-            light ? "text-turquoise-300/90" : "text-turquoise-600"
+            "font-display mb-4 text-xs font-medium tracking-[0.2em] uppercase sm:text-sm",
+            light ? "text-turquoise-300/95" : "text-turquoise-600"
           )}
         >
           {label}
@@ -27,8 +27,8 @@ export function SectionHeading({
       )}
       <h2
         className={cn(
-          "text-3xl font-semibold tracking-tight text-balance sm:text-4xl lg:text-[2.75rem] lg:leading-[1.15]",
-          light ? "text-white" : "text-foreground"
+          "font-heading text-3xl font-semibold tracking-[-0.02em] text-balance sm:text-4xl lg:text-[2.85rem] lg:leading-[1.14]",
+          light ? "text-white" : "text-navy-900 dark:text-foreground"
         )}
       >
         {title}
@@ -36,8 +36,8 @@ export function SectionHeading({
       {description && (
         <p
           className={cn(
-            "mx-auto mt-5 max-w-2xl text-base leading-[1.75] sm:mt-6 sm:text-lg",
-            light ? "text-white/75" : "text-muted-foreground"
+            "mx-auto mt-5 max-w-2xl text-base leading-[1.8] sm:mt-6 sm:text-lg sm:leading-[1.75]",
+            light ? "text-white/80" : "text-muted-foreground"
           )}
         >
           {description}

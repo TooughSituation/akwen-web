@@ -1,4 +1,5 @@
 import { Header } from "@/components/header";
+import { FundingLogos } from "@/components/funding-logos";
 import { Footer } from "@/components/footer";
 
 export default function SiteLayout({
@@ -9,6 +10,7 @@ export default function SiteLayout({
   return (
     <div className="flex min-h-screen flex-col">
       <Header />
+      <FundingLogos />
       <main className="flex-1">{children}</main>
       <Footer />
     </div>

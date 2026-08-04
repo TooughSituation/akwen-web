@@ -7,6 +7,7 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  /* Mapowanie fontów → utility: font-sans, font-heading, font-display */
   --font-sans: var(--font-sans);
   --font-mono: var(--font-geist-mono);
   --font-heading: var(--font-heading);
@@ -80,7 +81,7 @@
 }
 
 :root {
-  /* Dużo bieli + neutralne szarości, granat jako tekst */
+  /* Dużo bieli + neutralne szarości, granat jako tekst (lepszy kontrast 2026) */
   --background: #fafbfc;
   --foreground: #001f3f;
   --card: #ffffff;
@@ -92,7 +93,8 @@
   --secondary: #eef5f9;
   --secondary-foreground: #001f3f;
   --muted: #f3f5f7;
-  --muted-foreground: #5a6b7a;
+  /* Ciemniejszy muted — czytelniejszy body / opisy (WCAG-friendly) */
+  --muted-foreground: #3d4f5f;
   --accent: #0077b6;
   --accent-foreground: #ffffff;
   --destructive: oklch(0.55 0.18 27);
@@ -127,7 +129,8 @@
   --secondary: #002952;
   --secondary-foreground: #f0f7fb;
   --muted: #002952;
-  --muted-foreground: #b3c5d4;
+  /* Jaśniejszy muted w dark — lepszy kontrast na granacie */
+  --muted-foreground: #c5d4e0;
   --accent: #0077b6;
   --accent-foreground: #ffffff;
   --destructive: oklch(0.65 0.16 22);
@@ -160,7 +163,8 @@
     text-rendering: optimizeLegibility;
   }
   body {
-    @apply bg-background text-foreground text-base leading-[1.7] tracking-[-0.011em];
+    /* Inter · line-height 1.7 (zakres 1.6–1.8) · lekki tracking UI */
+    @apply bg-background text-foreground text-[0.975rem] leading-[1.7] tracking-[-0.011em] sm:text-base;
   }
   h1,
   h2,
@@ -168,20 +172,30 @@
   h4,
   h5,
   h6 {
-    font-family: var(--font-heading), var(--font-display), ui-serif, serif;
-    @apply tracking-tight text-balance font-semibold;
+    /* Playfair Display — eleganckie nagłówki, morski „quiet luxury” */
+    font-family: var(--font-heading), ui-serif, Georgia, serif;
+    color: var(--foreground);
+    @apply text-balance font-semibold tracking-[-0.02em];
   }
   h1 {
-    @apply text-4xl leading-[1.1] sm:text-5xl lg:text-6xl;
+    @apply text-4xl leading-[1.12] sm:text-5xl md:text-6xl lg:text-7xl lg:leading-[1.08];
   }
   h2 {
-    @apply text-3xl leading-[1.18] sm:text-4xl;
+    @apply text-3xl leading-[1.2] sm:text-4xl lg:text-[2.75rem] lg:leading-[1.15];
   }
   h3 {
-    @apply text-xl leading-snug sm:text-2xl;
+    @apply text-2xl leading-[1.3] sm:text-3xl sm:leading-[1.25];
+  }
+  h4 {
+    @apply text-xl leading-[1.35] sm:text-2xl;
   }
   p {
     @apply leading-[1.75];
+  }
+  /* Opisy / lead — wygodniejsze czytanie długich akapitów */
+  .lead,
+  .prose-akwen {
+    @apply text-base leading-[1.8] text-muted-foreground sm:text-lg sm:leading-[1.75];
   }
 }
 
@@ -195,8 +209,13 @@
     );
   }
 
+  /* Etykiety uppercase (Montserrat) — tracking 2026: nieco ciaśniejszy niż „wide” */
   .font-display {
     font-family: var(--font-display), var(--font-sans), ui-sans-serif, sans-serif;
+  }
+
+  .font-heading {
+    font-family: var(--font-heading), ui-serif, Georgia, serif;
   }
 
   .section-pad {
@@ -220,7 +239,7 @@
 /* Treść strony Dotacje (HTML z mammoth / .docx) */
 @layer components {
   .dotacje-content {
-    @apply max-w-none text-base leading-relaxed text-muted-foreground;
+    @apply max-w-none text-base leading-[1.8] text-muted-foreground;
   }
 
   .dotacje-content > p {

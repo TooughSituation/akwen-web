@@ -42,3 +42,7 @@ next-env.d.ts
 
 # local dev / IDE
 /terminals
+
+# Separate project (own GitHub repo)
+cmkw-patient-portal/
+

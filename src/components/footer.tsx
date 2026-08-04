@@ -99,31 +99,7 @@ export function Footer() {
           </div>
         </div>
 
-        <div className="mt-10 flex flex-wrap items-center justify-center gap-8 border-t border-white/10 pt-8">
-          <Image
-            src={assets.euLogos.ue}
-            alt="Unia Europejska"
-            width={160}
-            height={60}
-            className="h-12 w-auto object-contain opacity-90"
-          />
-          <Image
-            src={assets.euLogos.kpo}
-            alt="Krajowy Plan Odbudowy"
-            width={160}
-            height={60}
-            className="h-12 w-auto object-contain opacity-90"
-          />
-          <Image
-            src={assets.euLogos.poRyby}
-            alt="PO RYBY 2007-2013"
-            width={200}
-            height={80}
-            className="h-14 w-auto object-contain opacity-90"
-          />
-        </div>
-
-        <div className="mt-6 text-center text-sm text-ocean-200/70">
+        <div className="mt-10 border-t border-white/10 pt-6 text-center text-sm text-ocean-200/70">
           © {new Date().getFullYear()} {company.name} Wszelkie prawa zastrzeżone.
         </div>
       </div>

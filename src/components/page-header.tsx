@@ -13,13 +13,17 @@ export function PageHeader({
     <div className="relative maritime-gradient text-white">
       <div className="mx-auto max-w-6xl px-4 py-14 sm:px-6 sm:py-16 lg:px-8">
         {label && (
-          <p className="mb-2 text-sm font-medium uppercase tracking-[0.2em] text-turquoise-300">
+          <p className="font-display mb-3 text-xs font-medium tracking-[0.2em] text-turquoise-300 uppercase sm:text-sm">
             {label}
           </p>
         )}
-        <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">{title}</h1>
+        <h1 className="font-heading text-3xl font-semibold tracking-[-0.02em] sm:text-4xl lg:text-5xl lg:leading-[1.12]">
+          {title}
+        </h1>
         {description && (
-          <p className="mt-3 max-w-2xl text-ocean-100">{description}</p>
+          <p className="mt-4 max-w-2xl text-base leading-[1.8] text-ocean-100/95 sm:text-lg sm:leading-[1.75]">
+            {description}
+          </p>
         )}
       </div>
       <WaveDivider variant="light" />

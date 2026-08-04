@@ -29,7 +29,7 @@ export function B2BHeader({ title, description }: B2BHeaderProps) {
       <div className="flex flex-col gap-5 sm:gap-6">
         <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between lg:gap-8">
           <div className="min-w-0">
-            <h1 className="font-heading text-2xl font-semibold tracking-tight text-navy-900 sm:text-3xl dark:text-foreground">
+            <h1 className="font-heading text-2xl font-semibold tracking-[-0.02em] text-navy-900 sm:text-3xl sm:leading-[1.2] dark:text-foreground">
               {title}
             </h1>
             {description && (

@@ -31,15 +31,15 @@ export function Hero() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
         >
-          <p className="font-display mb-6 text-xs font-medium uppercase tracking-[0.28em] text-turquoise-300/90 sm:text-sm">
+          <p className="font-display mb-6 text-xs font-medium tracking-[0.22em] text-turquoise-300/95 uppercase sm:text-sm">
             Dystrybutor ryb od 1991 roku
           </p>
 
-          <h1 className="text-4xl font-semibold leading-[1.08] tracking-tight text-white sm:text-5xl md:text-6xl lg:text-7xl">
+          <h1 className="font-heading text-4xl font-semibold leading-[1.1] tracking-[-0.02em] text-white sm:text-5xl md:text-6xl lg:text-7xl lg:leading-[1.06]">
             {company.heroTitle}
           </h1>
 
-          <p className="mt-8 max-w-lg text-base leading-[1.75] text-white/80 sm:text-lg md:text-xl">
+          <p className="mt-8 max-w-lg text-base leading-[1.8] text-white/85 sm:text-lg sm:leading-[1.75] md:text-xl">
             {company.heroSubtitle}
           </p>
 

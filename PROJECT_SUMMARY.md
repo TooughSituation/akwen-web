@@ -1,9 +1,8 @@
-# Projekt: akwen-web — Portal B2B (Akwen)
+# Projekt: akwen-web — Strona publiczna + Portal B2B (Akwen)
 
-> Ostatnia aktualizacja: 17.07.2026  
-> Etapy 1–3: rabat, proponowane, search, mock API, smoke  
-> **Etap 4: Auth.js — logowanie B2B, middleware, dane per użytkownik**  
-> Kontekst dla GrokWeb / Grok Build
+> Ostatnia aktualizacja: **04.08.2026**  
+> Kontekst dla GrokWeb / Grok Build  
+> **Ostatnia zmiana:** belka `FundingLogos` — ciemny glassmorphism (spójny z granatem), bez białego paska
 
 ## Linki
 
@@ -11,15 +10,34 @@
 |-------|-----|
 | **Produkcja** | https://akwen-web.vercel.app |
 | **GitHub** | https://github.com/TooughSituation/akwen-web |
-| Branch | `master` (Vercel auto-deploy) |
+| Branch | `master` (Vercel: push + CLI `--prod`) |
 | Stara strona | https://www.akwen.bialystok.pl/ |
+| Vercel project | `toough-situation/akwen-web` |
 
 ## Stack
 
-- Next.js 15.5, React 19, TypeScript, Tailwind v4, shadcn/ui, xlsx
-- Deploy: Vercel (auto z `master`)
-- Stan: localStorage (MVP — bez backend auth/DB)
+- Next.js 15.5 (Turbopack), React 19, TypeScript, Tailwind v4, shadcn/ui, Framer Motion, xlsx
+- Deploy: Vercel (projekt `akwen-web`, domena `akwen-web.vercel.app`)
+- Auth B2B: Auth.js (Credentials)
+- Stan B2B: localStorage (MVP — bez backend DB)
 - Kolory: Granat `#001F3F`, Turkus `#0077B6`, Koral `#FF6B35`
+- Typografia: Inter (body), Playfair Display (nagłówki), Montserrat (etykiety display)
+
+---
+
+## ⚠️ Ważne — izolacja projektów
+
+| Projekt | Repo / folder | Uwaga |
+|---------|----------------|-------|
+| **akwen-web** | ten repo (`master`) | Jedyny cel deployu Vercel `akwen-web` |
+| **cmkw-patient-portal** | osobne repo (folder lokalnie w katalogu roboczym) | **Nie edytować** w kontekście Akwen |
+
+Lokalnie folder `cmkw-patient-portal/` może leżeć obok plików Akwen — ma własne `.git`.  
+Żeby nie psuł buildu Akwen:
+
+- `.gitignore` → `cmkw-patient-portal/`
+- `.vercelignore` → `cmkw-patient-portal/`
+- `tsconfig.json` → `exclude: ["cmkw-patient-portal", "mcps"]`
 
 ---
 
@@ -27,6 +45,8 @@
 
 | Etap | Status | Opis |
 |------|--------|------|
+| Strona publiczna | ✅ | Hero, oferta, o nas, produkty, kontakt, dotacje |
+| **Logotypy dofinansowania** | ✅ | UE / KPO / PO RYBY u góry · **ciemna belka glass** (nie biały pasek) |
 | MVP B2B | ✅ | Katalog, koszyk, zamówienia, profil, dashboard |
 | **Etap 1** | ✅ | Rabat w koszyku, proponowane z powodami, shareable filtry, zdjęcia |
 | **Etap 2** | ✅ | Kolumna Excel PowodProponowania, rabat na kartach, prompty Imagine |
@@ -39,6 +59,7 @@
 | **Czat mock** | ✅ | Sheet z handlowcem, auto-odpowiedź 2–3 s, historia per user |
 | **Przewodnik** | ✅ | Tour po B2B (overlay), start z sidebara, localStorage tour-seen |
 | **UI 2026** | ✅ | Quiet luxury: white space, typografia, Framer Motion, karty |
+| **Edycja zamówień B2B** | ✅ | Edycja / anulacja + blokada przy zaległościach |
 | Etap 7+ | ⏳ | Prawdziwa baza, Resend SMTP, ERP… |
 
 ### Moduły B2B
@@ -52,7 +73,83 @@
 | Moje dane | `/b2b/moje-dane` | Profil; walidacja PUT `/api/profile` |
 | Smoke | `/b2b/smoke` | Automatyczny smoke API + checklista |
 
-Strona publiczna: `/`, `/o-nas`, `/oferta`, `/produkty`, `/kontakt`, `/dotacje`
+Strona publiczna: `/`, `/o-nas`, `/oferta`, `/produkty`, `/kontakt`, `/dotacje`  
+Layout publiczny: `src/app/(site)/layout.tsx` → `Header` → **`FundingLogos`** → `main` → `Footer`  
+Portal B2B: `/b2b/*` — **bez** belki logotypów dofinansowania (osobny layout)
+
+---
+
+## Ostatnia zmiana (04.08.2026) — logotypy dofinansowania + styl belki
+
+### Cel (wymóg prawny)
+Logotypy UE / KPO / PO RYBY muszą być **widoczne na górze** strony publicznej (pod nawigacją), nie w stopce.  
+Belka ma być **zintegrowana z morską kolorystyką** (granat + hero) — bez agresywnego białego paska.
+
+### Co zrobiono
+
+1. **Usunięto** z `src/components/footer.tsx` rząd logotypów dofinansowania  
+2. **Dodano** `src/components/funding-logos.tsx` — belka z logami  
+3. **Wpięto** w `src/app/(site)/layout.tsx` zaraz pod `<Header />`  
+4. **Styl UI (v2):** ciemny glass zamiast `bg-white/95`
+
+### Logotypy (asset paths)
+
+| Logo | Plik | `assets.euLogos` |
+|------|------|------------------|
+| Unia Europejska / EFR | `/images/loga-ue.png` | `ue` |
+| Krajowy Plan Odbudowy | `/images/logo-kpo.png` | `kpo` |
+| PO RYBY 2007–2013 | `/images/po-ryby.png` | `poRyby` |
+
+Definicje: `src/lib/content.ts` → `assets.euLogos`
+
+### UI belki (`FundingLogos`) — aktualny wygląd
+
+| Warstwa | Opis |
+|---------|------|
+| Belka pełna szer. | Gradient `rgba(0,31,63,0.82)` → `rgba(0,20,40,0.68)` |
+| Glass | `backdrop-blur-md` + `border-b border-white/10` |
+| Podkładka log | Tylko pod rzędem log: `rounded-xl`, `rgba(255,255,255,0.92)` + delikatny cień |
+| Layout | Wyśrodkowany rząd, `flex-wrap`, `py-4` / `sm:py-5` |
+| Mobile | zawijanie + `max-w-[40vw]` |
+| A11y | `role="region"`, `aria-label`, `priority` na obrazach |
+
+**Nie wracać** do pełnoszerokościowego białego paska — czytelność log = mała jasna podkładka, spójność = ciemna belka.
+
+### Commity
+
+| Hash | Opis |
+|------|------|
+| `94b18b6` | Przeniesienie logotypów ze stopki na górę |
+| `5a66251` | `.vercelignore` + exclude w `tsconfig` (izolacja lokalnego CMKW) |
+| *(ten push)* | Glassmorphism belki + update `PROJECT_SUMMARY.md` |
+
+### Deploy
+
+- GitHub: `master`  
+- Vercel prod: `npx vercel --prod --yes` → **https://akwen-web.vercel.app**  
+- **Nie deployować / nie edytować** `cmkw-patient-portal`
+
+### Czego NIE ruszać przy tej zmianie
+
+- Reszty treści strony (hero, sekcje, B2B)
+- Nagrody w sekcji „O nas” na homepage (to osobne badge, nie belka prawna)
+- Portalu B2B layoutu
+- Projektu **cmkw-patient-portal**
+
+---
+
+## Strona publiczna — kluczowe pliki
+
+```
+src/app/(site)/layout.tsx     # Header + FundingLogos + main + Footer
+src/components/header.tsx     # Sticky nav (zawsze granat)
+src/components/funding-logos.tsx  # Belka UE / KPO / PO RYBY
+src/components/footer.tsx     # Stopka bez logów dofinansowania
+src/components/hero.tsx
+src/components/page-header.tsx
+src/components/section-heading.tsx
+src/lib/content.ts            # company, assets, copy
+```
 
 ---
 
@@ -324,6 +421,18 @@ Analogia VBA: `DoCmd.OutputTo acOutputReport, , acFormatPDF` + `DoCmd.SendObject
 - [ ] Prawdziwa baza zamiast localStorage  
 - [ ] VAT / cenniki wielopoziomowe  
 - [ ] Realizacja nagród po stronie handlowca (status fulfilled)  
+- [ ] (Opcjonalnie) drugi wariant PO RYBY / dodatkowe loga UE, jeśli formalnie wymagane  
+
+---
+
+## Szybki start dla GrokWeb (kolejna sesja)
+
+1. **Repo:** `akwen-web` · branch `master` · produkcja https://akwen-web.vercel.app  
+2. **Nie dotykać** `cmkw-patient-portal/` (osobny projekt; wykluczony z buildu)  
+3. **Loga dofinansowania:** `funding-logos.tsx` + layout `(site)` — **u góry**, ciemny glass, nie stopka, nie biały pasek  
+4. **B2B:** Auth.js + localStorage per user; dane z `public/data/produkty.xlsx`  
+5. **Deploy:** `git push origin master` i/lub `npx vercel --prod --yes` (z katalogu akwen-web)  
+6. **Język:** polski; wyjaśnienia z analogiami Excel/VBA jeśli pomaga  
 
 ---
 

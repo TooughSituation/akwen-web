@@ -2,7 +2,7 @@
 
 > Ostatnia aktualizacja: **04.08.2026**  
 > Kontekst dla GrokWeb / Grok Build  
-> **Ostatnia zmiana:** belka `FundingLogos` — ciemny glassmorphism (spójny z granatem), bez białego paska
+> **Ostatnia zmiana:** `FundingLogos` — prawie przezroczysta nakładka **nad** hero (zdjęcie w pełni widoczne), mniejsze loga
 
 ## Linki
 
@@ -46,7 +46,7 @@ Lokalnie folder `cmkw-patient-portal/` może leżeć obok plików Akwen — ma w
 | Etap | Status | Opis |
 |------|--------|------|
 | Strona publiczna | ✅ | Hero, oferta, o nas, produkty, kontakt, dotacje |
-| **Logotypy dofinansowania** | ✅ | UE / KPO / PO RYBY u góry · **ciemna belka glass** (nie biały pasek) |
+| **Logotypy dofinansowania** | ✅ | UE / KPO / PO RYBY u góry · **overlay nad hero** (subtelny gradient, małe loga) |
 | MVP B2B | ✅ | Katalog, koszyk, zamówienia, profil, dashboard |
 | **Etap 1** | ✅ | Rabat w koszyku, proponowane z powodami, shareable filtry, zdjęcia |
 | **Etap 2** | ✅ | Kolumna Excel PowodProponowania, rabat na kartach, prompty Imagine |
@@ -74,66 +74,92 @@ Lokalnie folder `cmkw-patient-portal/` może leżeć obok plików Akwen — ma w
 | Smoke | `/b2b/smoke` | Automatyczny smoke API + checklista |
 
 Strona publiczna: `/`, `/o-nas`, `/oferta`, `/produkty`, `/kontakt`, `/dotacje`  
-Layout publiczny: `src/app/(site)/layout.tsx` → `Header` → **`FundingLogos`** → `main` → `Footer`  
+Layout publiczny:
+
+```
+Header (sticky)
+└─ relative flex-1
+   ├─ FundingLogos  ← absolute top-0 z-20 (overlay)
+   └─ main          ← Hero / PageHeader prześwieca pod belką
+Footer
+```
+
 Portal B2B: `/b2b/*` — **bez** belki logotypów dofinansowania (osobny layout)
 
 ---
 
-## Ostatnia zmiana (04.08.2026) — logotypy dofinansowania + styl belki
+## Ostatnia zmiana (04.08.2026) — logotypy dofinansowania (v3 — final)
 
-### Cel (wymóg prawny)
-Logotypy UE / KPO / PO RYBY muszą być **widoczne na górze** strony publicznej (pod nawigacją), nie w stopce.  
-Belka ma być **zintegrowana z morską kolorystyką** (granat + hero) — bez agresywnego białego paska.
+### Cel (wymóg prawny + design)
+Logotypy UE / KPO / PO RYBY **widoczne u góry** strony publicznej (pod nawigacją), **nie w stopce**.  
+Belka ma być **prawie niewidoczna jako element UI** — loga czytelne, a zdjęcie hero w pełni widoczne pod spodem.
 
-### Co zrobiono
+### Historia iteracji (nie wracać do starych)
 
-1. **Usunięto** z `src/components/footer.tsx` rząd logotypów dofinansowania  
-2. **Dodano** `src/components/funding-logos.tsx` — belka z logami  
-3. **Wpięto** w `src/app/(site)/layout.tsx` zaraz pod `<Header />`  
-4. **Styl UI (v2):** ciemny glass zamiast `bg-white/95`
+| v | Styl | Problem |
+|---|------|---------|
+| v1 | Pełny biały pasek | Agresywnie odcina od hero / morskiego designu |
+| v2 | Ciemny glass + duża biała karta / solid `#001F3F` | Zasłania zdjęcie hero, zbyt dominująca |
+| **v3 (aktualny)** | **Overlay** + subtelny gradient + małe kafelki | Hero widać; belka minimalistyczna |
+
+### Architektura (ważne!)
+
+- `FundingLogos` = `position: absolute; inset-x-0; top-0; z-20` **nad** `main`
+- **Nie** w normalnym flow między Header a main (wtedy pod belką jest puste tło, nie hero)
+- Layout: `src/app/(site)/layout.tsx` — wrapper `relative flex-1` wokół overlay + main
+- `pointer-events-none` na belce (loga nie są linkami)
+- `hero.tsx` / `page-header.tsx` — większy `pt` na treści, żeby nie wchodziła pod loga
 
 ### Logotypy (asset paths)
 
 | Logo | Plik | `assets.euLogos` |
 |------|------|------------------|
-| Unia Europejska / EFR | `/images/loga-ue.png` | `ue` |
+| Unia Europejska / EFR (+ PO RYBY w stripie) | `/images/loga-ue.png` | `ue` |
 | Krajowy Plan Odbudowy | `/images/logo-kpo.png` | `kpo` |
-| PO RYBY 2007–2013 | `/images/po-ryby.png` | `poRyby` |
+| PO RYBY 2007–2013 (osobny wariant) | `/images/po-ryby.png` | `poRyby` |
 
-Definicje: `src/lib/content.ts` → `assets.euLogos`
+Definicje: `src/lib/content.ts` → `assets.euLogos`  
+Uwaga: `loga-ue.png` to **złożony strip** (UE + PO RYBY); `po-ryby.png` to drugi wariant (świadek) — celowe „oba warianty”.
 
-### UI belki (`FundingLogos`) — aktualny wygląd
+### UI belki (`FundingLogos`) — v3 aktualny
 
-| Warstwa | Opis |
-|---------|------|
-| Belka pełna szer. | Gradient `rgba(0,31,63,0.82)` → `rgba(0,20,40,0.68)` |
-| Glass | `backdrop-blur-md` + `border-b border-white/10` |
-| Podkładka log | Tylko pod rzędem log: `rounded-xl`, `rgba(255,255,255,0.92)` + delikatny cień |
-| Layout | Wyśrodkowany rząd, `flex-wrap`, `py-4` / `sm:py-5` |
-| Mobile | zawijanie + `max-w-[40vw]` |
-| A11y | `role="region"`, `aria-label`, `priority` na obrazach |
+| Element | Wartość |
+|---------|---------|
+| Pozycja | `absolute` nad hero / page header |
+| Tło belki | Gradient `rgba(0,20,40, 0.32 → 0.18 → 0)` — **bez** mocnego blur, **bez** solid navy |
+| Kafelki log | `bg-white/80`, `rounded-md/lg`, minimalny cień, `backdrop-blur-[2px]` tylko na kafelku |
+| Rozmiar log | `h-7`–`h-9` (~15% mniejsze vs v2) |
+| Układ | Wyśrodkowany, `flex-wrap`, `gap-2` / `sm:gap-3`, `py-2.5` / `sm:py-3` |
+| Mobile | `max-w-[min(38vw,190px)]`, zawijanie |
+| A11y | `role="region"`, `aria-label`, `priority` |
 
-**Nie wracać** do pełnoszerokościowego białego paska — czytelność log = mała jasna podkładka, spójność = ciemna belka.
+**Zasady designu (kolejne sesje):**
+- ❌ Nie wracać do pełnego białego paska full-width  
+- ❌ Nie wracać do solid `#001F3F` / mocnego `backdrop-blur-md` na całej belce  
+- ❌ Nie wracać log do stopki  
+- ✅ Hero / maritime page header **musi** przeświecać pod belką (overlay)  
+- ✅ Loga małe, wyśrodkowane, czytelne (wymóg prawny)
 
-### Commity
+### Commity (logotypy)
 
 | Hash | Opis |
 |------|------|
 | `94b18b6` | Przeniesienie logotypów ze stopki na górę |
-| `5a66251` | `.vercelignore` + exclude w `tsconfig` (izolacja lokalnego CMKW) |
-| *(ten push)* | Glassmorphism belki + update `PROJECT_SUMMARY.md` |
+| `5a66251` | Izolacja lokalnego `cmkw-patient-portal` w buildzie |
+| `eb55ef1` | v2: glass / granat (superseded) |
+| **`723ba71`** | **v3: przezroczysta nakładka nad hero, mniejsze loga** ← aktualny |
 
 ### Deploy
 
-- GitHub: `master`  
-- Vercel prod: `npx vercel --prod --yes` → **https://akwen-web.vercel.app**  
+- Branch: `master` @ `723ba71`  
+- Produkcja: **https://akwen-web.vercel.app** (Vercel Ready)  
 - **Nie deployować / nie edytować** `cmkw-patient-portal`
 
-### Czego NIE ruszać przy tej zmianie
+### Czego NIE ruszać
 
-- Reszty treści strony (hero, sekcje, B2B)
-- Nagrody w sekcji „O nas” na homepage (to osobne badge, nie belka prawna)
-- Portalu B2B layoutu
+- Reszty treści strony (sekcje poniżej hero, B2B)
+- Nagrody w „O nas” na homepage (osobne badge, nie belka prawna)
+- Layoutu portalu B2B
 - Projektu **cmkw-patient-portal**
 
 ---
@@ -141,16 +167,15 @@ Definicje: `src/lib/content.ts` → `assets.euLogos`
 ## Strona publiczna — kluczowe pliki
 
 ```
-src/app/(site)/layout.tsx     # Header + FundingLogos + main + Footer
-src/components/header.tsx     # Sticky nav (zawsze granat)
-src/components/funding-logos.tsx  # Belka UE / KPO / PO RYBY
-src/components/footer.tsx     # Stopka bez logów dofinansowania
-src/components/hero.tsx
-src/components/page-header.tsx
+src/app/(site)/layout.tsx        # Header + relative(FundingLogos overlay + main) + Footer
+src/components/header.tsx        # Sticky nav (zawsze granat #001F3F)
+src/components/funding-logos.tsx # Overlay UE / KPO / PO RYBY (v3)
+src/components/footer.tsx        # Stopka BEZ logów dofinansowania
+src/components/hero.tsx          # pt-32/pt-36 — miejsce na belkę
+src/components/page-header.tsx   # pt-20/pt-24 — miejsce na belkę
 src/components/section-heading.tsx
-src/lib/content.ts            # company, assets, copy
+src/lib/content.ts               # company, assets.euLogos, copy
 ```
-
 ---
 
 ## Etap 1 (przypomnienie)
@@ -427,12 +452,29 @@ Analogia VBA: `DoCmd.OutputTo acOutputReport, , acFormatPDF` + `DoCmd.SendObject
 
 ## Szybki start dla GrokWeb (kolejna sesja)
 
-1. **Repo:** `akwen-web` · branch `master` · produkcja https://akwen-web.vercel.app  
+1. **Repo:** `akwen-web` · `master` @ `723ba71` · https://akwen-web.vercel.app  
 2. **Nie dotykać** `cmkw-patient-portal/` (osobny projekt; wykluczony z buildu)  
-3. **Loga dofinansowania:** `funding-logos.tsx` + layout `(site)` — **u góry**, ciemny glass, nie stopka, nie biały pasek  
+3. **FundingLogos v3:** overlay `absolute` nad `main` — subtelny gradient, małe kafelki `white/80`; **nie** solid navy, **nie** biały pasek, **nie** stopka  
 4. **B2B:** Auth.js + localStorage per user; dane z `public/data/produkty.xlsx`  
-5. **Deploy:** `git push origin master` i/lub `npx vercel --prod --yes` (z katalogu akwen-web)  
-6. **Język:** polski; wyjaśnienia z analogiami Excel/VBA jeśli pomaga  
+5. **Deploy:** `git push origin master` i/lub `npx vercel --prod --yes` (katalog akwen-web)  
+6. **Język:** polski; analogie Excel/VBA gdy pomaga  
+
+### Wklejka kontekstowa (krótka)
+
+```
+akwen-web · https://akwen-web.vercel.app · master · 723ba71
+
+FundingLogos (wymóg prawny, strona publiczna):
+- Plik: src/components/funding-logos.tsx
+- Layout: (site)/layout — absolute overlay nad main (hero prześwieca)
+- Loga: UE (loga-ue.png), KPO (logo-kpo.png), PO RYBY (po-ryby.png)
+- Styl v3: gradient rgba(0,20,40,0.32→0), kafelki bg-white/80, h-7–h-9
+- NIE: stopka, biały full-width pasek, solid #001F3F na belce, mocny blur
+- NIE ruszać: cmkw-patient-portal
+
+B2B: Auth.js, localStorage, Excel produkty — osobny layout bez FundingLogos.
+```
+
 
 ---
 

@@ -24,7 +24,8 @@ export function Hero() {
       <div className="absolute inset-0 bg-gradient-to-r from-navy-950/88 via-navy-900/55 to-transparent" />
       <div className="absolute inset-0 bg-gradient-to-t from-navy-950/50 via-transparent to-navy-950/15" />
 
-      <div className="relative z-10 mx-auto w-full max-w-6xl px-5 py-28 sm:px-8 sm:py-32 lg:px-10">
+      {/* pt większe u góry — miejsce na belkę logotypów (absolute) */}
+      <div className="relative z-10 mx-auto w-full max-w-6xl px-5 pt-32 pb-28 sm:px-8 sm:pt-36 sm:pb-32 lg:px-10">
         <motion.div
           className="max-w-2xl text-left"
           initial={{ opacity: 0, y: 28 }}

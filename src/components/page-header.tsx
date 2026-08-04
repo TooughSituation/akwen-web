@@ -11,7 +11,8 @@ export function PageHeader({
 }) {
   return (
     <div className="relative maritime-gradient text-white">
-      <div className="mx-auto max-w-6xl px-4 py-14 sm:px-6 sm:py-16 lg:px-8">
+      {/* pt większe — miejsce na belkę logotypów (absolute) */}
+      <div className="mx-auto max-w-6xl px-4 pt-20 pb-14 sm:px-6 sm:pt-24 sm:pb-16 lg:px-8">
         {label && (
           <p className="font-display mb-3 text-xs font-medium tracking-[0.2em] text-turquoise-300 uppercase sm:text-sm">
             {label}

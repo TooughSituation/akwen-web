@@ -10,8 +10,11 @@ export default function SiteLayout({
   return (
     <div className="flex min-h-screen flex-col">
       <Header />
-      <FundingLogos />
-      <main className="flex-1">{children}</main>
+      {/* FundingLogos absolute nad treścią — hero / page header prześwieca pod belką */}
+      <div className="relative flex-1">
+        <FundingLogos />
+        <main>{children}</main>
+      </div>
       <Footer />
     </div>
   );

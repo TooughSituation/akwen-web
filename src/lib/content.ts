@@ -140,9 +140,9 @@ export const awards = [
     alt: "Orzeł Dystrybucji FMCG",
   },
   {
-    label: "KPO – Krajowy Plan Odbudowy",
+    label: "Polska Grupa Rybna",
     image: assets.awards.kpo,
-    alt: "Krajowy Plan Odbudowy",
+    alt: "Polska Grupa Rybna",
   },
   {
     label: "PO RYBY 2007–2013",

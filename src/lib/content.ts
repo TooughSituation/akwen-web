@@ -21,9 +21,10 @@ export const assets = {
     poRyby: "/images/po-ryby.png",
   },
   euLogos: {
-    ue: "/images/loga-ue.png",
-    kpo: "/images/logo-kpo.png",
-    poRyby: "/images/po-ryby.png",
+    /** Oficjalny pasek KPO + NextGenerationEU (z dokumentu projektu) */
+    kpo: "/images/funding-kpo.png",
+    rp: "/images/funding-rp.png",
+    ngeu: "/images/funding-ngeu.png",
   },
 } as const;
 

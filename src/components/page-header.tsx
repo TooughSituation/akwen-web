@@ -18,11 +18,12 @@ export function PageHeader({
             {label}
           </p>
         )}
-        <h1 className="font-heading text-3xl font-semibold tracking-[-0.02em] sm:text-4xl lg:text-5xl lg:leading-[1.12]">
+        {/* text-white jawnie — base h1 ma color: var(--foreground) i nie dziedziczy z rodzica */}
+        <h1 className="font-heading text-3xl font-semibold tracking-[-0.02em] text-white sm:text-4xl lg:text-5xl lg:leading-[1.12]">
           {title}
         </h1>
         {description && (
-          <p className="mt-4 max-w-2xl text-base leading-[1.8] text-ocean-100/95 sm:text-lg sm:leading-[1.75]">
+          <p className="mt-4 max-w-2xl text-base leading-[1.8] text-white/90 sm:text-lg sm:leading-[1.75]">
             {description}
           </p>
         )}

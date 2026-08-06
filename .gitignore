@@ -43,6 +43,8 @@ next-env.d.ts
 # local dev / IDE
 /terminals
 
-# Separate project (own GitHub repo)
+# Osobne projekty / lokalne artefakty (nie część repo akwen-web)
+# cmkw-patient-portal ma własne repo: github.com/TooughSituation/cmkw-patient-portal
 cmkw-patient-portal/
+mcps/
 

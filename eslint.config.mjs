@@ -18,6 +18,10 @@ const eslintConfig = [
       "out/**",
       "build/**",
       "next-env.d.ts",
+      // Osobne projekty / lokalne artefakty — nie lintować z akwen-web
+      "cmkw-patient-portal/**",
+      "mcps/**",
+      "terminals/**",
     ],
   },
 ];

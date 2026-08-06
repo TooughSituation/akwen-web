@@ -27,17 +27,21 @@
 
 ## ⚠️ Ważne — izolacja projektów
 
-| Projekt | Repo / folder | Uwaga |
-|---------|----------------|-------|
-| **akwen-web** | ten repo (`master`) | Jedyny cel deployu Vercel `akwen-web` |
-| **cmkw-patient-portal** | osobne repo (folder lokalnie w katalogu roboczym) | **Nie edytować** w kontekście Akwen |
+| Projekt | GitHub | Vercel | Lokalnie |
+|---------|--------|--------|----------|
+| **akwen-web** | `TooughSituation/akwen-web` · branch `master` | `toough-situation/akwen-web` | `C:\Users\user\akwen-web` |
+| **cmkw-patient-portal** | `TooughSituation/cmkw-patient-portal` · branch `main` | `toough-situation/cmkw-patient-portal` | `C:\Users\user\cmkw-patient-portal` (sibling, **nie** podfolder Akwen) |
 
-Lokalnie folder `cmkw-patient-portal/` może leżeć obok plików Akwen — ma własne `.git`.  
-Żeby nie psuł buildu Akwen:
+Projekty są **w pełni odseparowane**: osobne repo, osobne Vercel, osobne `package.json` / `.env` / `node_modules`.  
+Brak wspólnych importów, zależności i konfiguracji.  
+`cmkw-patient-portal` **nie** jest submodulem ani częścią tree akwen-web.
+
+Zabezpieczenia (gdyby folder wrócił lokalnie pod Akwen):
 
 - `.gitignore` → `cmkw-patient-portal/`
 - `.vercelignore` → `cmkw-patient-portal/`
 - `tsconfig.json` → `exclude: ["cmkw-patient-portal", "mcps"]`
+- `eslint.config.mjs` → `ignores: ["cmkw-patient-portal/**", …]`
 
 ---
 
@@ -153,14 +157,14 @@ Uwaga: `loga-ue.png` to **złożony strip** (UE + PO RYBY); `po-ryby.png` to dru
 
 - Branch: `master` @ `723ba71`  
 - Produkcja: **https://akwen-web.vercel.app** (Vercel Ready)  
-- **Nie deployować / nie edytować** `cmkw-patient-portal`
+- **Nie deployować / nie edytować** `cmkw-patient-portal` (osobny sibling: `C:\Users\user\cmkw-patient-portal`)
 
 ### Czego NIE ruszać
 
 - Reszty treści strony (sekcje poniżej hero, B2B)
 - Nagrody w „O nas” na homepage (osobne badge, nie belka prawna)
 - Layoutu portalu B2B
-- Projektu **cmkw-patient-portal**
+- Projektu **cmkw-patient-portal** (poza workspace Akwen)
 
 ---
 
@@ -452,8 +456,8 @@ Analogia VBA: `DoCmd.OutputTo acOutputReport, , acFormatPDF` + `DoCmd.SendObject
 
 ## Szybki start dla GrokWeb (kolejna sesja)
 
-1. **Repo:** `akwen-web` · `master` @ `723ba71` · https://akwen-web.vercel.app  
-2. **Nie dotykać** `cmkw-patient-portal/` (osobny projekt; wykluczony z buildu)  
+1. **Repo:** `akwen-web` · `master` · https://akwen-web.vercel.app  
+2. **Nie dotykać** `cmkw-patient-portal` (osobny projekt: `C:\Users\user\cmkw-patient-portal`, własne repo + Vercel)  
 3. **FundingLogos v3:** overlay `absolute` nad `main` — subtelny gradient, małe kafelki `white/80`; **nie** solid navy, **nie** biały pasek, **nie** stopka  
 4. **B2B:** Auth.js + localStorage per user; dane z `public/data/produkty.xlsx`  
 5. **Deploy:** `git push origin master` i/lub `npx vercel --prod --yes` (katalog akwen-web)  
@@ -470,7 +474,7 @@ FundingLogos (wymóg prawny, strona publiczna):
 - Loga: UE (loga-ue.png), KPO (logo-kpo.png), PO RYBY (po-ryby.png)
 - Styl v3: gradient rgba(0,20,40,0.32→0), kafelki bg-white/80, h-7–h-9
 - NIE: stopka, biały full-width pasek, solid #001F3F na belce, mocny blur
-- NIE ruszać: cmkw-patient-portal
+- NIE ruszać: cmkw-patient-portal (sibling C:\Users\user\cmkw-patient-portal)
 
 B2B: Auth.js, localStorage, Excel produkty — osobny layout bez FundingLogos.
 ```
